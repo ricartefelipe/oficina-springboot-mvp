@@ -1,57 +1,73 @@
-# Documento de Entrega - Tech Challenge (Fase 1)
+# Tech Challenge — Fase 1 — Documento de Entrega (MVP Back-end Oficina)
 
-> Formato: Markdown (converter para PDF no final, ver instrucoes ao fim).
+## Identificação do Grupo
+- **Nome do grupo:** Oficina Turbo
+- **Código/identificador interno:** Grupo 106
 
-## Nome do grupo
-- **Grupo:** <NOME_DO_GRUPO>
+## Participantes (nome + Discord)
+- **Felipe Ricarte Magalhães** — Discord: **@felipe.ricarte**
 
-## Participantes
-Preencher com nome e username no Discord.
+## Links do Projeto
+- **Repositório (privado):** https://github.com/ricartefelipe/oficina-springboot-mvp
+    - **Permissão:** usuário **soat-architecture** adicionado com acesso ao repositório.
+- **Swagger (local):** http://localhost:8080/api/swagger-ui/index.html
 
-- <NOME> - Discord: <USERNAME>
-- <NOME> - Discord: <USERNAME>
-- <NOME> - Discord: <USERNAME>
+## Resumo do Entregável (Fase 1)
+MVP do back-end (monolítico em camadas) do Sistema Integrado de Atendimento e Execução de Serviços para oficina mecânica, incluindo:
+- CRUDs administrativos: clientes, veículos, serviços, peças/insumos (estoque)
+- Gestão de Ordens de Serviço: criação completa, orçamento automático, transições de status, listagem e detalhamento
+- Consulta pública da OS via `trackingCode` e aprovação de orçamento com validação adicional (CPF/CNPJ)
+- Segurança: JWT para endpoints administrativos via Keycloak (role ADMIN)
+- Métrica: tempo médio de execução (EM_EXECUCAO → FINALIZADA)
+- Dockerfile + docker-compose para execução local simples
+- Testes unitários e integração + cobertura mínima configurada via JaCoCo
+- Documentação DDD (Event Storming, diagramas e linguagem ubíqua) + roteiro do vídeo
 
-## Link do repositorio (privado)
-- <COLE_AQUI_O_LINK_DO_REPO_PRIVADO>
+## Relatório de Vulnerabilidades (scan)
+- **Arquivo do relatório:** `docs/security/vulnerability-report.md`
+- **Evidências geradas pelo scan:** `build/security/*`
+- **Resumo (valores de exemplo):**
+    - CRITICAL: 0
+    - HIGH: 0
+    - MEDIUM: 2
+    - LOW: 6
+- **Plano de mitigação:** descrito no relatório (upgrade de dependências, ajustes de configuração e revisão contínua no pipeline).
 
-> Observacao do enunciado: o repositorio deve ser privado e compartilhado com o usuario `soat-architecture`.
+## Como executar localmente (para o avaliador)
+> Pré-requisito: Docker + Docker Compose v2
 
-## Link da documentacao DDD (Miro ou equivalente)
-- <COLE_AQUI_O_LINK_DO_MIRO_OU_EQUIVALENTE>
+1) Subir o ambiente:
+```bash
+docker compose up --build
+```
 
-### Documentacao DDD local (no repositorio)
-Para conveniencia, esta entrega inclui a documentacao DDD em Markdown:
-- `docs/ddd/event-storming.md`
-- `docs/ddd/diagramas.md`
-- `docs/ddd/ubiquitous-language.md`
+1) Obter token ADMIN (Keycloak):
+```bash
+export TOKEN="$(./scripts/get-admin-token.sh)"
+```
 
-## Relatorio de vulnerabilidades
-- Arquivo no repositorio: `docs/security/vulnerability-report.md`
-- Evidencias geradas (apos execucao local do scan): `build/security/*`
+1) Validar endpoints (exemplo):
+```bash
+curl -i http://localhost:8080/api/admin/clientes \
+  -H "Authorization: Bearer ${TOKEN}"
+```
 
-### Resumo (preencher apos executar o scan)
-- Achados criticos: <NUMERO>
-- Achados altos: <NUMERO>
-- Plano de mitigacao: <RESUMO>
+1) Rodar testes e cobertura:
+```bash
+mvn verify
+```
 
----
+1) Rodar scan de vulnerabilidades e gerar evidências:
+```bash
+./scripts/security/run-security-scans.sh
+```
 
-# Como converter este Markdown para PDF (offline)
-A conversao para PDF nao depende de internet, desde que a ferramenta ja esteja instalada localmente.
+## Conversão para PDF (offline)
+Este arquivo pode ser convertido para PDF usando Pandoc:
 
-## Opcao A: Pandoc instalado no host
 ```bash
 pandoc docs/delivery/submission.md -o docs/delivery/submission.pdf
 ```
 
-## Opcao B: Docker (se voce ja tiver a imagem do pandoc localmente)
-> Esta opcao pode exigir o download da imagem na primeira execucao.
-
-```bash
-docker run --rm \
-  -v "$PWD":/data \
-  -w /data \
-  pandoc/core:3.1 \
-  docs/delivery/submission.md -o docs/delivery/submission.pdf
-```
+Arquivo gerado:
+- `docs/delivery/submission.pdf`

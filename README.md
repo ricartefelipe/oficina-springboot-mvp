@@ -1,285 +1,124 @@
-# Oficina Service (MVP - Fase 1) - Spring Boot
+# Oficina Service — Tech Challenge (Fase 1) — MVP Back-end (Spring Boot)
 
-MVP back-end monolitico (arquitetura em camadas) do **Sistema Integrado de Atendimento e Execucao de Servicos** para uma oficina mecanica.
+MVP do **back-end monolítico** (arquitetura em camadas) do *Sistema Integrado de Atendimento e Execução de Serviços* para uma oficina mecânica.
 
-Este repositorio atende aos requisitos de:
-- APIs REST documentadas (Swagger/OpenAPI)
-- Persistencia em PostgreSQL
-- Migrations via Liquibase (YAML)
-- CRUDs administrativos: clientes, veiculos, servicos, pecas/insumos (com estoque)
-- Gestao de Ordens de Servico (OS): criacao, acompanhamento por status, orcamento automatico, envio para aprovacao, aprovacao do cliente, finalizacao e entrega
-- Consulta publica do cliente por trackingCode
-- Metricas: tempo medio de execucao (EM_EXECUCAO -> FINALIZADA)
-- Tratamento de erros padronizado (Problem Details) com correlation-id
-- Dockerfile + docker-compose para execucao local simples
-- Logs com correlation-id
-- **Seguranca: JWT (Keycloak) para endpoints administrativos**
+Este projeto implementa:
+- Gestão administrativa (CRUDs) de **clientes**, **veículos**, **serviços** e **peças/insumos** (com controle de estoque)
+- **Ordens de Serviço (OS)** com fluxo completo: criação, orçamento automático, envio, aprovação pelo cliente, execução e entrega
+- **Consulta pública** por `trackingCode` para acompanhamento do cliente + **aprovação** com validação adicional (CPF/CNPJ)
+- **Métrica** de tempo médio de execução (EM_EXECUCAO → FINALIZADA)
+- **Swagger/OpenAPI**
+- **Autenticação JWT** para endpoints administrativos via **Keycloak**
+- **Liquibase (YAML)** para migrations + seed mínima
+- **Dockerfile + docker-compose** (ambiente completo)
+- **Testes unitários e integração** + **JaCoCo** com cobertura mínima nos domínios críticos
+- **Documentação DDD** (Event Storming, Diagramas, Linguagem Ubíqua) + roteiro do vídeo
+- **Relatório de vulnerabilidades** (scan de dependências + container + filesystem) com evidências
+- **Documento de submissão** (Markdown pronto para PDF)
 
-## Stack
-- Java 21
-- Spring Boot 3
-- Spring MVC + Jackson
-- Spring Security (OAuth2 Resource Server / JWT)
-- PostgreSQL
-- Liquibase (YAML)
-- Swagger/OpenAPI (springdoc)
-- Keycloak (emissor JWT/admin)
+> Requisitos e entregáveis conforme o enunciado do Tech Challenge Fase 1.
 
-## Subir o ambiente local (Docker)
-Requisito: Docker + Docker Compose v2
+---
 
+## Sumário
+- [1. Stack e decisões técnicas](#1-stack-e-decisões-técnicas)
+- [2. Arquitetura e DDD (monólito com bounded contexts)](#2-arquitetura-e-ddd-monólito-com-bounded-contexts)
+- [3. Status da OS e regras principais](#3-status-da-os-e-regras-principais)
+- [4. Como rodar localmente (1 comando)](#4-como-rodar-localmente-1-comando)
+- [5. URLs importantes](#5-urls-importantes)
+- [6. Autenticação (JWT/Keycloak) e role ADMIN](#6-autenticação-jwtkeycloak-e-role-admin)
+- [7. Exemplos de uso (cURL)](#7-exemplos-de-uso-curl)
+- [8. Testes e cobertura (JaCoCo >= 80% domínios críticos)](#8-testes-e-cobertura-jacoco--80-domínios-críticos)
+- [9. Scans de vulnerabilidades (evidências)](#9-scans-de-vulnerabilidades-evidências)
+- [10. Documentação DDD e roteiro do vídeo](#10-documentação-ddd-e-roteiro-do-vídeo)
+- [11. Documento de submissão (PDF)](#11-documento-de-submissão-pdf)
+- [12. Entregas por fase (Partes 1 a 7)](#12-entregas-por-fase-partes-1-a-7)
+- [13. Observabilidade e logs](#13-observabilidade-e-logs)
+- [14. Troubleshooting](#14-troubleshooting)
+
+---
+
+## 1. Stack e decisões técnicas
+
+### Stack
+- **Java 21**
+- **Spring Boot 3** (REST, Validation, Security)
+- **PostgreSQL**
+- **Liquibase (YAML)**
+- **OpenAPI/Swagger** (springdoc)
+- **JWT** (Keycloak)
+- **Testes**: JUnit 5 + Spring Boot Test + Testcontainers (PostgreSQL) + JaCoCo
+- **Docker**: Dockerfile multi-stage + docker-compose
+
+### Decisão: PostgreSQL (justificativa)
+- ACID e consistência fortes (fluxos de OS, histórico, estoque)
+- Constraints/índices maduros e ótima integração com JPA/Liquibase
+- Fácil execução local via docker-compose e confiável para cenários transacionais
+
+### Decisão: JWT via Keycloak (justificativa)
+- Emissão e validação JWT padronizadas (OIDC), roles e expiração
+- Reprodutível no docker-compose via import de realm
+- Endpoints administrativos exigem JWT + role `ADMIN`
+- Endpoints públicos do cliente ficam em `/api/public/**` e usam mecanismo seguro de acesso via `trackingCode` + validação adicional (CPF/CNPJ) para aprovação
+
+---
+
+## 2. Arquitetura e DDD (monólito com bounded contexts)
+
+Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pragmático), reduzindo acoplamento e mantendo clareza do domínio.
+
+### Bounded Contexts (pacotes)
+- `br.com.oficina.cadastros`
+  - Cliente (VO: CPF/CNPJ)
+  - Veículo (VO: Placa)
+- `br.com.oficina.catalogo`
+  - Catálogo de Serviços (preço, tempo estimado)
+  - Peças/Insumos (preço, estoque)
+- `br.com.oficina.ordemservico`
+  - `OrdemServico` como **Aggregate Root**
+  - Itens de serviços e itens de peças
+  - Transições de status (timestamps)
+- `br.com.oficina.shared`
+  - correlação (`X-Correlation-Id`), erros padronizados, validações, utilitários
+
+---
+
+## 3. Status da OS e regras principais
+
+### Status obrigatórios
+- `RECEBIDA`
+- `EM_DIAGNOSTICO`
+- `AGUARDANDO_APROVACAO`
+- `EM_EXECUCAO`
+- `FINALIZADA`
+- `ENTREGUE`
+
+### Regras (MVP)
+- Criar OS:
+  - identifica cliente por CPF/CNPJ (cria se não existir)
+  - cadastra/associa veículo (placa, marca, modelo, ano)
+  - adiciona serviços e peças/insumos
+  - gera orçamento automaticamente (serviços + peças)
+  - gera `trackingCode` para o cliente
+- Ações administrativas:
+  - iniciar diagnóstico → `EM_DIAGNOSTICO`
+  - enviar orçamento → `AGUARDANDO_APROVACAO`
+  - finalizar execução → `FINALIZADA`
+  - registrar entrega → `ENTREGUE`
+- Ação do cliente:
+  - aprovar orçamento via endpoint público (exige CPF/CNPJ) → `EM_EXECUCAO`
+  - ao entrar em `EM_EXECUCAO` decrementa estoque das peças usadas (falha se insuficiente)
+- Métrica:
+  - tempo médio execução = média(`FINALIZADA.at - EM_EXECUCAO.at`)
+
+---
+
+## 4. Como rodar localmente (1 comando)
+
+### Pré-requisitos
+- Docker + Docker Compose v2
+- (Opcional) Maven + JDK 21 para rodar fora do container
+
+### Subir tudo
 ```bash
 docker compose up --build
-```
-
-### Seed minima
-Ao subir pela primeira vez, o Liquibase cria o schema e aplica seed minima de **servicos** e **pecas/insumos** (catalogos) para demonstracao.
-
-IDs seed (fixos) estao em `/docs/assumptions.md`.
-
-### URLs
-- App (base): http://localhost:8080/api
-- Swagger UI: http://localhost:8080/api/swagger-ui
-- OpenAPI JSON: http://localhost:8080/api/openapi
-- Actuator health: http://localhost:8080/api/actuator/health
-- Keycloak: http://localhost:8180
-
-## Seguranca (JWT) - Admin
-
-### Regras
-- **Publico (cliente):** `/api/public/**` (nao exige JWT)
-- **Administrativo:** `/api/admin/**` exige **JWT valido** e role **ADMIN**
-- **Negar por padrao:** qualquer outra rota nao listada acima e negada (HTTP 403/401 conforme o caso)
-
-### Credenciais DEV (Keycloak)
-Estao em `/docs/assumptions.md`.
-
-### Obter token ADMIN (script)
-1) Garanta que o `docker compose up` esteja rodando.
-2) Em outro terminal:
-
-```bash
-./scripts/get-admin-token.sh
-```
-
-Para salvar em variavel:
-
-```bash
-export TOKEN="$(./scripts/get-admin-token.sh)"
-```
-
-### Obter token ADMIN (curl manual)
-```bash
-curl -sS -X POST "http://localhost:8180/realms/oficina/protocol/openid-connect/token" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=password" \
-  -d "client_id=oficina-api" \
-  -d "username=admin" \
-  -d "password=admin"
-```
-
-### Chamar endpoint admin com JWT
-```bash
-export TOKEN="$(./scripts/get-admin-token.sh)"
-
-curl -sS "http://localhost:8080/api/admin/clientes" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Accept: application/json"
-```
-
-> Observacao sobre issuer (Keycloak): dependendo de como o token foi obtido, o `iss` pode variar (ex.: `http://localhost:8180/...` vs `http://keycloak:8080/...`).
-> Para manter o ambiente reprodutivel no docker-compose, o recurso-server valida contra uma **lista de issuers permitidos** (configuravel via `JWT_ALLOWED_ISSUERS`).
-
-## Endpoints (Fase 1)
-Base path: `/api`
-
-### Admin (protegido por JWT/role ADMIN)
-- Clientes:
-  - `POST /admin/clientes`
-  - `GET /admin/clientes`
-  - `GET /admin/clientes/{id}`
-  - `PUT /admin/clientes/{id}`
-  - `DELETE /admin/clientes/{id}`
-
-- Veiculos:
-  - `POST /admin/veiculos`
-  - `GET /admin/veiculos`
-  - `GET /admin/veiculos/{id}`
-  - `PUT /admin/veiculos/{id}`
-  - `DELETE /admin/veiculos/{id}`
-
-- Servicos (catalogo):
-  - `POST /admin/servicos`
-  - `GET /admin/servicos`
-  - `GET /admin/servicos/{id}`
-  - `PUT /admin/servicos/{id}`
-  - `DELETE /admin/servicos/{id}`
-
-- Pecas/Insumos (com estoque):
-  - `POST /admin/pecas`
-  - `GET /admin/pecas`
-  - `GET /admin/pecas/{id}`
-  - `PUT /admin/pecas/{id}`
-  - `DELETE /admin/pecas/{id}`
-
-- Ordens de Servico:
-  - `POST /admin/ordens-servico` (cria OS completa: cliente + veiculo + itens)
-  - `GET /admin/ordens-servico` (filtros: `status`, `placa`, `cpfCnpj`, `from`, `to`)
-  - `GET /admin/ordens-servico/{id}`
-  - `POST /admin/ordens-servico/{id}/diagnostico/iniciar`
-  - `POST /admin/ordens-servico/{id}/orcamento/enviar`
-  - `POST /admin/ordens-servico/{id}/execucao/finalizar`
-  - `POST /admin/ordens-servico/{id}/entrega/registrar`
-
-- Metricas:
-  - `GET /admin/metricas/tempo-medio-execucao?from=&to=`
-
-### Public (cliente)
-- `GET /public/ordens-servico/{trackingCode}`
-- `POST /public/ordens-servico/{trackingCode}/aprovar` (body: `{ "cpfCnpj": "..." }`)
-
-## Exemplos de curl
-
-### Criar OS (admin) com JWT
-Usando seeds do catalogo (IDs em `/docs/assumptions.md`):
-
-```bash
-export TOKEN="$(./scripts/get-admin-token.sh)"
-
-curl -sS -X POST "http://localhost:8080/api/admin/ordens-servico" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cliente": {"nome": "Joao da Silva", "cpfCnpj": "39053344705"},
-    "veiculo": {"placa": "ABC1D23", "marca": "VW", "modelo": "Gol", "ano": 2018},
-    "servicos": [
-      {"servicoId": "11111111-1111-1111-1111-111111111111", "quantidade": 1}
-    ],
-    "pecas": [
-      {"pecaId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "quantidade": 4}
-    ]
-  }'
-```
-
-### Fluxo de status (admin) com JWT
-```bash
-export TOKEN="$(./scripts/get-admin-token.sh)"
-
-# iniciar diagnostico
-curl -sS -X POST "http://localhost:8080/api/admin/ordens-servico/<OS_ID>/diagnostico/iniciar" \
-  -H "Authorization: Bearer ${TOKEN}"
-
-# enviar orcamento
-curl -sS -X POST "http://localhost:8080/api/admin/ordens-servico/<OS_ID>/orcamento/enviar" \
-  -H "Authorization: Bearer ${TOKEN}"
-
-# finalizar execucao
-curl -sS -X POST "http://localhost:8080/api/admin/ordens-servico/<OS_ID>/execucao/finalizar" \
-  -H "Authorization: Bearer ${TOKEN}"
-
-# registrar entrega
-curl -sS -X POST "http://localhost:8080/api/admin/ordens-servico/<OS_ID>/entrega/registrar" \
-  -H "Authorization: Bearer ${TOKEN}"
-```
-
-### Consulta publica (cliente)
-```bash
-curl -sS "http://localhost:8080/api/public/ordens-servico/<TRACKING_CODE>"
-```
-
-### Aprovar orcamento (cliente)
-Ao aprovar, o sistema entra em `EM_EXECUCAO` e decrementa o estoque das pecas da OS (falha se insuficiente).
-
-```bash
-curl -sS -X POST "http://localhost:8080/api/public/ordens-servico/<TRACKING_CODE>/aprovar" \
-  -H "Content-Type: application/json" \
-  -d '{"cpfCnpj":"39053344705"}'
-```
-
-## Tratamento de erros
-O sistema retorna erros no formato **Problem Details** (Spring `ProblemDetail`), incluindo:
-- `correlationId` (para rastreabilidade)
-- `path`
-- detalhes de validacao quando aplicavel
-
-Para autenticacao/autorizacao (401/403), o projeto retorna `application/problem+json` com `correlationId`.
-
-## Como rodar testes (sem instalar Maven localmente)
-### Pre-requisitos
-- Para **testes unitarios e integracao**, o projeto usa **Testcontainers (PostgreSQL)**.
-- Portanto, os testes exigem um **Docker daemon** acessivel (Docker Desktop ou Docker Engine).
-
-### Rodar testes
-```bash
-mvn -q test
-```
-
-### Rodar com cobertura (JaCoCo) e validar minimo >= 80% nos dominios criticos
-```bash
-mvn -q verify
-```
-
-Relatorio JaCoCo (HTML): `target/site/jacoco/index.html`.
-
-#### Regra de cobertura aplicada
-A regra de cobertura minima (80%) e aplicada **somente** aos pacotes de dominio (`br/com/oficina/**/domain/**`).
-Isso evita que camadas de API/infrastrutura (controllers, mapeamentos, configs) distorcam a medicao do core.
-
-### Rodar Maven via Docker (opcional)
-Se voce preferir rodar Maven dentro de um container, e necessario montar o socket do Docker para que o Testcontainers funcione:
-
-```bash
-docker run --rm \
-  -v "$PWD":/workspace -w /workspace \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  maven:3.9.8-eclipse-temurin-21 mvn -q test
-```
-
-## Observabilidade (Correlation-Id)
-- Header de entrada: `X-Correlation-Id` (opcional)
-- Header de saida: `X-Correlation-Id`
-- MDC: `correlationId`
-
-## Relatorio de vulnerabilidades (scan)
-Este repositorio inclui um fluxo reprodutivel para gerar o relatorio de vulnerabilidades exigido na Fase 1.
-
-1) Executar:
-```bash
-./scripts/security/run-security-scans.sh
-```
-
-2) Evidencias geradas em:
-- `build/security/dependency-check/*`
-- `build/security/trivy-fs.*`
-- `build/security/trivy-image.*`
-
-3) Atualize o resumo em:
-- `docs/security/vulnerability-report.md`
-
-> Pre-requisito: Docker no host. Na primeira execucao, as ferramentas podem baixar bases/imagens.
-
-## Documento de entrega (PDF)
-O arquivo de submissao esta em `docs/delivery/submission.md`.
-
-Para converter para PDF (Pandoc):
-```bash
-pandoc docs/delivery/submission.md -o docs/delivery/submission.pdf
-```
-
-(ou ver instrucoes completas no proprio arquivo).
-
-## Entregas por partes
-- Parte 1-4: Base do projeto, dominios, APIs e seguranca JWT (Keycloak)
-- Parte 5: Testes unitarios/integracao + cobertura (JaCoCo) >= 80% nos dominios criticos
-- Parte 6: Documentacao DDD completa em `/docs/ddd` e roteiro em `/docs/video-script.md`
-- Parte 7: Relatorio de vulnerabilidades + documento de entrega (PDF)
-
-
-## Troubleshooting
-- Se a porta 8080 ou 8180 estiver ocupada, ajuste o `docker-compose.yml`.
-- Se quiser rodar o app fora do container (modo local), o Postgres do compose fica exposto em `localhost:5433`.
-
-## Banco e migrations
-- PostgreSQL via docker-compose
-- Liquibase (YAML) aplicado no startup
-- Seed minima de catalogo (servicos/pecas) via migration (ver /docs/assumptions.md)
