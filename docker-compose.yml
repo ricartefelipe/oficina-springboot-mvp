@@ -72,6 +72,10 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/oficina
       DB_USER: oficina
       DB_PASS: oficina
+
+      # JWT (Keycloak)
+      JWT_JWK_SET_URI: http://keycloak:8080/realms/oficina/protocol/openid-connect/certs
+      JWT_ALLOWED_ISSUERS: http://localhost:8180/realms/oficina,http://keycloak:8080/realms/oficina
     ports:
       - "8080:8080"
 
