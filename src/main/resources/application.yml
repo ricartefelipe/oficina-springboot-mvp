@@ -21,6 +21,15 @@ spring:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+# JWT Resource Server
+# - O aplicativo busca as chaves publicas (JWK Set) no Keycloak.
+# - O "issuer" do token pode variar dependendo de como o token foi obtido (localhost vs. rede docker).
+#   Por isso, validamos contra uma lista de issuers permitidos.
+security:
+  jwt:
+    jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8180/realms/oficina/protocol/openid-connect/certs}
+    allowed-issuers: ${JWT_ALLOWED_ISSUERS:http://localhost:8180/realms/oficina}
+
 management:
   endpoints:
     web:
