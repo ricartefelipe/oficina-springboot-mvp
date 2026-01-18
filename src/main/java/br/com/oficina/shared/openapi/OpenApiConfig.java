@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,10 +20,7 @@ import org.springframework.context.annotation.Configuration;
                 version = "0.1.0",
                 description = "MVP back-end do Sistema Integrado de Atendimento e Execucao de Servicos (Oficina).",
                 contact = @Contact(name = "Equipe (definir em /docs/delivery/submission.md)")
-        ),
-        security = {
-                @SecurityRequirement(name = "bearerAuth")
-        }
+        )
 )
 public class OpenApiConfig {
 }

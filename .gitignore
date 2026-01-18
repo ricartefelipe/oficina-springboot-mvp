@@ -12,3 +12,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Security scan outputs
+build/security/*
+!build/security/.gitkeep

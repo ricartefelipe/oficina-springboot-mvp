@@ -3,17 +3,30 @@
 ## Objetivo
 Definir decisoes de seguranca e trade-offs do MVP, alinhado ao enunciado.
 
-## Autenticacao e Autorizacao
-- Estrategia: JWT emitido por Keycloak (OpenID Connect).
-- Papel (role) principal: `ADMIN` (realm role).
-- Endpoints administrativos: `/api/admin/**` (serao protegidos na Parte 4).
-- Endpoints publicos do cliente: `/api/public/**` (consulta de OS por trackingCode e validacao adicional sera implementada nas partes seguintes).
+## Autenticacao e Autorizacao (JWT)
+- Estrategia: **JWT** emitido por **Keycloak** (OpenID Connect).
+- Papel (realm role) principal: `ADMIN`.
+- Protecao:
+  - **Publico (cliente):** `/api/public/**` (nao exige JWT)
+  - **Administrativo:** `/api/admin/**` exige JWT valido e **ROLE_ADMIN** (mapeada a partir de `realm_access.roles`)
+  - **Negar por padrao:** qualquer outra rota nao explicitamente permitida.
 
-## Principios adotados
-- Negar por padrao para rotas administrativas.
-- Nao vazar stacktrace em producao (tratamento padronizado de erros sera feito nas proximas partes).
-- Logs com correlation-id; evitar dados sensiveis em logs (CPF/CNPJ completos, tokens, etc).
+## Validacao do token
+- O recurso-server busca chaves publicas via **JWK Set URI**.
+- Para manter o ambiente local reproduzivel no docker-compose, validamos `issuer` contra uma lista de issuers permitidos (configuravel via `JWT_ALLOWED_ISSUERS`).
+  - Motivacao: o `iss` pode variar conforme o host usado para obter o token (ex.: `http://localhost:8180/...` vs `http://keycloak:8080/...`).
+
+## Tratamento padronizado de 401/403
+- Respostas de autenticacao/autorizacao retornam **Problem Details** (`application/problem+json`) e incluem:
+  - `correlationId`
+  - `path`
+
+## Observabilidade / rastreabilidade
+- `X-Correlation-Id`:
+  - se o cliente nao enviar, o sistema gera.
+  - o header e retornado em todas as respostas, inclusive 401/403.
+- Logs incluem `correlationId` via MDC.
 
 ## Trade-offs do MVP
-- Keycloak adiciona peso ao docker-compose, mas garante emissao/roles realistas.
-- Credenciais default foram fixadas para execucao local simples; isso nao e producao.
+- Keycloak adiciona peso ao docker-compose, mas entrega um fluxo realista de JWT/roles.
+- Credenciais default e secrets sao apenas para DEV (nao producao).
