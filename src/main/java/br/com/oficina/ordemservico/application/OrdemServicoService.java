@@ -9,9 +9,10 @@ import br.com.oficina.catalogo.peca.domain.PecaInsumo;
 import br.com.oficina.catalogo.peca.infra.persistence.PecaInsumoJpaRepository;
 import br.com.oficina.catalogo.servico.application.ServicoCatalogoService;
 import br.com.oficina.catalogo.servico.domain.ServicoCatalogo;
+import br.com.oficina.ordemservico.application.port.OrdemServicoPersistencePort;
 import br.com.oficina.ordemservico.domain.OrdemServico;
+import br.com.oficina.ordemservico.domain.StatusOrdemServico;
 import br.com.oficina.ordemservico.domain.TrackingCodeGenerator;
-import br.com.oficina.ordemservico.infra.persistence.OrdemServicoJpaRepository;
 import br.com.oficina.shared.domain.BusinessRuleException;
 import br.com.oficina.shared.domain.NotFoundException;
 import br.com.oficina.shared.domain.Strings;
@@ -27,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,20 +35,20 @@ public class OrdemServicoService {
 
     private static final Logger log = LoggerFactory.getLogger(OrdemServicoService.class);
 
-    private final OrdemServicoJpaRepository osRepository;
+    private final OrdemServicoPersistencePort ordemServicoPersistence;
     private final ClienteService clienteService;
     private final VeiculoService veiculoService;
     private final ServicoCatalogoService servicoCatalogoService;
     private final PecaInsumoJpaRepository pecaRepository;
 
     public OrdemServicoService(
-            OrdemServicoJpaRepository osRepository,
+            OrdemServicoPersistencePort ordemServicoPersistence,
             ClienteService clienteService,
             VeiculoService veiculoService,
             ServicoCatalogoService servicoCatalogoService,
             PecaInsumoJpaRepository pecaRepository
     ) {
-        this.osRepository = osRepository;
+        this.ordemServicoPersistence = ordemServicoPersistence;
         this.clienteService = clienteService;
         this.veiculoService = veiculoService;
         this.servicoCatalogoService = servicoCatalogoService;
@@ -91,27 +91,27 @@ public class OrdemServicoService {
             }
         }
 
-        OrdemServico saved = osRepository.save(os);
+        OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("os_criada osId={} trackingCode={} status={} orcamentoTotal={}", saved.getId(), saved.getTrackingCode(), saved.getStatus(), saved.getOrcamentoTotal());
         return saved;
     }
 
     @Transactional(readOnly = true)
     public OrdemServico obterDetalhe(UUID id) {
-        return osRepository.findDetailedById(id)
+        return ordemServicoPersistence.findDetailedById(id)
                 .orElseThrow(() -> new NotFoundException("Ordem de Servico nao encontrada"));
     }
 
     @Transactional(readOnly = true)
     public OrdemServico obterPorTrackingCode(String trackingCode) {
         String tc = Strings.requireNonBlank(trackingCode, "trackingCode").trim().toUpperCase();
-        return osRepository.findDetailedByTrackingCode(tc)
+        return ordemServicoPersistence.findDetailedByTrackingCode(tc)
                 .orElseThrow(() -> new NotFoundException("Ordem de Servico nao encontrada"));
     }
 
     @Transactional(readOnly = true)
     public List<OrdemServico> listar(
-            br.com.oficina.ordemservico.domain.StatusOrdemServico status,
+            StatusOrdemServico status,
             String placa,
             String cpfCnpj,
             OffsetDateTime from,
@@ -121,14 +121,14 @@ public class OrdemServicoService {
         String cpfDigits = (cpfCnpj == null || cpfCnpj.isBlank()) ? null : Strings.onlyDigits(cpfCnpj);
 
         Specification<OrdemServico> spec = OrdemServicoSpecifications.filtrar(status, placaNormalized, cpfDigits, from, to);
-        return osRepository.findAll(spec);
+        return ordemServicoPersistence.findAll(spec);
     }
 
     @Transactional
     public OrdemServico iniciarDiagnostico(UUID osId) {
         OrdemServico os = obterDetalhe(osId);
         os.iniciarDiagnostico();
-        OrdemServico saved = osRepository.save(os);
+        OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("os_status_alterado osId={} status={}", saved.getId(), saved.getStatus());
         return saved;
     }
@@ -137,9 +137,7 @@ public class OrdemServicoService {
     public OrdemServico enviarOrcamento(UUID osId) {
         OrdemServico os = obterDetalhe(osId);
         os.enviarOrcamento();
-        OrdemServico saved = osRepository.save(os);
-
-        // Simulacao de envio no MVP
+        OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("orcamento_enviado osId={} trackingCode={} orcamentoTotal={}", saved.getId(), saved.getTrackingCode(), saved.getOrcamentoTotal());
         return saved;
     }
@@ -148,7 +146,7 @@ public class OrdemServicoService {
     public OrdemServico finalizarExecucao(UUID osId) {
         OrdemServico os = obterDetalhe(osId);
         os.finalizarExecucao();
-        OrdemServico saved = osRepository.save(os);
+        OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("os_status_alterado osId={} status={}", saved.getId(), saved.getStatus());
         return saved;
     }
@@ -157,26 +155,21 @@ public class OrdemServicoService {
     public OrdemServico registrarEntrega(UUID osId) {
         OrdemServico os = obterDetalhe(osId);
         os.registrarEntrega();
-        OrdemServico saved = osRepository.save(os);
+        OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("os_status_alterado osId={} status={}", saved.getId(), saved.getStatus());
         return saved;
     }
 
-    /**
-     * Aprovacao pelo cliente (public). Regra: ao entrar EM_EXECUCAO, decrementar estoque das pecas.
-     */
     @Transactional
     public OrdemServico aprovarOrcamentoPublico(String trackingCode, String cpfCnpjRaw) {
         OrdemServico os = obterPorTrackingCode(trackingCode);
 
-        // Validacao adicional: CPF/CNPJ deve casar com o cliente da OS
         CpfCnpj informado = CpfCnpj.of(cpfCnpjRaw);
         String esperado = os.getCliente().getCpfCnpj().value();
         if (!esperado.equals(informado.value())) {
             throw new BusinessRuleException("CPF/CNPJ nao confere para esta Ordem de Servico");
         }
 
-        // Decremento de estoque: agrupa por peca para evitar double-decrement em duplicidades
         Map<UUID, Integer> qtyByPeca = new HashMap<>();
         for (var item : os.getItensPeca()) {
             UUID pecaId = item.getPeca().getId();
@@ -186,7 +179,6 @@ public class OrdemServicoService {
             qtyByPeca.merge(pecaId, item.getQuantidade(), Integer::sum);
         }
 
-        // Lock pessimista para evitar corrida em estoque
         for (Map.Entry<UUID, Integer> e : qtyByPeca.entrySet()) {
             UUID pecaId = e.getKey();
             int qtd = e.getValue();
@@ -196,7 +188,7 @@ public class OrdemServicoService {
         }
 
         os.aprovarOrcamento();
-        OrdemServico saved = osRepository.save(os);
+        OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("orcamento_aprovado osId={} trackingCode={} status={}", saved.getId(), saved.getTrackingCode(), saved.getStatus());
         return saved;
     }
