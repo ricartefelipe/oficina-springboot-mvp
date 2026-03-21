@@ -22,8 +22,30 @@ jobs:
       - name: Build and test (sem integração Docker)
         run: mvn -B -Pci verify
 
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Terraform fmt (check)
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        run: terraform validate
+
   docker:
-    needs: build
+    needs: [build, terraform]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
