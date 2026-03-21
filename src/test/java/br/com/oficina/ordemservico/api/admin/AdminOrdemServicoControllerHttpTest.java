@@ -1,5 +1,6 @@
 package br.com.oficina.ordemservico.api.admin;
 
+import br.com.oficina.ordemservico.adapters.in.web.AdminOrdemServicoController;
 import br.com.oficina.shared.api.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

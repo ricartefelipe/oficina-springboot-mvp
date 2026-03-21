@@ -5,7 +5,7 @@ MVP do **back-end monolítico** (arquitetura em camadas) do *Sistema Integrado d
 Este projeto implementa:
 - Gestão administrativa (CRUDs) de **clientes**, **veículos**, **serviços** e **peças/insumos** (com controle de estoque)
 - **Ordens de Serviço (OS)** com fluxo completo: criação, orçamento automático, envio, aprovação pelo cliente, execução e entrega
-- **Consulta pública** por `trackingCode` para acompanhamento do cliente + **aprovação** com validação adicional (CPF/CNPJ)
+- **Consulta pública** por `trackingCode` para acompanhamento do cliente: `GET /api/public/ordens-servico/{trackingCode}` retorna o **status atual** da OS no campo JSON `status` (valores alinhados a `StatusOrdemServico`), além de itens e histórico; **aprovação** de orçamento com validação adicional (CPF/CNPJ)
 - **Métrica** de tempo médio de execução (EM_EXECUCAO → FINALIZADA)
 - **Swagger/OpenAPI**
 - **Autenticação JWT** para endpoints administrativos via **Keycloak**
