@@ -1,4 +1,4 @@
-package br.com.oficina.ordemservico.api.public;
+package br.com.oficina.ordemservico.api.publicapi;
 
 import br.com.oficina.ordemservico.application.OrdemServicoService;
 import br.com.oficina.ordemservico.domain.OrdemServico;
