@@ -1,6 +1,7 @@
 package br.com.oficina.ordemservico.adapters.in.web;
 
 import br.com.oficina.ordemservico.application.OrdemServicoService;
+import br.com.oficina.ordemservico.testsupport.NotificacaoOrdemServicoPortNoop;
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class AdminOrdemServicoListagemParametrosHttpTest {
         boolean ultimoIncluirEncerradas;
 
         ListarStub() {
-            super(null, null, null, null, null, null);
+            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE);
         }
 
         @Override

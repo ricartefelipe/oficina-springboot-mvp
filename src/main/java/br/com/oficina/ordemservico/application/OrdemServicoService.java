@@ -10,6 +10,7 @@ import br.com.oficina.catalogo.peca.infra.persistence.PecaInsumoJpaRepository;
 import br.com.oficina.catalogo.servico.application.ServicoCatalogoService;
 import br.com.oficina.catalogo.servico.domain.ServicoCatalogo;
 import br.com.oficina.ordemservico.adapters.out.persistence.OsOrcamentoRespostaIdempotenciaRepository;
+import br.com.oficina.ordemservico.application.port.NotificacaoOrdemServicoPort;
 import br.com.oficina.ordemservico.application.port.OrdemServicoPersistencePort;
 import br.com.oficina.ordemservico.domain.DecisaoRespostaOrcamentoExterna;
 import br.com.oficina.ordemservico.domain.OsOrcamentoRespostaIdempotencia;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Service
 public class OrdemServicoService {
@@ -46,6 +48,7 @@ public class OrdemServicoService {
     private final ServicoCatalogoService servicoCatalogoService;
     private final PecaInsumoJpaRepository pecaRepository;
     private final OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository;
+    private final NotificacaoOrdemServicoPort notificacaoOrdemServicoPort;
 
     public OrdemServicoService(
             OrdemServicoPersistencePort ordemServicoPersistence,
@@ -53,7 +56,8 @@ public class OrdemServicoService {
             VeiculoService veiculoService,
             ServicoCatalogoService servicoCatalogoService,
             PecaInsumoJpaRepository pecaRepository,
-            OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository
+            OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository,
+            NotificacaoOrdemServicoPort notificacaoOrdemServicoPort
     ) {
         this.ordemServicoPersistence = ordemServicoPersistence;
         this.clienteService = clienteService;
@@ -61,6 +65,7 @@ public class OrdemServicoService {
         this.servicoCatalogoService = servicoCatalogoService;
         this.pecaRepository = pecaRepository;
         this.orcamentoRespostaIdempotenciaRepository = orcamentoRespostaIdempotenciaRepository;
+        this.notificacaoOrdemServicoPort = notificacaoOrdemServicoPort;
     }
 
     @Transactional
@@ -159,6 +164,7 @@ public class OrdemServicoService {
         os.enviarOrcamento();
         OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("orcamento_enviado osId={} trackingCode={} orcamentoTotal={}", saved.getId(), saved.getTrackingCode(), saved.getOrcamentoTotal());
+        notificarSeguro(n -> n.aoEnviarOrcamento(saved));
         return saved;
     }
 
@@ -177,6 +183,7 @@ public class OrdemServicoService {
         os.registrarEntrega();
         OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("os_status_alterado osId={} status={}", saved.getId(), saved.getStatus());
+        notificarSeguro(n -> n.aoVeiculoEntregue(saved));
         return saved;
     }
 
@@ -233,6 +240,7 @@ public class OrdemServicoService {
         os.recusarOrcamento();
         OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("orcamento_recusado_externo osId={} trackingCode={} status={}", saved.getId(), saved.getTrackingCode(), saved.getStatus());
+        notificarSeguro(n -> n.aoOrcamentoRecusado(saved));
         return saved;
     }
 
@@ -267,7 +275,16 @@ public class OrdemServicoService {
         os.aprovarOrcamento();
         OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("orcamento_aprovado osId={} trackingCode={} status={}", saved.getId(), saved.getTrackingCode(), saved.getStatus());
+        notificarSeguro(n -> n.aoOrcamentoAprovado(saved));
         return saved;
+    }
+
+    private void notificarSeguro(Consumer<NotificacaoOrdemServicoPort> acao) {
+        try {
+            acao.accept(notificacaoOrdemServicoPort);
+        } catch (Exception e) {
+            log.warn("notificacao_ordem_servico_falhou", e);
+        }
     }
 
     public record ItemServico(UUID servicoId, int quantidade) {
