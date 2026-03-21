@@ -205,6 +205,10 @@ public class OrdemServico {
         transicionarPara(StatusOrdemServico.EM_EXECUCAO, this.aprovadoAt);
     }
 
+    public void recusarOrcamento() {
+        transicionarPara(StatusOrdemServico.CANCELADA, OffsetDateTime.now());
+    }
+
     public void finalizarExecucao() {
         transicionarPara(StatusOrdemServico.FINALIZADA, OffsetDateTime.now());
     }

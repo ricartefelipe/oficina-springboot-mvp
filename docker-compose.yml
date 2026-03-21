@@ -16,6 +16,13 @@ services:
       timeout: 5s
       retries: 20
 
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: oficina-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   keycloak-db:
     image: postgres:16-alpine
     container_name: oficina-keycloak-db
@@ -66,12 +73,18 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_started
+      mailhog:
+        condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: prod
 
       DB_URL: jdbc:postgresql://postgres:5432/oficina
       DB_USER: oficina
       DB_PASS: oficina
+
+      MAIL_HOST: mailhog
+      MAIL_PORT: "1025"
+      PUBLIC_BASE_URL: http://localhost:8080/api/public
 
       # JWT (Keycloak)
       JWT_JWK_SET_URI: http://keycloak:8080/realms/oficina/protocol/openid-connect/certs
