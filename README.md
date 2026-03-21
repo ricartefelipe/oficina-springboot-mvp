@@ -132,6 +132,8 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 docker compose up --build
 ```
 
+O compose inclui **MailHog** para desenvolvimento: interface web em `http://localhost:8025` (mensagens capturadas pelo SMTP na porta **1025**). O serviço da aplicação envia e-mails de notificação (orçamento enviado/aprovado/recusado, veículo entregue) para o destinatário configurado em `app.notification.default-recipient` (por defeito `cliente-demo@mailhog.local`). Para desligar o envio, use `NOTIFICATION_ENABLED=false`.
+
 ## Fluxo de branches (Fase 2)
 
 - [Convenções de branches e integração](docs/development/gitflow.md)
