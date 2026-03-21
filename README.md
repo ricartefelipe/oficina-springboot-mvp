@@ -79,6 +79,9 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
   - `OrdemServico` como **Aggregate Root**
   - Itens de serviços e itens de peças
   - Transições de status (timestamps)
+  - Camada de aplicação (`application`) com porta `OrdemServicoPersistencePort` e casos de uso em `OrdemServicoService` / `MetricasService`
+  - Adaptadores de entrada HTTP em `adapters.in.web` (admin e público)
+  - Persistência JPA em `adapters.out.persistence` atrás da porta (implementação `OrdemServicoPersistenceAdapter`)
 - `br.com.oficina.shared`
   - correlação (`X-Correlation-Id`), erros padronizados, validações, utilitários
 

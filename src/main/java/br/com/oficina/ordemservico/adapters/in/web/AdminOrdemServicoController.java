@@ -1,12 +1,12 @@
-package br.com.oficina.ordemservico.api.admin;
+package br.com.oficina.ordemservico.adapters.in.web;
 
+import br.com.oficina.cadastros.veiculo.domain.Veiculo;
 import br.com.oficina.ordemservico.application.OrdemServicoService;
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.domain.OrdemServicoItemPeca;
 import br.com.oficina.ordemservico.domain.OrdemServicoItemServico;
 import br.com.oficina.ordemservico.domain.OrdemServicoTransicaoStatus;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
-import br.com.oficina.cadastros.veiculo.domain.Veiculo;
 import br.com.oficina.shared.validation.ValidCpfCnpj;
 import br.com.oficina.shared.validation.ValidPlaca;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

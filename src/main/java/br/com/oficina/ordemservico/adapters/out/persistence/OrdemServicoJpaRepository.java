@@ -1,13 +1,13 @@
-package br.com.oficina.ordemservico.infra.persistence;
+package br.com.oficina.ordemservico.adapters.out.persistence;
 
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -48,11 +48,6 @@ public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, U
     })
     Optional<OrdemServico> findDetailedByTrackingCode(String trackingCode);
 
-    /**
-     * Media (em segundos) do tempo entre a transicao para EM_EXECUCAO e para FINALIZADA.
-     *
-     * Filtra por periodo usando o timestamp da transicao FINALIZADA.
-     */
     @Query(
             value = """
                     select avg(extract(epoch from (t_final.ocorrido_em - t_exec.ocorrido_em)))
