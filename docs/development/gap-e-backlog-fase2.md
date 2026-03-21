@@ -38,7 +38,7 @@
 8. **testes-ampliados**: happy path, erros, estoque, endpoints principais, idempotência — em progresso (testes HTTP 404/409 API pública + validações admin; integração Docker continua opcional local)
 9. **kubernetes**: namespace, deployment, service, ConfigMap, Secret, probes, recursos, HPA, documentação de apply e rollback — feito (`k8s/`, `k8s/README.md`)
 10. **terraform**: módulos ou stacks reproduzíveis, documentação de apply e destroy
-11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions `mvn -Pci verify` (build + testes sem Testcontainers); deploy/smoke pendente
+11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions: `mvn -Pci verify` + build/push da imagem para **GHCR** em push a `develop`/`master`; deploy/smoke pendente
 12. **ddd-visual-artifacts**: drawio, PlantUML ou Mermaid com export SVG ou PNG em `docs/ddd/`
 13. **documentacao-readme-fase2**: README, arquitetura, execução local, deploy e links exigidos pelo enunciado
 
