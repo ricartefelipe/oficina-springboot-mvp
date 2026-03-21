@@ -24,7 +24,7 @@
 | Notificação | Adapter de e-mail desacoplado do domínio; MailHog ou equivalente no compose local |
 | Testes | Ampliar integração de API, erros, transições inválidas, estoque e autenticação onde aplicável |
 | DDD | Domain Storytelling visual, Event Storming visual final, diagrama de agregados, dicionário ubíquo reforçado com sinônimos rejeitados |
-| Entrega | `/k8s`, `/infra` (Terraform), GitHub Actions com build, testes, imagem, deploy e smoke test; README alinhado à Fase 2 |
+| Entrega | `/k8s` e `/infra` (Terraform) presentes; GitHub Actions com build, testes e imagem; deploy e smoke test ainda opcionais; README em evolução para Fase 2 |
 
 ## Backlog fatiado (ordem sugerida)
 
@@ -37,7 +37,7 @@
 7. **notificacao-email-mailhog**: porta de notificação, adapter SMTP, eventos em transições relevantes, compose atualizado — feito (`NotificacaoOrdemServicoPort`, SMTP/MailHog, `NOTIFICATION_ENABLED`, `docker-compose` com MailHog)
 8. **testes-ampliados**: happy path, erros, estoque, endpoints principais, idempotência — em progresso (testes HTTP 404/409 API pública + validações admin; integração Docker continua opcional local)
 9. **kubernetes**: namespace, deployment, service, ConfigMap, Secret, probes, recursos, HPA, documentação de apply e rollback — feito (`k8s/`, `k8s/README.md`)
-10. **terraform**: módulos ou stacks reproduzíveis, documentação de apply e destroy
+10. **terraform**: módulos ou stacks reproduzíveis, documentação de apply e destroy — feito (`infra/`, módulo `network` AWS, `infra/README.md`)
 11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions: `mvn -Pci verify` + build/push da imagem para **GHCR** em push a `develop`/`master`; deploy/smoke pendente
 12. **ddd-visual-artifacts**: drawio, PlantUML ou Mermaid com export SVG ou PNG em `docs/ddd/`
 13. **documentacao-readme-fase2**: README, arquitetura, execução local, deploy e links exigidos pelo enunciado
