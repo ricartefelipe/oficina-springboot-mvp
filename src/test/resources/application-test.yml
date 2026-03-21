@@ -17,3 +17,8 @@ security:
 logging:
   level:
     root: INFO
+
+# Testes de integração: sem SMTP real
+app:
+  notification:
+    enabled: false
