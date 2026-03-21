@@ -104,6 +104,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
   - adiciona serviços e peças/insumos
   - gera orçamento automaticamente (serviços + peças)
   - gera `trackingCode` para o cliente
+  - contrato da API: com `server.servlet.context-path=/api`, a abertura é `POST /api/admin/ordens-servico`; o corpo deve ter ao menos um item em `servicos`; violações de validação respondem com HTTP 400 e Problem Details; testes em `src/test/java/br/com/oficina/ordemservico/api/admin/`
 - Ações administrativas:
   - iniciar diagnóstico → `EM_DIAGNOSTICO`
   - enviar orçamento → `AGUARDANDO_APROVACAO`
