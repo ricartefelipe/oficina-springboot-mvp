@@ -96,6 +96,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 - `EM_EXECUCAO`
 - `FINALIZADA`
 - `ENTREGUE`
+- `CANCELADA` (orçamento recusado; OS encerrada sem execução)
 
 ### Regras (MVP)
 - Criar OS:
@@ -108,6 +109,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 - Ações administrativas:
   - iniciar diagnóstico → `EM_DIAGNOSTICO`
   - enviar orçamento → `AGUARDANDO_APROVACAO`
+  - resposta externa ao orçamento (`POST /api/admin/ordens-servico/{id}/orcamento/resposta-externa`, JWT admin, cabeçalho `Idempotency-Key`, corpo `{"decisao":"APROVAR"}` ou `{"decisao":"RECUSAR"}`) → `EM_EXECUCAO` ou `CANCELADA`, com registro idempotente para reprocessamentos seguros
   - finalizar execução → `FINALIZADA`
   - registrar entrega → `ENTREGUE`
 - Ação do cliente:
