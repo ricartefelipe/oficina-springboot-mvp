@@ -138,9 +138,9 @@ O compose inclui **MailHog** para desenvolvimento: interface web em `http://loca
 
 ### CI (GitHub Actions)
 
-No repositório, o workflow em `.github/workflows/ci.yml` executa `mvn -B -Pci verify` (Java 21). O perfil Maven `ci` exclui testes que exigem Docker (Testcontainers). Para o mesmo conjunto localmente: `mvn -Pci verify`.
+No repositório, o workflow em `.github/workflows/ci.yml` executa `mvn -B -Pci verify` (Java 21), valida **Terraform** em `infra/` (`fmt -check`, `init -backend=false`, `validate`) e, em **push** a `develop`/`master`, constrói e publica a imagem Docker. O perfil Maven `ci` exclui testes que exigem Docker (Testcontainers). Para o mesmo conjunto localmente: `mvn -Pci verify`.
 
-Em cada **push** para `develop` ou `master`, após os testes passarem, a imagem é construída e publicada no **GitHub Container Registry** (`ghcr.io/<org>/<repo>`) com as tags `latest`, o nome do branch (`develop` ou `master`) e `sha-<commit completo>`. Pull requests não publicam imagem. Para puxar a imagem noutro ambiente, o pacote no GitHub pode precisar de visibilidade **pública** ou de `imagePullSecrets` se for privado.
+Em cada **push** para `develop` ou `master`, após **Maven e Terraform** passarem, a imagem é construída e publicada no **GitHub Container Registry** (`ghcr.io/<org>/<repo>`) com as tags `latest`, o nome do branch (`develop` ou `master`) e `sha-<commit completo>`. Pull requests não publicam imagem. Para puxar a imagem noutro ambiente, o pacote no GitHub pode precisar de visibilidade **pública** ou de `imagePullSecrets` se for privado.
 
 ### Kubernetes
 
