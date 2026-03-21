@@ -30,7 +30,9 @@ Inicializar (descarrega providers, prepara módulos):
 terraform init
 ```
 
-O primeiro `init` gera `.terraform.lock.hcl` com as versões exatas dos providers; em projetos de equipa convém **versionar** esse ficheiro (não está ignorado no `.gitignore`).
+O primeiro `init` gera `.terraform.lock.hcl` com as versões exatas dos providers; em projetos de equipa convém **versionar** esse ficheiro (não está ignorado no `.gitignore`). O repositório inclui o lock com checksums para **linux_amd64** e **windows_amd64**.
+
+No **GitHub Actions**, o workflow de CI executa `terraform fmt -check`, `init -backend=false` e `validate` na pasta `infra/` (sem credenciais AWS e sem `plan`/`apply`).
 
 Planejar alterações:
 
