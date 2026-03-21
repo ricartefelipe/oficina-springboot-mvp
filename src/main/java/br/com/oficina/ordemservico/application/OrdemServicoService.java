@@ -123,12 +123,24 @@ public class OrdemServicoService {
             String placa,
             String cpfCnpj,
             OffsetDateTime from,
-            OffsetDateTime to
+            OffsetDateTime to,
+            boolean incluirEncerradas
     ) {
         String placaNormalized = (placa == null || placa.isBlank()) ? null : Strings.alnumUpper(placa);
         String cpfDigits = (cpfCnpj == null || cpfCnpj.isBlank()) ? null : Strings.onlyDigits(cpfCnpj);
 
-        Specification<OrdemServico> spec = OrdemServicoSpecifications.filtrar(status, placaNormalized, cpfDigits, from, to);
+        boolean excluirEncerradas = status == null && !incluirEncerradas;
+        OrdemServicoListagemOrdem ordem;
+        if (status != null) {
+            ordem = OrdemServicoListagemOrdem.CRIADA_MAIS_ANTIGA;
+        } else if (excluirEncerradas) {
+            ordem = OrdemServicoListagemOrdem.PRIORIDADE_OPERACAO;
+        } else {
+            ordem = OrdemServicoListagemOrdem.CRIADA_MAIS_RECENTE;
+        }
+
+        Specification<OrdemServico> spec = OrdemServicoSpecifications.filtrar(
+                status, placaNormalized, cpfDigits, from, to, excluirEncerradas, ordem);
         return ordemServicoPersistence.findAll(spec);
     }
 
