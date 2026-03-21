@@ -139,6 +139,8 @@ O compose inclui **MailHog** para desenvolvimento: interface web em `http://loca
 
 No repositório, o workflow em `.github/workflows/ci.yml` executa `mvn -B -Pci verify` (Java 21). O perfil Maven `ci` exclui testes que exigem Docker (Testcontainers). Para o mesmo conjunto localmente: `mvn -Pci verify`.
 
+Em cada **push** para `develop` ou `master`, após os testes passarem, a imagem é construída e publicada no **GitHub Container Registry** (`ghcr.io/<org>/<repo>`) com as tags `latest`, o nome do branch (`develop` ou `master`) e `sha-<commit completo>`. Pull requests não publicam imagem. Para puxar a imagem noutro ambiente, o pacote no GitHub pode precisar de visibilidade **pública** ou de `imagePullSecrets` se for privado.
+
 ### Kubernetes
 
 Manifestos (namespace, deployment, service, ConfigMap, exemplo de Secret, HPA, probes e recursos) e instruções de **apply** e **rollback** estão em [`k8s/README.md`](k8s/README.md).
