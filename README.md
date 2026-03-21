@@ -5,7 +5,7 @@ MVP do **back-end monolítico** (arquitetura em camadas) do *Sistema Integrado d
 Este projeto implementa:
 - Gestão administrativa (CRUDs) de **clientes**, **veículos**, **serviços** e **peças/insumos** (com controle de estoque)
 - **Ordens de Serviço (OS)** com fluxo completo: criação, orçamento automático, envio, aprovação pelo cliente, execução e entrega
-- **Consulta pública** por `trackingCode` para acompanhamento do cliente + **aprovação** com validação adicional (CPF/CNPJ)
+- **Consulta pública** por `trackingCode` para acompanhamento do cliente: `GET /api/public/ordens-servico/{trackingCode}` retorna o **status atual** da OS no campo JSON `status` (valores alinhados a `StatusOrdemServico`), além de itens e histórico; **aprovação** de orçamento com validação adicional (CPF/CNPJ)
 - **Métrica** de tempo médio de execução (EM_EXECUCAO → FINALIZADA)
 - **Swagger/OpenAPI**
 - **Autenticação JWT** para endpoints administrativos via **Keycloak**
@@ -25,6 +25,8 @@ Este projeto implementa:
 - [2. Arquitetura e DDD (monólito com bounded contexts)](#2-arquitetura-e-ddd-monólito-com-bounded-contexts)
 - [3. Status da OS e regras principais](#3-status-da-os-e-regras-principais)
 - [4. Como rodar localmente (1 comando)](#4-como-rodar-localmente-1-comando)
+- [Kubernetes (manifestos e rollback)](k8s/README.md)
+- [Infraestrutura Terraform (AWS)](infra/README.md)
 - [5. URLs importantes](#5-urls-importantes)
 - [6. Autenticação (JWT/Keycloak) e role ADMIN](#6-autenticação-jwtkeycloak-e-role-admin)
 - [7. Exemplos de uso (cURL)](#7-exemplos-de-uso-curl)
@@ -35,6 +37,7 @@ Este projeto implementa:
 - [12. Entregas por fase (Partes 1 a 7)](#12-entregas-por-fase-partes-1-a-7)
 - [13. Observabilidade e logs](#13-observabilidade-e-logs)
 - [14. Troubleshooting](#14-troubleshooting)
+- [Fluxo de branches (Fase 2)](#fluxo-de-branches-fase-2)
 
 ---
 
@@ -78,6 +81,9 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
   - `OrdemServico` como **Aggregate Root**
   - Itens de serviços e itens de peças
   - Transições de status (timestamps)
+  - Camada de aplicação (`application`) com porta `OrdemServicoPersistencePort` e casos de uso em `OrdemServicoService` / `MetricasService`
+  - Adaptadores de entrada HTTP em `adapters.in.web` (admin e público)
+  - Persistência JPA em `adapters.out.persistence` atrás da porta (implementação `OrdemServicoPersistenceAdapter`)
 - `br.com.oficina.shared`
   - correlação (`X-Correlation-Id`), erros padronizados, validações, utilitários
 
@@ -92,6 +98,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 - `EM_EXECUCAO`
 - `FINALIZADA`
 - `ENTREGUE`
+- `CANCELADA` (orçamento recusado; OS encerrada sem execução)
 
 ### Regras (MVP)
 - Criar OS:
@@ -100,9 +107,12 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
   - adiciona serviços e peças/insumos
   - gera orçamento automaticamente (serviços + peças)
   - gera `trackingCode` para o cliente
+  - contrato da API: com `server.servlet.context-path=/api`, a abertura é `POST /api/admin/ordens-servico`; o corpo deve ter ao menos um item em `servicos`; violações de validação respondem com HTTP 400 e Problem Details; testes em `src/test/java/br/com/oficina/ordemservico/api/admin/`
+  - listagem `GET /api/admin/ordens-servico`: por defeito **não** retorna `FINALIZADA`, `ENTREGUE` nem `CANCELADA`, ordenando por prioridade operacional (execução → aguardando aprovação → diagnóstico → recebida) e, no mesmo status, pela OS **mais antiga** primeiro; use `incluirEncerradas=true` para incluir todos os status (ordenados pela criação mais recente primeiro)
 - Ações administrativas:
   - iniciar diagnóstico → `EM_DIAGNOSTICO`
   - enviar orçamento → `AGUARDANDO_APROVACAO`
+  - resposta externa ao orçamento (`POST /api/admin/ordens-servico/{id}/orcamento/resposta-externa`, JWT admin, cabeçalho `Idempotency-Key`, corpo `{"decisao":"APROVAR"}` ou `{"decisao":"RECUSAR"}`) → `EM_EXECUCAO` ou `CANCELADA`, com registro idempotente para reprocessamentos seguros
   - finalizar execução → `FINALIZADA`
   - registrar entrega → `ENTREGUE`
 - Ação do cliente:
@@ -122,3 +132,25 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 ### Subir tudo
 ```bash
 docker compose up --build
+```
+
+O compose inclui **MailHog** para desenvolvimento: interface web em `http://localhost:8025` (mensagens capturadas pelo SMTP na porta **1025**). O serviço da aplicação envia e-mails de notificação (orçamento enviado/aprovado/recusado, veículo entregue) para o destinatário configurado em `app.notification.default-recipient` (por defeito `cliente-demo@mailhog.local`). Para desligar o envio, use `NOTIFICATION_ENABLED=false`.
+
+### CI (GitHub Actions)
+
+No repositório, o workflow em `.github/workflows/ci.yml` executa `mvn -B -Pci verify` (Java 21), valida **Terraform** em `infra/` (`fmt -check`, `init -backend=false`, `validate`) e, em **push** a `develop`/`master`, constrói e publica a imagem Docker. O perfil Maven `ci` exclui testes que exigem Docker (Testcontainers). Para o mesmo conjunto localmente: `mvn -Pci verify`.
+
+Em cada **push** para `develop` ou `master`, após **Maven e Terraform** passarem, a imagem é construída e publicada no **GitHub Container Registry** (`ghcr.io/<org>/<repo>`) com as tags `latest`, o nome do branch (`develop` ou `master`) e `sha-<commit completo>`. Pull requests não publicam imagem. Para puxar a imagem noutro ambiente, o pacote no GitHub pode precisar de visibilidade **pública** ou de `imagePullSecrets` se for privado.
+
+### Kubernetes
+
+Manifestos (namespace, deployment, service, ConfigMap, exemplo de Secret, HPA, probes e recursos) e instruções de **apply** e **rollback** estão em [`k8s/README.md`](k8s/README.md).
+
+### Infraestrutura (Terraform)
+
+Stack em [`infra/`](infra/README.md): módulo de **rede AWS** (VPC, subnets públicas, IGW) reproduzível, com `terraform plan` / `apply` / `destroy` documentados. Requer credenciais AWS.
+
+## Fluxo de branches (Fase 2)
+
+- [Convenções de branches e integração](docs/development/gitflow.md)
+- [Diagnóstico de lacunas e backlog Fase 2](docs/development/gap-e-backlog-fase2.md)
