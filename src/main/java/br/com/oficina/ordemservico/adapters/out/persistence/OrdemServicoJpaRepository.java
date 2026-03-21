@@ -2,10 +2,12 @@ package br.com.oficina.ordemservico.adapters.out.persistence;
 
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -36,6 +38,18 @@ public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, U
             "transicoesStatus"
     })
     Optional<OrdemServico> findDetailedById(UUID id);
+
+    @EntityGraph(attributePaths = {
+            "cliente",
+            "veiculo",
+            "itensServico",
+            "itensServico.servico",
+            "itensPeca",
+            "itensPeca.peca",
+            "transicoesStatus"
+    })
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<OrdemServico> findDetailedByIdForUpdate(UUID id);
 
     @EntityGraph(attributePaths = {
             "cliente",
