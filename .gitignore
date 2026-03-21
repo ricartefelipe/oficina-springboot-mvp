@@ -16,3 +16,6 @@ Thumbs.db
 # Security scan outputs
 build/security/*
 !build/security/.gitkeep
+
+# Kubernetes secrets locais (use secret.example.yaml)
+k8s/secret.yaml

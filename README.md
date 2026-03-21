@@ -25,6 +25,7 @@ Este projeto implementa:
 - [2. Arquitetura e DDD (monólito com bounded contexts)](#2-arquitetura-e-ddd-monólito-com-bounded-contexts)
 - [3. Status da OS e regras principais](#3-status-da-os-e-regras-principais)
 - [4. Como rodar localmente (1 comando)](#4-como-rodar-localmente-1-comando)
+- [Kubernetes (manifestos e rollback)](k8s/README.md)
 - [5. URLs importantes](#5-urls-importantes)
 - [6. Autenticação (JWT/Keycloak) e role ADMIN](#6-autenticação-jwtkeycloak-e-role-admin)
 - [7. Exemplos de uso (cURL)](#7-exemplos-de-uso-curl)
@@ -137,6 +138,10 @@ O compose inclui **MailHog** para desenvolvimento: interface web em `http://loca
 ### CI (GitHub Actions)
 
 No repositório, o workflow em `.github/workflows/ci.yml` executa `mvn -B -Pci verify` (Java 21). O perfil Maven `ci` exclui testes que exigem Docker (Testcontainers). Para o mesmo conjunto localmente: `mvn -Pci verify`.
+
+### Kubernetes
+
+Manifestos (namespace, deployment, service, ConfigMap, exemplo de Secret, HPA, probes e recursos) e instruções de **apply** e **rollback** estão em [`k8s/README.md`](k8s/README.md).
 
 ## Fluxo de branches (Fase 2)
 
