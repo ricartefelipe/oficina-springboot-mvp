@@ -5,6 +5,7 @@ import br.com.oficina.cadastros.cliente.domain.CpfCnpj;
 import br.com.oficina.cadastros.veiculo.domain.Placa;
 import br.com.oficina.cadastros.veiculo.domain.Veiculo;
 import br.com.oficina.ordemservico.application.OrdemServicoService;
+import br.com.oficina.ordemservico.testsupport.NotificacaoOrdemServicoPortNoop;
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class PublicOrdemServicoControllerConsultaHttpTest {
         private final OrdemServico ordem;
 
         ObterPorTrackingCodeStub(OrdemServico ordem) {
-            super(null, null, null, null, null, null);
+            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE);
             this.ordem = ordem;
         }
 
