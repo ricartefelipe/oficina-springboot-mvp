@@ -1,6 +1,6 @@
 package br.com.oficina.ordemservico.application;
 
-import br.com.oficina.ordemservico.infra.persistence.OrdemServicoJpaRepository;
+import br.com.oficina.ordemservico.application.port.OrdemServicoPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,16 +12,16 @@ import java.time.OffsetDateTime;
 @Service
 public class MetricasService {
 
-    private final OrdemServicoJpaRepository osRepository;
+    private final OrdemServicoPersistencePort ordemServicoPersistence;
 
-    public MetricasService(OrdemServicoJpaRepository osRepository) {
-        this.osRepository = osRepository;
+    public MetricasService(OrdemServicoPersistencePort ordemServicoPersistence) {
+        this.ordemServicoPersistence = ordemServicoPersistence;
     }
 
     @Transactional(readOnly = true)
     public TempoMedioExecucao calcularTempoMedioExecucao(OffsetDateTime from, OffsetDateTime to) {
-        Double avgSeconds = osRepository.avgExecutionSeconds(from, to);
-        Long count = osRepository.countExecutionMeasured(from, to);
+        Double avgSeconds = ordemServicoPersistence.avgExecutionSeconds(from, to);
+        Long count = ordemServicoPersistence.countExecutionMeasured(from, to);
 
         if (avgSeconds == null || count == null || count == 0) {
             return new TempoMedioExecucao(from, to, 0L, BigDecimal.ZERO, "PT0S");
