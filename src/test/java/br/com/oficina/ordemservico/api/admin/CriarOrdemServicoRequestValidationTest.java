@@ -1,5 +1,6 @@
 package br.com.oficina.ordemservico.api.admin;
 
+import br.com.oficina.ordemservico.adapters.in.web.AdminOrdemServicoController;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeAll;
