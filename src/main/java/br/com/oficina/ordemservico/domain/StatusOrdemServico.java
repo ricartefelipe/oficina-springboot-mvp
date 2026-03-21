@@ -14,16 +14,19 @@ public enum StatusOrdemServico {
     AGUARDANDO_APROVACAO,
     EM_EXECUCAO,
     FINALIZADA,
-    ENTREGUE;
+    ENTREGUE,
+    /** Orçamento recusado pelo cliente ou por sistema externo; OS encerrada sem execução. */
+    CANCELADA;
 
     public Set<StatusOrdemServico> proximosPermitidos() {
         return switch (this) {
             case RECEBIDA -> EnumSet.of(EM_DIAGNOSTICO);
             case EM_DIAGNOSTICO -> EnumSet.of(AGUARDANDO_APROVACAO);
-            case AGUARDANDO_APROVACAO -> EnumSet.of(EM_EXECUCAO);
+            case AGUARDANDO_APROVACAO -> EnumSet.of(EM_EXECUCAO, CANCELADA);
             case EM_EXECUCAO -> EnumSet.of(FINALIZADA);
             case FINALIZADA -> EnumSet.of(ENTREGUE);
             case ENTREGUE -> EnumSet.noneOf(StatusOrdemServico.class);
+            case CANCELADA -> EnumSet.noneOf(StatusOrdemServico.class);
         };
     }
 

@@ -14,6 +14,11 @@ public interface OrdemServicoPersistencePort {
 
     Optional<OrdemServico> findDetailedById(UUID id);
 
+    /**
+     * Carrega a OS com grafo completo e bloqueio pessimista (para transições e idempotência).
+     */
+    Optional<OrdemServico> findDetailedByIdForUpdate(UUID id);
+
     Optional<OrdemServico> findDetailedByTrackingCode(String trackingCode);
 
     List<OrdemServico> findAll(Specification<OrdemServico> spec);

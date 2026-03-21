@@ -9,7 +9,10 @@ import br.com.oficina.catalogo.peca.domain.PecaInsumo;
 import br.com.oficina.catalogo.peca.infra.persistence.PecaInsumoJpaRepository;
 import br.com.oficina.catalogo.servico.application.ServicoCatalogoService;
 import br.com.oficina.catalogo.servico.domain.ServicoCatalogo;
+import br.com.oficina.ordemservico.adapters.out.persistence.OsOrcamentoRespostaIdempotenciaRepository;
 import br.com.oficina.ordemservico.application.port.OrdemServicoPersistencePort;
+import br.com.oficina.ordemservico.domain.DecisaoRespostaOrcamentoExterna;
+import br.com.oficina.ordemservico.domain.OsOrcamentoRespostaIdempotencia;
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
 import br.com.oficina.ordemservico.domain.TrackingCodeGenerator;
@@ -19,6 +22,7 @@ import br.com.oficina.shared.domain.Strings;
 import br.com.oficina.shared.domain.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -40,19 +45,22 @@ public class OrdemServicoService {
     private final VeiculoService veiculoService;
     private final ServicoCatalogoService servicoCatalogoService;
     private final PecaInsumoJpaRepository pecaRepository;
+    private final OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository;
 
     public OrdemServicoService(
             OrdemServicoPersistencePort ordemServicoPersistence,
             ClienteService clienteService,
             VeiculoService veiculoService,
             ServicoCatalogoService servicoCatalogoService,
-            PecaInsumoJpaRepository pecaRepository
+            PecaInsumoJpaRepository pecaRepository,
+            OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository
     ) {
         this.ordemServicoPersistence = ordemServicoPersistence;
         this.clienteService = clienteService;
         this.veiculoService = veiculoService;
         this.servicoCatalogoService = servicoCatalogoService;
         this.pecaRepository = pecaRepository;
+        this.orcamentoRespostaIdempotenciaRepository = orcamentoRespostaIdempotenciaRepository;
     }
 
     @Transactional
@@ -170,6 +178,63 @@ public class OrdemServicoService {
             throw new BusinessRuleException("CPF/CNPJ nao confere para esta Ordem de Servico");
         }
 
+        return executarAprovacaoComBaixaEstoque(os);
+    }
+
+    /**
+     * Integração externa (ex.: notificação de canal parceiro): aprova ou recusa o orçamento com idempotência por chave.
+     */
+    @Transactional
+    public OrdemServico processarRespostaOrcamentoExterna(UUID osId, String idempotencyKeyRaw, DecisaoRespostaOrcamentoExterna decisao) {
+        String key = Strings.requireNonBlank(idempotencyKeyRaw, "Idempotency-Key").trim();
+        if (key.length() > 128) {
+            throw new ValidationException("Idempotency-Key deve ter no maximo 128 caracteres");
+        }
+
+        Optional<OsOrcamentoRespostaIdempotencia> jaRegistrado = orcamentoRespostaIdempotenciaRepository.findByIdempotencyKey(key);
+        if (jaRegistrado.isPresent()) {
+            validarMesmaOperacaoIdempotente(osId, decisao, jaRegistrado.get());
+            return obterDetalhe(osId);
+        }
+
+        OrdemServico os = ordemServicoPersistence.findDetailedByIdForUpdate(osId)
+                .orElseThrow(() -> new NotFoundException("Ordem de Servico nao encontrada"));
+
+        if (os.getStatus() != StatusOrdemServico.AGUARDANDO_APROVACAO) {
+            throw new BusinessRuleException("Ordem nao esta aguardando aprovacao do orcamento");
+        }
+
+        try {
+            orcamentoRespostaIdempotenciaRepository.saveAndFlush(
+                    new OsOrcamentoRespostaIdempotencia(UUID.randomUUID(), key, osId, decisao));
+        } catch (DataIntegrityViolationException e) {
+            OsOrcamentoRespostaIdempotencia row = orcamentoRespostaIdempotenciaRepository.findByIdempotencyKey(key)
+                    .orElseThrow(() -> e);
+            validarMesmaOperacaoIdempotente(osId, decisao, row);
+            return obterDetalhe(osId);
+        }
+
+        if (decisao == DecisaoRespostaOrcamentoExterna.APROVAR) {
+            return executarAprovacaoComBaixaEstoque(os);
+        }
+
+        os.recusarOrcamento();
+        OrdemServico saved = ordemServicoPersistence.save(os);
+        log.info("orcamento_recusado_externo osId={} trackingCode={} status={}", saved.getId(), saved.getTrackingCode(), saved.getStatus());
+        return saved;
+    }
+
+    private void validarMesmaOperacaoIdempotente(
+            UUID osId,
+            DecisaoRespostaOrcamentoExterna decisao,
+            OsOrcamentoRespostaIdempotencia row
+    ) {
+        if (!row.getOrdemServicoId().equals(osId) || row.getDecisao() != decisao) {
+            throw new BusinessRuleException("Chave de idempotencia ja utilizada para outra operacao");
+        }
+    }
+
+    private OrdemServico executarAprovacaoComBaixaEstoque(OrdemServico os) {
         Map<UUID, Integer> qtyByPeca = new HashMap<>();
         for (var item : os.getItensPeca()) {
             UUID pecaId = item.getPeca().getId();

@@ -2,6 +2,7 @@ package br.com.oficina.ordemservico.adapters.in.web;
 
 import br.com.oficina.cadastros.veiculo.domain.Veiculo;
 import br.com.oficina.ordemservico.application.OrdemServicoService;
+import br.com.oficina.ordemservico.domain.DecisaoRespostaOrcamentoExterna;
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.domain.OrdemServicoItemPeca;
 import br.com.oficina.ordemservico.domain.OrdemServicoItemServico;
@@ -86,6 +87,21 @@ public class AdminOrdemServicoController {
         return OrdemServicoDetalheResponse.from(osService.enviarOrcamento(id));
     }
 
+    /**
+     * Resposta de sistema externo (ex.: canal de notificação) sobre o orçamento.
+     * Idempotência via cabeçalho {@code Idempotency-Key} (ex.: UUID da mensagem do parceiro).
+     */
+    @PostMapping("/{id}/orcamento/resposta-externa")
+    public OrdemServicoDetalheResponse respostaOrcamentoExterna(
+            @PathVariable UUID id,
+            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody RespostaOrcamentoExternaRequest body
+    ) {
+        return OrdemServicoDetalheResponse.from(
+                osService.processarRespostaOrcamentoExterna(id, idempotencyKey, body.decisao())
+        );
+    }
+
     @PostMapping("/{id}/execucao/finalizar")
     public OrdemServicoDetalheResponse finalizarExecucao(@PathVariable UUID id) {
         return OrdemServicoDetalheResponse.from(osService.finalizarExecucao(id));
@@ -94,6 +110,11 @@ public class AdminOrdemServicoController {
     @PostMapping("/{id}/entrega/registrar")
     public OrdemServicoDetalheResponse registrarEntrega(@PathVariable UUID id) {
         return OrdemServicoDetalheResponse.from(osService.registrarEntrega(id));
+    }
+
+    public record RespostaOrcamentoExternaRequest(
+            @NotNull DecisaoRespostaOrcamentoExterna decisao
+    ) {
     }
 
     public record CriarOrdemServicoRequest(

@@ -12,6 +12,7 @@ class StatusOrdemServicoTest {
         assertDoesNotThrow(() -> StatusOrdemServico.RECEBIDA.validarTransicaoPara(StatusOrdemServico.EM_DIAGNOSTICO));
         assertDoesNotThrow(() -> StatusOrdemServico.EM_DIAGNOSTICO.validarTransicaoPara(StatusOrdemServico.AGUARDANDO_APROVACAO));
         assertDoesNotThrow(() -> StatusOrdemServico.AGUARDANDO_APROVACAO.validarTransicaoPara(StatusOrdemServico.EM_EXECUCAO));
+        assertDoesNotThrow(() -> StatusOrdemServico.AGUARDANDO_APROVACAO.validarTransicaoPara(StatusOrdemServico.CANCELADA));
         assertDoesNotThrow(() -> StatusOrdemServico.EM_EXECUCAO.validarTransicaoPara(StatusOrdemServico.FINALIZADA));
         assertDoesNotThrow(() -> StatusOrdemServico.FINALIZADA.validarTransicaoPara(StatusOrdemServico.ENTREGUE));
     }
@@ -21,6 +22,7 @@ class StatusOrdemServicoTest {
         assertThrows(BusinessRuleException.class, () -> StatusOrdemServico.RECEBIDA.validarTransicaoPara(StatusOrdemServico.ENTREGUE));
         assertThrows(BusinessRuleException.class, () -> StatusOrdemServico.AGUARDANDO_APROVACAO.validarTransicaoPara(StatusOrdemServico.FINALIZADA));
         assertThrows(BusinessRuleException.class, () -> StatusOrdemServico.ENTREGUE.validarTransicaoPara(StatusOrdemServico.RECEBIDA));
+        assertThrows(BusinessRuleException.class, () -> StatusOrdemServico.CANCELADA.validarTransicaoPara(StatusOrdemServico.EM_EXECUCAO));
     }
 
     @Test
