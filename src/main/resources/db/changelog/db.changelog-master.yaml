@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/changes/0002-initial-schema.yaml
   - include:
       file: db/changelog/changes/0003-seed-catalog.yaml
+  - include:
+      file: db/changelog/changes/0004-os-orcamento-resposta-idempotencia.yaml

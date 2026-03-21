@@ -38,7 +38,7 @@ class PublicOrdemServicoControllerConsultaHttpTest {
         private final OrdemServico ordem;
 
         ObterPorTrackingCodeStub(OrdemServico ordem) {
-            super(null, null, null, null, null);
+            super(null, null, null, null, null, null);
             this.ordem = ordem;
         }
 

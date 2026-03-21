@@ -43,4 +43,15 @@ class OrdemServicoOrcamentoTest {
         assertFalse(os.getTransicoesStatus().isEmpty());
         assertEquals(StatusOrdemServico.RECEBIDA, os.getTransicoesStatus().get(0).getParaStatus());
     }
+
+    @Test
+    void recusarOrcamentoEmAguardandoVaiParaCancelada() {
+        Cliente cliente = Cliente.novo("Maria", CpfCnpj.of("111.444.777-35"));
+        Veiculo veiculo = Veiculo.novo(Placa.of("ABC1D23"), "Fiat", "Uno", 2018, cliente);
+        OrdemServico os = OrdemServico.receber(cliente, veiculo, "TRACK9999");
+        os.iniciarDiagnostico();
+        os.enviarOrcamento();
+        os.recusarOrcamento();
+        assertEquals(StatusOrdemServico.CANCELADA, os.getStatus());
+    }
 }

@@ -28,11 +28,11 @@
 
 ## Backlog fatiado (ordem sugerida)
 
-1. **gitflow-bootstrap**: convenções de branch, template de PR, referência no repositório (esta entrega)
-2. **hexagonal-structure**: reorganização incremental para domain, application, adapters e ports preservando testes
-3. **os-abertura-contract-tests**: revisão de abertura de OS, identificador único e testes de contrato
-4. **os-status-consulta**: consulta de status alinhada à máquina de estados e testes
-5. **orcamento-notificacao-externa**: endpoint idempotente para aprovação ou recusa externa, histórico e validação de transição
+1. **gitflow-bootstrap**: convenções de branch, template de PR, referência no repositório (esta entrega) — feito
+2. **hexagonal-structure**: reorganização incremental para domain, application, adapters e ports preservando testes — feito
+3. **os-abertura-contract-tests**: revisão de abertura de OS, identificador único e testes de contrato — feito
+4. **os-status-consulta**: consulta de status alinhada à máquina de estados e testes — feito
+5. **orcamento-notificacao-externa**: endpoint idempotente para aprovação ou recusa externa, histórico e validação de transição — feito (`POST /admin/ordens-servico/{id}/orcamento/resposta-externa`, status `CANCELADA` na recusa)
 6. **os-listagem-priorizada**: ordenação EM_EXECUCAO > AGUARDANDO_APROVACAO > EM_DIAGNOSTICO > RECEBIDA; mais antigas primeiro; excluir FINALIZADA e ENTREGUE
 7. **notificacao-email-mailhog**: porta de notificação, adapter SMTP, eventos em transições relevantes, compose atualizado
 8. **testes-ampliados**: happy path, erros, estoque, endpoints principais, idempotência
