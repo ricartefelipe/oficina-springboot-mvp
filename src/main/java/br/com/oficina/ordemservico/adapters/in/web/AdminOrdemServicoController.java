@@ -61,15 +61,24 @@ public class AdminOrdemServicoController {
         return ResponseEntity.created(location).body(OrdemServicoDetalheResponse.from(os));
     }
 
+    /**
+     * Listagem administrativa: por defeito exclui {@code FINALIZADA}, {@code ENTREGUE} e {@code CANCELADA},
+     * ordenando por prioridade operacional (execução, depois aguardando aprovação, diagnóstico, recebida)
+     * e, dentro do mesmo status, pela data de criação mais antiga primeiro.
+     * Use {@code incluirEncerradas=true} para listar todas (ordenadas pela criação mais recente primeiro).
+     */
     @GetMapping
     public List<OrdemServicoResumoResponse> listar(
             @RequestParam(required = false) StatusOrdemServico status,
             @RequestParam(required = false) String placa,
             @RequestParam(required = false) String cpfCnpj,
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime to
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime to,
+            @RequestParam(required = false, defaultValue = "false") boolean incluirEncerradas
     ) {
-        return osService.listar(status, placa, cpfCnpj, from, to).stream().map(OrdemServicoResumoResponse::from).toList();
+        return osService.listar(status, placa, cpfCnpj, from, to, incluirEncerradas).stream()
+                .map(OrdemServicoResumoResponse::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
