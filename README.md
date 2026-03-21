@@ -35,6 +35,7 @@ Este projeto implementa:
 - [12. Entregas por fase (Partes 1 a 7)](#12-entregas-por-fase-partes-1-a-7)
 - [13. Observabilidade e logs](#13-observabilidade-e-logs)
 - [14. Troubleshooting](#14-troubleshooting)
+- [Fluxo de branches (Fase 2)](#fluxo-de-branches-fase-2)
 
 ---
 
@@ -122,3 +123,9 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 ### Subir tudo
 ```bash
 docker compose up --build
+```
+
+## Fluxo de branches (Fase 2)
+
+- [Convenções de branches e integração](docs/development/gitflow.md)
+- [Diagnóstico de lacunas e backlog Fase 2](docs/development/gap-e-backlog-fase2.md)
