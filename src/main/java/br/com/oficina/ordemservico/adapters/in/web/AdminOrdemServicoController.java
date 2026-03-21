@@ -1,12 +1,13 @@
-package br.com.oficina.ordemservico.api.admin;
+package br.com.oficina.ordemservico.adapters.in.web;
 
+import br.com.oficina.cadastros.veiculo.domain.Veiculo;
 import br.com.oficina.ordemservico.application.OrdemServicoService;
+import br.com.oficina.ordemservico.domain.DecisaoRespostaOrcamentoExterna;
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.domain.OrdemServicoItemPeca;
 import br.com.oficina.ordemservico.domain.OrdemServicoItemServico;
 import br.com.oficina.ordemservico.domain.OrdemServicoTransicaoStatus;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
-import br.com.oficina.cadastros.veiculo.domain.Veiculo;
 import br.com.oficina.shared.validation.ValidCpfCnpj;
 import br.com.oficina.shared.validation.ValidPlaca;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -60,15 +61,24 @@ public class AdminOrdemServicoController {
         return ResponseEntity.created(location).body(OrdemServicoDetalheResponse.from(os));
     }
 
+    /**
+     * Listagem administrativa: por defeito exclui {@code FINALIZADA}, {@code ENTREGUE} e {@code CANCELADA},
+     * ordenando por prioridade operacional (execução, depois aguardando aprovação, diagnóstico, recebida)
+     * e, dentro do mesmo status, pela data de criação mais antiga primeiro.
+     * Use {@code incluirEncerradas=true} para listar todas (ordenadas pela criação mais recente primeiro).
+     */
     @GetMapping
     public List<OrdemServicoResumoResponse> listar(
             @RequestParam(required = false) StatusOrdemServico status,
             @RequestParam(required = false) String placa,
             @RequestParam(required = false) String cpfCnpj,
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime from,
-            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime to
+            @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) OffsetDateTime to,
+            @RequestParam(required = false, defaultValue = "false") boolean incluirEncerradas
     ) {
-        return osService.listar(status, placa, cpfCnpj, from, to).stream().map(OrdemServicoResumoResponse::from).toList();
+        return osService.listar(status, placa, cpfCnpj, from, to, incluirEncerradas).stream()
+                .map(OrdemServicoResumoResponse::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -86,6 +96,21 @@ public class AdminOrdemServicoController {
         return OrdemServicoDetalheResponse.from(osService.enviarOrcamento(id));
     }
 
+    /**
+     * Resposta de sistema externo (ex.: canal de notificação) sobre o orçamento.
+     * Idempotência via cabeçalho {@code Idempotency-Key} (ex.: UUID da mensagem do parceiro).
+     */
+    @PostMapping("/{id}/orcamento/resposta-externa")
+    public OrdemServicoDetalheResponse respostaOrcamentoExterna(
+            @PathVariable UUID id,
+            @RequestHeader(value = "Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody RespostaOrcamentoExternaRequest body
+    ) {
+        return OrdemServicoDetalheResponse.from(
+                osService.processarRespostaOrcamentoExterna(id, idempotencyKey, body.decisao())
+        );
+    }
+
     @PostMapping("/{id}/execucao/finalizar")
     public OrdemServicoDetalheResponse finalizarExecucao(@PathVariable UUID id) {
         return OrdemServicoDetalheResponse.from(osService.finalizarExecucao(id));
@@ -94,6 +119,11 @@ public class AdminOrdemServicoController {
     @PostMapping("/{id}/entrega/registrar")
     public OrdemServicoDetalheResponse registrarEntrega(@PathVariable UUID id) {
         return OrdemServicoDetalheResponse.from(osService.registrarEntrega(id));
+    }
+
+    public record RespostaOrcamentoExternaRequest(
+            @NotNull DecisaoRespostaOrcamentoExterna decisao
+    ) {
     }
 
     public record CriarOrdemServicoRequest(

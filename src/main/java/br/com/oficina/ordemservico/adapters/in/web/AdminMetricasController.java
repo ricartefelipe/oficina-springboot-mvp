@@ -1,4 +1,4 @@
-package br.com.oficina.ordemservico.api.admin;
+package br.com.oficina.ordemservico.adapters.in.web;
 
 import br.com.oficina.ordemservico.application.MetricasService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
