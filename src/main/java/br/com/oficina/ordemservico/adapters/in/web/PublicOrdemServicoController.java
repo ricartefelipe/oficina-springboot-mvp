@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/br/com/oficina/ordemservico/adapters/in/web/PublicOrdemServicoController.java
 package br.com.oficina.ordemservico.adapters.in.web;
-========
-package br.com.oficina.ordemservico.api.publicapi;
->>>>>>>> origin/feature/os-abertura-contract-tests:src/main/java/br/com/oficina/ordemservico/api/publicapi/PublicOrdemServicoController.java
 
 import br.com.oficina.ordemservico.application.OrdemServicoService;
 import br.com.oficina.ordemservico.domain.OrdemServico;
