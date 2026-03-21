@@ -26,6 +26,7 @@ Este projeto implementa:
 - [3. Status da OS e regras principais](#3-status-da-os-e-regras-principais)
 - [4. Como rodar localmente (1 comando)](#4-como-rodar-localmente-1-comando)
 - [Kubernetes (manifestos e rollback)](k8s/README.md)
+- [Infraestrutura Terraform (AWS)](infra/README.md)
 - [5. URLs importantes](#5-urls-importantes)
 - [6. Autenticação (JWT/Keycloak) e role ADMIN](#6-autenticação-jwtkeycloak-e-role-admin)
 - [7. Exemplos de uso (cURL)](#7-exemplos-de-uso-curl)
@@ -144,6 +145,10 @@ Em cada **push** para `develop` ou `master`, após os testes passarem, a imagem 
 ### Kubernetes
 
 Manifestos (namespace, deployment, service, ConfigMap, exemplo de Secret, HPA, probes e recursos) e instruções de **apply** e **rollback** estão em [`k8s/README.md`](k8s/README.md).
+
+### Infraestrutura (Terraform)
+
+Stack em [`infra/`](infra/README.md): módulo de **rede AWS** (VPC, subnets públicas, IGW) reproduzível, com `terraform plan` / `apply` / `destroy` documentados. Requer credenciais AWS.
 
 ## Fluxo de branches (Fase 2)
 
