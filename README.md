@@ -107,8 +107,7 @@ Com a aplicação a correr em `http://localhost:8080` e `server.servlet.context-
 |---------|-----|
 | **Swagger UI** | [http://localhost:8080/api/swagger-ui/index.html](http://localhost:8080/api/swagger-ui/index.html) |
 | **OpenAPI (JSON)** | [http://localhost:8080/api/openapi](http://localhost:8080/api/openapi) |
-
-- **Vídeo demonstrativo** (YouTube ou Vimeo, até 15 min — deploy, CI/CD, consumo de APIs, escalabilidade): *a publicar; colocar o link aqui e no PDF de entrega.*
+| **Vídeo demonstrativo** (≤ 15 min — YouTube ou Vimeo) | *Substituir pelo link após publicar. Roteiro: [`docs/video-script.md`](docs/video-script.md). Checklist de entrega (PDF, portal, `soat-architecture`): [`docs/delivery/submission.md`](docs/delivery/submission.md#checklist-entrega-fase-2).* |
 
 ---
 
