@@ -13,7 +13,7 @@
 - **Persistência**: JPA + Liquibase; repositórios por contexto
 - **Testes**: testes de domínio e integração presentes; cobertura ainda abaixo do desejado para Fase 2 em endpoints e erros
 - **Documentação DDD**: linguagem ubíqua e event storming em Markdown; faltam artefatos visuais versionáveis finais (SVG ou PNG) e Domain Storytelling visual
-- **Infra**: Dockerfile e docker-compose; manifestos em `/k8s`; Terraform em `/infra` (rede AWS); CI com Maven, Terraform validate e imagem GHCR; **deploy em cluster** via workflow opcional (`deploy-kubernetes.yml` + secret `KUBE_CONFIG_B64`); **BD gerido na pipeline** não automatizado (RDS via Terraform seria evolução — ver `infra/docs/terraform-vs-enunciado.md`)
+- **Infra**: Dockerfile e docker-compose; `/k8s`; Terraform **rede + RDS opcional**; CI Maven + Terraform validate + GHCR; **workflows manuais** Deploy Kubernetes e Terraform AWS (RDS com `enable_rds`); EKS não versionado
 - **README**: alinhado aos entregáveis da Fase 2 (objetivos, arquitetura, fluxo de deploy, links Swagger/OpenAPI; vídeo a publicar)
 
 ## Lacunas em relação à Fase 2
@@ -23,7 +23,7 @@
 | Arquitetura | Hexagonal em evolução nos bounded contexts; continuar extraindo portas e adaptadores onde fizer sentido |
 | Testes | Ampliar integração de API, erros, estoque e autenticação onde o enunciado exigir reforço |
 | DDD | Artefatos **visuais** versionáveis (SVG/PNG) em `docs/ddd/` — ver item 12 |
-| CI/CD (enunciado) | **Apply** dos YAML: workflow manual opcional + `kubectl`; **deploy de BD** (RDS) ainda não na pipeline; alinhar com docente se basta documentação + vídeo |
+| CI/CD (enunciado) | **Apply** YAML + rollout + smoke no workflow Deploy Kubernetes; **RDS** via workflow Terraform AWS ou CLI (não no push automático); **EKS** fora do repositório |
 | Entrega académica | PDF no portal, vídeo (≤15 min), partilha do repo com **soat-architecture**, diagrama no PDF |
 
 ## Backlog fatiado (ordem sugerida)
@@ -37,8 +37,8 @@
 7. **notificacao-email-mailhog**: porta de notificação, adapter SMTP, eventos em transições relevantes, compose atualizado — feito (`NotificacaoOrdemServicoPort`, SMTP/MailHog, `NOTIFICATION_ENABLED`, `docker-compose` com MailHog)
 8. **testes-ampliados**: happy path, erros, estoque, endpoints principais, idempotência — em progresso (HTTP 404/409 público; validações admin; **JWT 401/403/200** em `AdminJwtSecurityWebMvcTest` no perfil `ci`; integração Docker/Testcontainers opcional local)
 9. **kubernetes**: namespace, deployment, service, ConfigMap, Secret, probes, recursos, HPA, documentação de apply e rollback — feito (`k8s/`, `k8s/README.md`)
-10. **terraform**: módulos ou stacks reproduzíveis, documentação de apply e destroy — feito (`infra/`, módulo `network` AWS, `infra/README.md`)
-11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions: `mvn -Pci verify` + **Terraform** `fmt`/`validate` + imagem **GHCR**; **deploy K8s** opcional via `deploy-kubernetes.yml` (`workflow_dispatch`); smoke/evolução RDS conforme docente
+10. **terraform**: módulos ou stacks reproduzíveis, documentação de apply e destroy — feito (`infra/`: rede AWS + **RDS opcional** `enable_rds`, `infra/README.md`, `infra/docs/terraform-vs-enunciado.md`)
+11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions: `mvn -Pci verify` + **Terraform** `fmt`/`validate` + imagem **GHCR**; **Deploy Kubernetes** (rollout + smoke); **Terraform AWS** (`plan`/`apply`, RDS opcional); EKS/cluster gerido fora do repo
 12. **ddd-visual-artifacts**: drawio, PlantUML ou Mermaid com export SVG ou PNG em `docs/ddd/` — feito SVG (`docs/ddd/diagrams/*.svg`); Mermaid mantido em `diagramas.md`
 13. **documentacao-readme-fase2**: README, arquitetura, execução local, deploy e links exigidos pelo enunciado — feito (README raiz); **link do vídeo** a preencher após publicação
 
