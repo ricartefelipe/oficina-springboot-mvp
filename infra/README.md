@@ -69,3 +69,4 @@ VPC, subnets e IGW **não têm custo** por si; tráfego e outros serviços (NAT 
 | `main.tf` | Instancia o módulo `network` |
 | `variables.tf` / `outputs.tf` | Variáveis e outputs da raiz |
 | `modules/network/` | VPC, subnets públicas, IGW, rota default |
+| `docs/terraform-vs-enunciado.md` | Alinhamento com o enunciado (EKS, RDS, custos) |
