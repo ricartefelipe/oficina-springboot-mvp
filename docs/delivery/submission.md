@@ -13,6 +13,7 @@
 
 - **Repositório (privado):** https://github.com/ricartefelipe/oficina-springboot-mvp  
   - **Acesso ao avaliador SOAT:** utilizador de organização **`soat-architecture`** com permissão de leitura (ou conforme o enunciado). Passos: [Convidar o utilizador no GitHub](#1-convidar-soat-architecture-no-repositório).
+- **Documento para o PDF do portal (Fase 2):** [`entrega-portal-fase2.md`](entrega-portal-fase2.md) — *estrutura alinhada ao enunciário (repo, arquitetura, vídeo, Swagger).*
 - **Swagger (local):** http://localhost:8080/api/swagger-ui/index.html
 - **Vídeo demonstrativo (≤ 15 min):** *colar aqui o URL público (YouTube ou Vimeo) após publicação — e o mesmo na tabela de “Links rápidos (APIs e vídeo)” no [README](../../README.md).*
 
