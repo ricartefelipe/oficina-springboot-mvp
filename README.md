@@ -17,9 +17,11 @@ Conforme o enunciário: **repositório** atualizado (código, `/k8s`, `/infra`, 
 
 | Documento | Uso |
 |-----------|-----|
-| [**Entrega PDF — portal (Fase 2)**](docs/delivery/entrega-portal-fase2.md) | Base para o **PDF** do aluno (repo, arquitetura, vídeo, Swagger). |
-| [Submissão / checklist](docs/delivery/submission.md) | Checklist completa (convite GitHub, Pandoc, etc.). |
+| [**Entrega PDF — portal (Fase 2)**](docs/delivery/entrega-portal-fase2.md) | Conteúdo Markdown; **PDF pronto:** [`docs/delivery/entrega-portal-fase2.pdf`](docs/delivery/entrega-portal-fase2.pdf) (submeter no portal). |
+| [Submissão / checklist](docs/delivery/submission.md) | Documento longo; **PDF pronto:** [`docs/delivery/submission.pdf`](docs/delivery/submission.pdf). |
 | [Roteiro do vídeo](docs/video-script.md) | Inclui blocos **Fase 2** obrigatórios no início do ficheiro. |
+
+Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-to-pdf-edge.ps1 -InputMd "docs\delivery\entrega-portal-fase2.md"` (e o mesmo com `submission.md`). Requer **Pandoc** e **Microsoft Edge** no Windows.
 
 ---
 
