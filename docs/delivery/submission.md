@@ -141,4 +141,4 @@ Com [Pandoc](https://pandoc.org/) só (sem diagramas rasterizados como acima):
 pandoc docs/delivery/submission.md -o docs/delivery/submission.pdf
 ```
 
-**Sem Pandoc no Windows:** `winget install JohnMacFarlane.Pandoc`, ou abrir este `.md` no VS Code / Cursor e usar **Imprimir → Guardar como PDF**.
+**Sem Pandoc no Windows:** `winget install JohnMacFarlane.Pandoc`, ou abrir este `.md` num editor com pré-visualização Markdown e usar **Imprimir → Guardar como PDF**.
