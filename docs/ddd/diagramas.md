@@ -2,6 +2,13 @@
 
 Este documento consolida os diagramas do MVP (Fase 1) do Sistema Integrado de Atendimento e Execução de Serviços de uma oficina.
 
+## Artefatos visuais (SVG — Fase 2)
+
+Versões exportadas para inclusão em PDFs ou apresentações:
+
+- [Agregado Ordem de Serviço](diagrams/ordem-servico-agregado.svg)
+- [Event storming — contextos (resumo)](diagrams/event-storming-contextos.svg)
+
 Conteúdo:
 - Context Map (Bounded Contexts em monólito)
 - Diagrama de agregados (foco em Ordem de Serviço)

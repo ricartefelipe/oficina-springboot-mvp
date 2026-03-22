@@ -67,8 +67,9 @@ flowchart TB
 |----------|----------|
 | **Docker** | `Dockerfile` multi-stage; `docker-compose.yml` (app, PostgreSQL, Keycloak, MailHog). |
 | **`/k8s`** | Namespace, Deployment, Service, ConfigMap, exemplo de Secret, HPA, probes — ver [`k8s/README.md`](k8s/README.md). |
-| **`/infra` (Terraform)** | Módulo de **rede AWS** (VPC, subnets públicas, IGW). **Não** inclui neste repositório: cluster Kubernetes gerido (EKS, etc.) nem RDS — evolução natural documentada em [`infra/README.md`](infra/README.md). |
+| **`/infra` (Terraform)** | Módulo de **rede AWS** (VPC, subnets públicas, IGW). **Não** inclui neste repositório: cluster Kubernetes gerido (EKS, etc.) nem RDS — ver [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md). |
 | **CI** | GitHub Actions: build Maven, testes, validação Terraform, build/push da imagem para **GHCR**. |
+| **DDD (visual)** | Diagramas SVG em [`docs/ddd/diagrams/`](docs/ddd/diagrams/) (agregado OS, event storming resumido). |
 
 ---
 
@@ -91,8 +92,9 @@ flowchart LR
 
 1. **Desenvolvimento local**: `docker compose up --build` — sobe aplicação, PostgreSQL, Keycloak e MailHog (ver secção 4).
 2. **Integração contínua (repositório)**: em cada push a `develop` ou `master`, o workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) executa **build e testes** (`mvn -B -Pci verify`), **validação Terraform** em `infra/` (sem credenciais cloud) e **build/push da imagem Docker** para `ghcr.io/<org>/<repo>`. Em pull requests rodam build e Terraform; **não** há publicação de imagem.
-3. **Deploy em Kubernetes**: aplicar manifestos em `k8s/` (ajustar ConfigMap/Secret e imagem), conforme [`k8s/README.md`](k8s/README.md). O enunciado da Fase 2 prevê também automatização de deploy no cluster e de banco; **neste projeto isso não está na pipeline** — pode ser feito manualmente ou evoluído com secrets (`KUBECONFIG`, etc.) e scripts versionados.
-4. **Provisionamento Terraform**: na pasta `infra/`, com credenciais AWS, `terraform plan` / `apply` criam a **rede** descrita no módulo; destruição com `terraform destroy`. Detalhes em [`infra/README.md`](infra/README.md).
+3. **Deploy em Kubernetes**: aplicar manifestos em `k8s/` (ajustar ConfigMap/Secret e imagem), conforme [`k8s/README.md`](k8s/README.md).
+4. **Deploy automatizado (opcional)**: o workflow [`.github/workflows/deploy-kubernetes.yml`](.github/workflows/deploy-kubernetes.yml) pode ser disparado manualmente (**Actions → Deploy Kubernetes → Run workflow**). Requer o secret **`KUBE_CONFIG_B64`** (conteúdo do ficheiro kubeconfig em **base64**). Aplica `namespace`, `configmap`, `deployment`, `service` e `hpa`; o **Secret** da aplicação com credenciais de BD deve existir no cluster (ver `k8s/secret.example.yaml`). Opcionalmente atualiza a imagem do Deployment para uma tag (`image_tag`, por defeito `latest`).
+5. **Provisionamento Terraform**: na pasta `infra/`, com credenciais AWS, `terraform plan` / `apply` criam a **rede** descrita no módulo; destruição com `terraform destroy`. Detalhes em [`infra/README.md`](infra/README.md). Relação com o enunciado (cluster + BD): [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md).
 
 ---
 
@@ -224,6 +226,8 @@ Rede AWS reproduzível em [`infra/README.md`](infra/README.md). Requer credencia
 
 - [Convenções de branches e integração](docs/development/gitflow.md)
 - [Diagnóstico de lacunas e backlog Fase 2](docs/development/gap-e-backlog-fase2.md)
+
+**Manutenção:** integrar trabalho em `develop` via pull request; promover para `master` quando houver uma linha estável (outro PR `develop` → `master`), como referência de entrega.
 
 ### Documentação complementar (Fase 1 e artefatos)
 
