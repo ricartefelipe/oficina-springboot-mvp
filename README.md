@@ -211,6 +211,12 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 - Docker + Docker Compose v2
 - (Opcional) Maven + JDK 21 para rodar fora do container
 
+### IntelliJ IDEA (Maven)
+
+- No Maven **não existe** a fase `build` (gera *Unknown lifecycle phase "build"*). Use **`clean package`**, **`clean verify`** ou a run configuration **«Oficina — clean verify (ci)»** em [`.idea/runConfigurations/`](.idea/runConfigurations/) (mesmo comando do CI: `mvn -B -Pci clean verify`).
+- Script na raiz: `.\scripts\mvn-verify.ps1`
+- O ficheiro [`.mvn/jvm.config`](.mvn/jvm.config) fixa **UTF-8** para o Maven (reduz conflitos com `JAVA_TOOL_OPTIONS` em IBM850).
+
 ### Subir tudo
 ```bash
 docker compose up --build

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ProjectRunConfigurationManager">
+  <configuration default="true" name="Oficina — clean verify (ci)" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="delegateBuildToMaven" value="false" />
+    </MavenSettings>
+    <option name="goals">
+      <list>
+        <option value="clean" />
+        <option value="verify" />
+      </list>
+    </option>
+    <option name="profiles">
+      <set>
+        <option value="ci" />
+      </set>
+    </option>
+    <option name="pomFileName" value="pom.xml" />
+    <option name="workingDirPath" value="$PROJECT_DIR$" />
+    <method v="2" />
+  </configuration>
+</component>
