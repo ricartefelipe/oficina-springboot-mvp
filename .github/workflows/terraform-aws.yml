@@ -1,0 +1,67 @@
+# Plan ou Apply na AWS (requer secrets). Use enable_rds=true para criar PostgreSQL RDS (custo).
+
+name: Terraform AWS
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "plan (apenas leitura) ou apply (cria/altera recursos)"
+        required: true
+        type: choice
+        options:
+          - plan
+          - apply
+      enable_rds:
+        description: "Incluir RDS PostgreSQL (custo mensal na AWS)"
+        required: true
+        type: boolean
+        default: false
+      aws_region:
+        description: "Regiao AWS"
+        required: true
+        default: "sa-east-1"
+
+env:
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar credenciais AWS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        run: |
+          if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+            echo "::error::Defina os secrets AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY no repositorio."
+            exit 1
+          fi
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ github.event.inputs.aws_region }}
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Plan
+        if: inputs.command == 'plan'
+        run: terraform plan -input=false -var="enable_rds=${{ inputs.enable_rds }}"
+
+      - name: Terraform Apply
+        if: inputs.command == 'apply'
+        run: terraform apply -input=false -auto-approve -var="enable_rds=${{ inputs.enable_rds }}"
