@@ -11,6 +11,16 @@ Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para
 
 > Requisitos oficiais e entregáveis: documento **Tech Challenge — Fase 2** (disciplina SOAT).
 
+### Entrega oficial (portal + repositório)
+
+Conforme o enunciário: **repositório** atualizado (código, `/k8s`, `/infra`, CI/CD) e **PDF no portal** com link do repo (partilhado com **`soat-architecture`**), **desenho da arquitetura** e **link do vídeo** (≤ 15 min: deploy, CI/CD, APIs, escalabilidade).
+
+| Documento | Uso |
+|-----------|-----|
+| [**Entrega PDF — portal (Fase 2)**](docs/delivery/entrega-portal-fase2.md) | Base para o **PDF** do aluno (repo, arquitetura, vídeo, Swagger). |
+| [Submissão / checklist](docs/delivery/submission.md) | Checklist completa (convite GitHub, Pandoc, etc.). |
+| [Roteiro do vídeo](docs/video-script.md) | Inclui blocos **Fase 2** obrigatórios no início do ficheiro. |
+
 ---
 
 ## Sumário
@@ -106,8 +116,8 @@ Com a aplicação a correr em `http://localhost:8080` e `server.servlet.context-
 | Recurso | URL |
 |---------|-----|
 | **Swagger UI** | [http://localhost:8080/api/swagger-ui/index.html](http://localhost:8080/api/swagger-ui/index.html) |
-| **OpenAPI (JSON)** | [http://localhost:8080/api/openapi](http://localhost:8080/api/openapi) |
-| **Vídeo demonstrativo** (≤ 15 min — YouTube ou Vimeo) | *Substituir pelo link após publicar. Roteiro: [`docs/video-script.md`](docs/video-script.md). Checklist de entrega (PDF, portal, `soat-architecture`): [`docs/delivery/submission.md`](docs/delivery/submission.md#checklist-entrega-fase-2).* |
+| **OpenAPI (JSON)** | [http://localhost:8080/api/openapi](http://localhost:8080/api/openapi) — *importar no Postman: File → Import → cole o URL do OpenAPI.* |
+| **Vídeo demonstrativo** (≤ 15 min — YouTube ou Vimeo) | *Substituir pelo link após publicar. Roteiro: [`docs/video-script.md`](docs/video-script.md). PDF portal: [`docs/delivery/entrega-portal-fase2.md`](docs/delivery/entrega-portal-fase2.md). Checklist: [`docs/delivery/submission.md`](docs/delivery/submission.md#checklist-entrega-fase-2).* |
 
 ---
 
