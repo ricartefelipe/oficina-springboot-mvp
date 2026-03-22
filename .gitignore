@@ -1,8 +1,10 @@
 /target/
 **/target/
 
-# IDEs
-.idea/
+# IDEs (ignorar .idea exceto run configurations Maven versionadas)
+.idea/*
+!.idea/runConfigurations/
+!.idea/runConfigurations/**
 .vscode/
 *.iml
 
