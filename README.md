@@ -1,43 +1,111 @@
-# Oficina Service — Tech Challenge (Fase 1) — MVP Back-end (Spring Boot)
+# Oficina Service — Tech Challenge (Fases 1 e 2) — Back-end Spring Boot
 
-MVP do **back-end monolítico** (arquitetura em camadas) do *Sistema Integrado de Atendimento e Execução de Serviços* para uma oficina mecânica.
+Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para oficina mecânica: gestão de clientes, veículos, catálogo, peças/estoque e **ordens de serviço (OS)** com fluxo completo, consulta pública por `trackingCode`, JWT (Keycloak) e notificações por e-mail.
 
-Este projeto implementa:
-- Gestão administrativa (CRUDs) de **clientes**, **veículos**, **serviços** e **peças/insumos** (com controle de estoque)
-- **Ordens de Serviço (OS)** com fluxo completo: criação, orçamento automático, envio, aprovação pelo cliente, execução e entrega
-- **Consulta pública** por `trackingCode` para acompanhamento do cliente: `GET /api/public/ordens-servico/{trackingCode}` retorna o **status atual** da OS no campo JSON `status` (valores alinhados a `StatusOrdemServico`), além de itens e histórico; **aprovação** de orçamento com validação adicional (CPF/CNPJ)
-- **Métrica** de tempo médio de execução (EM_EXECUCAO → FINALIZADA)
-- **Swagger/OpenAPI**
-- **Autenticação JWT** para endpoints administrativos via **Keycloak**
-- **Liquibase (YAML)** para migrations + seed mínima
-- **Dockerfile + docker-compose** (ambiente completo)
-- **Testes unitários e integração** + **JaCoCo** com cobertura mínima nos domínios críticos
-- **Documentação DDD** (Event Storming, Diagramas, Linguagem Ubíqua) + roteiro do vídeo
-- **Relatório de vulnerabilidades** (scan de dependências + container + filesystem) com evidências
-- **Documento de submissão** (Markdown pronto para PDF)
+## Objetivos por fase
 
-> Requisitos e entregáveis conforme o enunciado do Tech Challenge Fase 1.
+| Fase | Foco |
+|------|------|
+| **Fase 1** | MVP funcional: APIs, persistência, Docker, testes, DDD em Markdown, segurança admin/público. |
+| **Fase 2** | **Resiliência e escalabilidade**: Clean Code e **arquitetura hexagonal**, testes nos fluxos críticos, **contêineres**, **Kubernetes** (`/k8s`), **IaC** (`/infra`), **CI/CD** (GitHub Actions), preparação para picos de carga (HPA, imagem no registry). |
+
+> Requisitos oficiais e entregáveis: documento **Tech Challenge — Fase 2** (disciplina SOAT).
 
 ---
 
 ## Sumário
+
+- [Fase 2 — visão da solução e arquitetura](#fase-2--visão-da-solução-e-arquitetura)
+- [Fluxo de deploy e CI/CD](#fluxo-de-deploy-e-cicd)
+- [Links rápidos (APIs e vídeo)](#links-rápidos-apis-e-vídeo)
 - [1. Stack e decisões técnicas](#1-stack-e-decisões-técnicas)
-- [2. Arquitetura e DDD (monólito com bounded contexts)](#2-arquitetura-e-ddd-monólito-com-bounded-contexts)
+- [2. Arquitetura e DDD (bounded contexts)](#2-arquitetura-e-ddd-bounded-contexts)
 - [3. Status da OS e regras principais](#3-status-da-os-e-regras-principais)
-- [4. Como rodar localmente (1 comando)](#4-como-rodar-localmente-1-comando)
-- [Kubernetes (manifestos e rollback)](k8s/README.md)
-- [Infraestrutura Terraform (AWS)](infra/README.md)
-- [5. URLs importantes](#5-urls-importantes)
-- [6. Autenticação (JWT/Keycloak) e role ADMIN](#6-autenticação-jwtkeycloak-e-role-admin)
-- [7. Exemplos de uso (cURL)](#7-exemplos-de-uso-curl)
-- [8. Testes e cobertura (JaCoCo >= 80% domínios críticos)](#8-testes-e-cobertura-jacoco--80-domínios-críticos)
-- [9. Scans de vulnerabilidades (evidências)](#9-scans-de-vulnerabilidades-evidências)
-- [10. Documentação DDD e roteiro do vídeo](#10-documentação-ddd-e-roteiro-do-vídeo)
-- [11. Documento de submissão (PDF)](#11-documento-de-submissão-pdf)
-- [12. Entregas por fase (Partes 1 a 7)](#12-entregas-por-fase-partes-1-a-7)
-- [13. Observabilidade e logs](#13-observabilidade-e-logs)
-- [14. Troubleshooting](#14-troubleshooting)
-- [Fluxo de branches (Fase 2)](#fluxo-de-branches-fase-2)
+- [4. Como rodar localmente](#4-como-rodar-localmente)
+- [Kubernetes (`/k8s`)](k8s/README.md)
+- [Terraform (`/infra`)](infra/README.md)
+- [Fluxo de branches e documentos de apoio](#fluxo-de-branches-e-documentos-de-apoio)
+
+---
+
+## Fase 2 — visão da solução e arquitetura
+
+### Componentes da aplicação
+
+- **API HTTP** (Spring MVC): rotas **admin** (`/api/admin/**`, JWT + role `ADMIN`) e **públicas** (`/api/public/**`, `trackingCode` e validações para aprovação).
+- **Domínio**: `ordemservico` como agregado principal; transições de estado, orçamento, idempotência em resposta externa ao orçamento, métricas.
+- **Aplicação**: casos de uso (`OrdemServicoService`, `MetricasService`), portas (`OrdemServicoPersistencePort`, `NotificacaoOrdemServicoPort`).
+- **Adaptadores**: persistência JPA, e-mail SMTP (MailHog em desenvolvimento), integração com **Keycloak** para JWK/issuer.
+
+```mermaid
+flowchart TB
+  subgraph Clientes
+    A[Clientes admin / integrações]
+    C[Cliente final / tracking]
+  end
+  subgraph API["API Spring Boot contexto /api"]
+    W[adapters.in.web]
+    S[application services]
+    D[domain]
+    P[adapters.out: JPA + mail]
+  end
+  KC[(Keycloak)]
+  DB[(PostgreSQL)]
+  M[SMTP / MailHog]
+
+  A -->|Bearer JWT| W
+  C --> W
+  W --> S --> D
+  P --> DB
+  P --> M
+  W -.->|JWK / issuer| KC
+```
+
+### Infraestrutura provisionada (o que está no repositório)
+
+| Artefato | Conteúdo |
+|----------|----------|
+| **Docker** | `Dockerfile` multi-stage; `docker-compose.yml` (app, PostgreSQL, Keycloak, MailHog). |
+| **`/k8s`** | Namespace, Deployment, Service, ConfigMap, exemplo de Secret, HPA, probes — ver [`k8s/README.md`](k8s/README.md). |
+| **`/infra` (Terraform)** | Módulo de **rede AWS** (VPC, subnets públicas, IGW). **Não** inclui neste repositório: cluster Kubernetes gerido (EKS, etc.) nem RDS — evolução natural documentada em [`infra/README.md`](infra/README.md). |
+| **CI** | GitHub Actions: build Maven, testes, validação Terraform, build/push da imagem para **GHCR**. |
+
+---
+
+## Fluxo de deploy e CI/CD
+
+```mermaid
+flowchart LR
+  subgraph GA["GitHub Actions"]
+    B[mvn -Pci verify]
+    T[terraform fmt / validate]
+    I[docker build + push GHCR]
+  end
+  B --> T --> I
+  subgraph Manual["Deploy alvo — fora da pipeline atual"]
+    K[kubectl apply -f k8s/]
+    TF[terraform apply em infra/]
+  end
+  I -.->|imagem| K
+```
+
+1. **Desenvolvimento local**: `docker compose up --build` — sobe aplicação, PostgreSQL, Keycloak e MailHog (ver secção 4).
+2. **Integração contínua (repositório)**: em cada push a `develop` ou `master`, o workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) executa **build e testes** (`mvn -B -Pci verify`), **validação Terraform** em `infra/` (sem credenciais cloud) e **build/push da imagem Docker** para `ghcr.io/<org>/<repo>`. Em pull requests rodam build e Terraform; **não** há publicação de imagem.
+3. **Deploy em Kubernetes**: aplicar manifestos em `k8s/` (ajustar ConfigMap/Secret e imagem), conforme [`k8s/README.md`](k8s/README.md). O enunciado da Fase 2 prevê também automatização de deploy no cluster e de banco; **neste projeto isso não está na pipeline** — pode ser feito manualmente ou evoluído com secrets (`KUBECONFIG`, etc.) e scripts versionados.
+4. **Provisionamento Terraform**: na pasta `infra/`, com credenciais AWS, `terraform plan` / `apply` criam a **rede** descrita no módulo; destruição com `terraform destroy`. Detalhes em [`infra/README.md`](infra/README.md).
+
+---
+
+## Links rápidos (APIs e vídeo)
+
+Com a aplicação a correr em `http://localhost:8080` e `server.servlet.context-path=/api`:
+
+| Recurso | URL |
+|---------|-----|
+| **Swagger UI** | [http://localhost:8080/api/swagger-ui/index.html](http://localhost:8080/api/swagger-ui/index.html) |
+| **OpenAPI (JSON)** | [http://localhost:8080/api/openapi](http://localhost:8080/api/openapi) |
+
+- **Vídeo demonstrativo** (YouTube ou Vimeo, até 15 min — deploy, CI/CD, consumo de APIs, escalabilidade): *a publicar; colocar o link aqui e no PDF de entrega.*
 
 ---
 
@@ -66,9 +134,9 @@ Este projeto implementa:
 
 ---
 
-## 2. Arquitetura e DDD (monólito com bounded contexts)
+## 2. Arquitetura e DDD (bounded contexts)
 
-Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pragmático), reduzindo acoplamento e mantendo clareza do domínio.
+Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pragmático) e separação **hexagonal** (domínio no centro, portas, adaptadores).
 
 ### Bounded Contexts (pacotes)
 - `br.com.oficina.cadastros`
@@ -123,7 +191,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 
 ---
 
-## 4. Como rodar localmente (1 comando)
+## 4. Como rodar localmente
 
 ### Pré-requisitos
 - Docker + Docker Compose v2
@@ -138,19 +206,27 @@ O compose inclui **MailHog** para desenvolvimento: interface web em `http://loca
 
 ### CI (GitHub Actions)
 
-No repositório, o workflow em `.github/workflows/ci.yml` executa `mvn -B -Pci verify` (Java 21), valida **Terraform** em `infra/` (`fmt -check`, `init -backend=false`, `validate`) e, em **push** a `develop`/`master`, constrói e publica a imagem Docker. O perfil Maven `ci` exclui testes que exigem Docker (Testcontainers). Para o mesmo conjunto localmente: `mvn -Pci verify`.
+O workflow em `.github/workflows/ci.yml` executa `mvn -B -Pci verify` (Java 21), valida **Terraform** em `infra/` (`fmt -check`, `init -backend=false`, `validate`) e, em **push** a `develop`/`master`, constrói e publica a imagem Docker. O perfil Maven `ci` exclui testes que exigem Docker (Testcontainers). Localmente: `mvn -Pci verify`.
 
-Em cada **push** para `develop` ou `master`, após **Maven e Terraform** passarem, a imagem é construída e publicada no **GitHub Container Registry** (`ghcr.io/<org>/<repo>`) com as tags `latest`, o nome do branch (`develop` ou `master`) e `sha-<commit completo>`. Pull requests não publicam imagem. Para puxar a imagem noutro ambiente, o pacote no GitHub pode precisar de visibilidade **pública** ou de `imagePullSecrets` se for privado.
+Em cada **push** para `develop` ou `master`, após **Maven e Terraform** passarem, a imagem é publicada no **GitHub Container Registry** (`ghcr.io/<org>/<repo>`) com as tags `latest`, o nome do branch e `sha-<commit>`. Pull requests não publicam imagem. Pacote privado no GHCR pode exigir `imagePullSecrets` ou visibilidade pública.
 
 ### Kubernetes
 
-Manifestos (namespace, deployment, service, ConfigMap, exemplo de Secret, HPA, probes e recursos) e instruções de **apply** e **rollback** estão em [`k8s/README.md`](k8s/README.md).
+Manifestos e **rollback** documentados em [`k8s/README.md`](k8s/README.md).
 
 ### Infraestrutura (Terraform)
 
-Stack em [`infra/`](infra/README.md): módulo de **rede AWS** (VPC, subnets públicas, IGW) reproduzível, com `terraform plan` / `apply` / `destroy` documentados. Requer credenciais AWS.
+Rede AWS reproduzível em [`infra/README.md`](infra/README.md). Requer credenciais AWS.
 
-## Fluxo de branches (Fase 2)
+---
+
+## Fluxo de branches e documentos de apoio
 
 - [Convenções de branches e integração](docs/development/gitflow.md)
 - [Diagnóstico de lacunas e backlog Fase 2](docs/development/gap-e-backlog-fase2.md)
+
+### Documentação complementar (Fase 1 e artefatos)
+
+- [Event Storming](docs/ddd/event-storming.md) · [Linguagem ubíqua](docs/ddd/ubiquitous-language.md) · [Diagramas DDD](docs/ddd/diagramas.md)
+- [Roteiro de vídeo](docs/video-script.md) · [Submissão / entrega](docs/delivery/submission.md)
+- [Notas de segurança](docs/security/security-notes.md) · [Relatório de vulnerabilidades](docs/security/vulnerability-report.md)
