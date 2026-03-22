@@ -10,6 +10,16 @@ on:
         description: "Tag da imagem em ghcr.io (ex.: sha-abc1234 ou latest)"
         required: false
         default: "latest"
+      wait_rollout:
+        description: "Aguardar rollout do Deployment"
+        required: true
+        type: boolean
+        default: true
+      smoke_health:
+        description: "Smoke test HTTP (port-forward para /actuator/health/liveness)"
+        required: true
+        type: boolean
+        default: true
 
 concurrency:
   group: deploy-k8s-${{ github.ref }}
@@ -54,3 +64,14 @@ jobs:
           DEPLOY: oficina-app
           IMAGE: ghcr.io/${{ github.repository }}:${{ inputs.image_tag }}
         run: kubectl -n "$NS" set image "deployment/$DEPLOY" "app=$IMAGE" --record=true
+
+      - name: Aguardar rollout
+        if: ${{ inputs.wait_rollout }}
+        run: kubectl -n oficina rollout status deployment/oficina-app --timeout=180s
+
+      - name: Smoke — health (port-forward local)
+        if: ${{ inputs.smoke_health }}
+        run: |
+          kubectl -n oficina port-forward svc/oficina-app 18080:8080 &
+          sleep 10
+          curl -sf --retry 8 --retry-delay 5 --retry-all-errors "http://127.0.0.1:18080/actuator/health/liveness"
