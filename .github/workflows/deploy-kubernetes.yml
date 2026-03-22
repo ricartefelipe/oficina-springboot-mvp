@@ -1,0 +1,56 @@
+# Deploy opcional: requer secrets no repositório (kubeconfig).
+# O enunciado da Fase 2 pede CD completo; este workflow automatiza kubectl apply quando o cluster está disponível.
+
+name: Deploy Kubernetes
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Tag da imagem em ghcr.io (ex.: sha-abc1234 ou latest)"
+        required: false
+        default: "latest"
+
+concurrency:
+  group: deploy-k8s-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.30.0"
+
+      - name: Configurar kubeconfig
+        env:
+          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG_B64 }}
+        run: |
+          if [ -z "$KUBE_CONFIG_B64" ]; then
+            echo "::error::Defina o secret KUBE_CONFIG_B64 (kubeconfig em base64) nas Settings do repositório."
+            exit 1
+          fi
+          mkdir -p "$HOME/.kube"
+          echo "$KUBE_CONFIG_B64" | base64 -d > "$HOME/.kube/config"
+
+      - name: Aplicar manifestos (sem Secret com credenciais — criar antes no cluster)
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/hpa.yaml
+
+      - name: Atualizar imagem do Deployment (opcional)
+        if: ${{ inputs.image_tag != '' }}
+        env:
+          NS: oficina
+          DEPLOY: oficina-app
+          IMAGE: ghcr.io/${{ github.repository }}:${{ inputs.image_tag }}
+        run: kubectl -n "$NS" set image "deployment/$DEPLOY" "app=$IMAGE" --record=true
