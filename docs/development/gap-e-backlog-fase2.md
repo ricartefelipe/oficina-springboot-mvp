@@ -13,7 +13,7 @@
 - **Persistência**: JPA + Liquibase; repositórios por contexto
 - **Testes**: testes de domínio e integração presentes; cobertura ainda abaixo do desejado para Fase 2 em endpoints e erros
 - **Documentação DDD**: linguagem ubíqua e event storming em Markdown; faltam artefatos visuais versionáveis finais (SVG ou PNG) e Domain Storytelling visual
-- **Infra**: Dockerfile e docker-compose; manifestos em `/k8s`; Terraform em `/infra` (rede AWS); CI com Maven, Terraform validate e imagem GHCR; **deploy em cluster e BD na pipeline** não automatizados (ver README raiz)
+- **Infra**: Dockerfile e docker-compose; manifestos em `/k8s`; Terraform em `/infra` (rede AWS); CI com Maven, Terraform validate e imagem GHCR; **deploy em cluster** via workflow opcional (`deploy-kubernetes.yml` + secret `KUBE_CONFIG_B64`); **BD gerido na pipeline** não automatizado (RDS via Terraform seria evolução — ver `infra/docs/terraform-vs-enunciado.md`)
 - **README**: alinhado aos entregáveis da Fase 2 (objetivos, arquitetura, fluxo de deploy, links Swagger/OpenAPI; vídeo a publicar)
 
 ## Lacunas em relação à Fase 2
@@ -23,7 +23,7 @@
 | Arquitetura | Hexagonal em evolução nos bounded contexts; continuar extraindo portas e adaptadores onde fizer sentido |
 | Testes | Ampliar integração de API, erros, estoque e autenticação onde o enunciado exigir reforço |
 | DDD | Artefatos **visuais** versionáveis (SVG/PNG) em `docs/ddd/` — ver item 12 |
-| CI/CD (enunciado) | Pipeline com **deploy** no cluster, **deploy do BD** e **apply** dos YAML — **fora** do workflow atual; documentado no README como manual ou evolução futura |
+| CI/CD (enunciado) | **Apply** dos YAML: workflow manual opcional + `kubectl`; **deploy de BD** (RDS) ainda não na pipeline; alinhar com docente se basta documentação + vídeo |
 | Entrega académica | PDF no portal, vídeo (≤15 min), partilha do repo com **soat-architecture**, diagrama no PDF |
 
 ## Backlog fatiado (ordem sugerida)
@@ -35,11 +35,11 @@
 5. **orcamento-notificacao-externa**: endpoint idempotente para aprovação ou recusa externa, histórico e validação de transição — feito (`POST /admin/ordens-servico/{id}/orcamento/resposta-externa`, status `CANCELADA` na recusa)
 6. **os-listagem-priorizada**: ordenação EM_EXECUCAO > AGUARDANDO_APROVACAO > EM_DIAGNOSTICO > RECEBIDA; mais antigas primeiro; excluir FINALIZADA e ENTREGUE — feito (exclui também `CANCELADA`; parâmetro `incluirEncerradas`)
 7. **notificacao-email-mailhog**: porta de notificação, adapter SMTP, eventos em transições relevantes, compose atualizado — feito (`NotificacaoOrdemServicoPort`, SMTP/MailHog, `NOTIFICATION_ENABLED`, `docker-compose` com MailHog)
-8. **testes-ampliados**: happy path, erros, estoque, endpoints principais, idempotência — em progresso (testes HTTP 404/409 API pública + validações admin; integração Docker continua opcional local)
+8. **testes-ampliados**: happy path, erros, estoque, endpoints principais, idempotência — em progresso (HTTP 404/409 público; validações admin; **JWT 401/403/200** em `AdminJwtSecurityWebMvcTest` no perfil `ci`; integração Docker/Testcontainers opcional local)
 9. **kubernetes**: namespace, deployment, service, ConfigMap, Secret, probes, recursos, HPA, documentação de apply e rollback — feito (`k8s/`, `k8s/README.md`)
 10. **terraform**: módulos ou stacks reproduzíveis, documentação de apply e destroy — feito (`infra/`, módulo `network` AWS, `infra/README.md`)
-11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions: `mvn -Pci verify` + **Terraform** `fmt`/`validate` em `infra/` + build/push da imagem para **GHCR** em push a `develop`/`master` (após build e terraform OK); deploy/smoke pendente
-12. **ddd-visual-artifacts**: drawio, PlantUML ou Mermaid com export SVG ou PNG em `docs/ddd/`
+11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions: `mvn -Pci verify` + **Terraform** `fmt`/`validate` + imagem **GHCR**; **deploy K8s** opcional via `deploy-kubernetes.yml` (`workflow_dispatch`); smoke/evolução RDS conforme docente
+12. **ddd-visual-artifacts**: drawio, PlantUML ou Mermaid com export SVG ou PNG em `docs/ddd/` — feito SVG (`docs/ddd/diagrams/*.svg`); Mermaid mantido em `diagramas.md`
 13. **documentacao-readme-fase2**: README, arquitetura, execução local, deploy e links exigidos pelo enunciado — feito (README raiz); **link do vídeo** a preencher após publicação
 
 ## Riscos e mitigação
