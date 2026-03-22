@@ -3,9 +3,7 @@
 **Grupo:** Oficina Turbo (106)  
 **Aluno:** Felipe Ricarte Magalhães  
 
-Este ficheiro serve de **base para o PDF** exigido no portal: *link do repositório partilhado com `soat-architecture`, desenho da arquitetura e link do vídeo (≤ 15 min)*.
-
-**Como gerar o PDF:** ver [Conversão para PDF](submission.md#conversão-para-pdf-offline) em `submission.md`, ou imprimir a partir do GitHub / VS Code para PDF.
+Documento para **entrega no portal** (PDF): repositório, `soat-architecture`, arquitetura e link do vídeo (≤ 15 min). Versão PDF gerada: `entrega-portal-fase2.pdf` (mesma pasta).
 
 ---
 
@@ -35,7 +33,11 @@ Diagramas DDD versionados no repositório:
 | Agregado Ordem de Serviço | [`docs/ddd/diagrams/ordem-servico-agregado.svg`](../ddd/diagrams/ordem-servico-agregado.svg) |
 | Event storming (contextos) | [`docs/ddd/diagrams/event-storming-contextos.svg`](../ddd/diagrams/event-storming-contextos.svg) |
 
-*(No PDF, podes inserir estes SVG como imagens ou anexar páginas exportadas.)*
+**Figuras (desenho da arquitetura — DDD):**
+
+![Diagrama — agregado Ordem de Serviço](../ddd/diagrams/ordem-servico-agregado.svg)
+
+![Diagrama — event storming (contextos)](../ddd/diagrams/event-storming-contextos.svg)
 
 ### 2.2 Infraestrutura e automação
 
@@ -85,4 +87,8 @@ Com a app em `http://localhost:8080`:
 - [ ] Vídeo com duração **≤ 15 minutos** e tópicos do enunciário  
 - [ ] `README.md` no GitHub atualizado com o **mesmo link do vídeo**  
 
-Documento complementar: [`submission.md`](submission.md).
+Documento complementar: [`submission.md`](submission.md) (e [`submission.pdf`](submission.pdf)).
+
+---
+
+*Regenerar este PDF após editar o Markdown: na raiz do repositório, `.\scripts\delivery\md-to-pdf-edge.ps1 -InputMd "docs\delivery\entrega-portal-fase2.md"` (requer Pandoc e Microsoft Edge).*
