@@ -1,8 +1,19 @@
-# Roteiro do video (ate 15 minutos) - Tech Challenge Fase 1
+# Roteiro do video (ate 15 minutos) - Tech Challenge Fases 1 e 2
 
-Este roteiro foi criado para demonstrar todos os pontos exigidos no Tech Challenge (Fase 1): MVP back-end, fluxos de OS, gestao de estoque, JWT para admin, Swagger, Docker, testes e documentacao DDD.
+Este roteiro cobre o MVP (Fase 1) e deve ser **complementado** com os blocos obrigatorios da **Fase 2** abaixo (mesmo video, ate 15 minutos no total).
 
 Sugestao: grave em 1080p, com fonte grande e zoom (se necessario). Evite mostrar tokens completos em tela.
+
+## Fase 2 — O que o enunciario exige no video (prioridade)
+
+Reserve tempo para mostrar **nesta ordem** (pode encurtar secoes 5–8 da Fase 1 se precisar de minutos):
+
+1. **Deploy da aplicacao** — `docker compose up` e/ou `kubectl apply` (manifestos em `/k8s`), rollout.
+2. **CI/CD** — GitHub Actions: workflow `ci.yml` (build, testes, Terraform validate, imagem GHCR); mencionar workflows manuais `deploy-kubernetes.yml` / `terraform-aws.yml` se usar.
+3. **Consumo das APIs** — Swagger ou `curl` (abertura OS, consulta status, listagem admin, resposta externa ao orcamento se aplicavel).
+4. **Escalabilidade automatica** — HPA em `/k8s/hpa.yaml` (metricas CPU/memoria) e/ou simulacao de varias OS ou carga; explicar em 1 frase o comportamento esperado.
+
+Referencia: [`docs/delivery/entrega-portal-fase2.md`](delivery/entrega-portal-fase2.md).
 
 ## 0) Abertura (0:00 - 0:40)
 - Apresente rapidamente:
