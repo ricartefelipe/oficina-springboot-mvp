@@ -26,6 +26,8 @@ cp k8s/secret.example.yaml k8s/secret.yaml
 kubectl apply -f k8s/secret.yaml
 ```
 
+Se criou **RDS** com Terraform (`enable_rds = true` em `infra/`), use os outputs `rds_jdbc_url`, `rds_master_password` e o utilizador configurado (`db_username`, por defeito `oficina`) para preencher `DB_URL`, `DB_PASS` e `DB_USER`. Ver [`../infra/README.md`](../infra/README.md).
+
 3. Deployment, Service e HPA:
 
 ```bash
