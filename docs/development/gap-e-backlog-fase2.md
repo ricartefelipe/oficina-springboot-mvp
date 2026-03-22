@@ -40,7 +40,7 @@
 10. **terraform**: módulos ou stacks reproduzíveis, documentação de apply e destroy — feito (`infra/`: rede AWS + **RDS opcional** `enable_rds`, `infra/README.md`, `infra/docs/terraform-vs-enunciado.md`)
 11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions: `mvn -Pci verify` + **Terraform** `fmt`/`validate` + imagem **GHCR**; **Deploy Kubernetes** (rollout + smoke); **Terraform AWS** (`plan`/`apply`, RDS opcional); EKS/cluster gerido fora do repo
 12. **ddd-visual-artifacts**: drawio, PlantUML ou Mermaid com export SVG ou PNG em `docs/ddd/` — feito SVG (`docs/ddd/diagrams/*.svg`); Mermaid mantido em `diagramas.md`
-13. **documentacao-readme-fase2**: README, arquitetura, execução local, deploy e links exigidos pelo enunciado — feito (README raiz); **link do vídeo** a preencher após publicação
+13. **documentacao-readme-fase2**: README, arquitetura, execução local, deploy e links exigidos pelo enunciado — feito (README raiz); **link do vídeo**, PDF no portal e convite **soat-architecture** — passos em [`docs/delivery/submission.md`](../delivery/submission.md#checklist-entrega-fase-2)
 
 ## Riscos e mitigação
 
