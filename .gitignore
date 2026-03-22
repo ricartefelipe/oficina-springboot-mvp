@@ -5,6 +5,7 @@
 .idea/*
 !.idea/runConfigurations/
 !.idea/runConfigurations/**
+.idea/runConfigurations/_template*.xml
 .vscode/
 *.iml
 
