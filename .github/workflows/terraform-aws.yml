@@ -39,8 +39,9 @@ jobs:
       - name: Verificar credenciais AWS
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
             echo "::error::Defina os secrets AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY no repositorio."
             exit 1
           fi
@@ -53,15 +54,19 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ github.event.inputs.aws_region }}
+          aws-region: ${{ inputs.aws_region || 'sa-east-1' }}
 
       - name: Terraform Init
         run: terraform init -input=false
 
       - name: Terraform Plan
-        if: inputs.command == 'plan'
-        run: terraform plan -input=false -var="enable_rds=${{ inputs.enable_rds }}"
+        if: ${{ inputs.command == 'plan' }}
+        env:
+          ENABLE_RDS: ${{ inputs.enable_rds }}
+        run: terraform plan -input=false -var="enable_rds=$ENABLE_RDS"
 
       - name: Terraform Apply
-        if: inputs.command == 'apply'
-        run: terraform apply -input=false -auto-approve -var="enable_rds=${{ inputs.enable_rds }}"
+        if: ${{ inputs.command == 'apply' }}
+        env:
+          ENABLE_RDS: ${{ inputs.enable_rds }}
+        run: terraform apply -input=false -auto-approve -var="enable_rds=$ENABLE_RDS"
