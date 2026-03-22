@@ -16,6 +16,13 @@
 - **Documento para o PDF do portal (Fase 2):** [`entrega-portal-fase2.md`](entrega-portal-fase2.md) — *estrutura alinhada ao enunciário (repo, arquitetura, vídeo, Swagger).*
 - **Swagger (local):** http://localhost:8080/api/swagger-ui/index.html
 - **Vídeo demonstrativo (≤ 15 min):** *colar aqui o URL público (YouTube ou Vimeo) após publicação — e o mesmo na tabela de “Links rápidos (APIs e vídeo)” no [README](../../README.md).*
+- **PDF deste documento (gerado):** `submission.pdf` (na mesma pasta; ver [Conversão para PDF](#conversão-para-pdf-offline)).
+
+## Diagramas de arquitetura (DDD)
+
+![Diagrama — agregado Ordem de Serviço](../ddd/diagrams/ordem-servico-agregado.svg)
+
+![Diagrama — event storming (contextos)](../ddd/diagrams/event-storming-contextos.svg)
 
 ---
 
@@ -120,12 +127,18 @@ mvn verify
 
 ## Conversão para PDF (offline)
 
-Com [Pandoc](https://pandoc.org/) instalado:
+**Recomendado (Windows, PDF com diagramas embutidos):** na raiz do repositório:
+
+```powershell
+.\scripts\delivery\md-to-pdf-edge.ps1 -InputMd "docs\delivery\submission.md"
+```
+
+Gera `docs/delivery/submission.pdf` (e um `.html` intermédio, ignorado pelo Git).
+
+Com [Pandoc](https://pandoc.org/) só (sem diagramas rasterizados como acima):
 
 ```bash
 pandoc docs/delivery/submission.md -o docs/delivery/submission.pdf
 ```
 
-Ficheiro gerado: `docs/delivery/submission.pdf`
-
-**Sem Pandoc no Windows:** podes instalar com `winget install JohnMacFarlane.Pandoc`, ou abrir este `.md` no VS Code / Cursor e usar **Imprimir → Guardar como PDF**, ou exportar a partir de qualquer visualizador Markdown.
+**Sem Pandoc no Windows:** `winget install JohnMacFarlane.Pandoc`, ou abrir este `.md` no VS Code / Cursor e usar **Imprimir → Guardar como PDF**.
