@@ -3,3 +3,9 @@
 # project_name = "oficina"
 # environment  = "dev"
 # vpc_cidr     = "10.42.0.0/16"
+#
+# RDS PostgreSQL (opcional; gera custo na AWS)
+# enable_rds         = true
+# db_name            = "oficina"
+# db_username        = "oficina"
+# rds_instance_class = "db.t3.micro"
