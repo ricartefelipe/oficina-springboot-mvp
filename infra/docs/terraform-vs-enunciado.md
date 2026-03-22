@@ -4,31 +4,29 @@ O **Tech Challenge Fase 2** pede scripts Terraform para **provisionamento do clu
 
 ## O que este repositório entrega hoje
 
-- Módulo **`modules/network`** na raiz de `infra/`: **VPC**, subnets públicas em duas AZs, **Internet Gateway** e rota default.
-- Variáveis, outputs e `terraform plan` / `apply` / `destroy` descritos em [`../README.md`](../README.md).
+| Entrega | Detalhe |
+|---------|---------|
+| **Rede** | Módulo `modules/network`: VPC, subnets públicas (2 AZs), IGW, rota default. |
+| **Base de dados (AWS)** | Módulo opcional `modules/database`: **RDS PostgreSQL 16** com `enable_rds = true` (custo; cenário laboratorial em subnets públicas). |
+| **CI** | `terraform fmt` / `validate` no push (sem credenciais). |
+| **CD infra** | Workflow manual **Terraform AWS** (`plan` / `apply`) com secrets AWS. |
+| **Documentação** | [`../README.md`](../README.md), este ficheiro, `terraform.tfvars.example`. |
 
-Isto cobre **base de rede** na AWS para futuramente associar subnets privadas, **EKS**, **RDS** ou endpoints geridos.
-
-## O que normalmente falta para “fechar” o enunciao literal
+## O que ainda difere do enunciado “literal”
 
 | Recurso | Observação |
 |---------|------------|
-| **Cluster Kubernetes (EKS)** | Módulo `terraform-aws-modules/eks` ou equivalente; subnets **privadas** + **NAT Gateway** (custo recorrente) são o padrão. |
-| **Banco PostgreSQL (RDS)** | `aws_db_instance` ou módulo RDS; **subnet group** em subnets privadas; **Security Group** restritivo. |
-| **Custos** | NAT, EKS control plane e RDS geram cobrança; use `terraform destroy` e ambientes de dev com cautela. |
+| **Cluster Kubernetes (EKS)** | Não provisionado em Terraform neste repo; manifestos em `/k8s` aplicam-se a qualquer cluster (EKS, GKE, k3s, kind). Evolução típica: módulo EKS + subnets **privadas** + **NAT** (custo). |
+| **RDS “produção”** | O módulo atual usa subnets **públicas** e `publicly_accessible` para simplificar laboratório; em produção usa-se subnets privadas e SG apenas a partir do cluster. |
+| **Custos** | RDS, NAT e EKS geram cobrança; use `terraform destroy` e `enable_rds = false` quando não precisar. |
 
 ## Equivalente aceitável (alinhamento com docente)
 
-Algumas turmas aceitam:
+- **RDS via Terraform** + **K8s** com YAML versionado + **pipeline** com build, testes, imagem e deploy opcional costuma demonstrar o espírito do enunciado.
+- Confirme com o professor se **EKS obrigatório** ou se cluster gerido externo / local com vídeo + documentação é suficiente.
 
-- **Rede + documentação** do desenho alvo (EKS + RDS) e limites de custo, **ou**
-- Cluster **local** (kind, minikube, k3d) com **manifestos** em `/k8s` e Terraform apenas para **rede/EC2** de laboratório.
+## Próximos passos técnicos (evolução)
 
-**Confirme** com o professor qual combinação atende ao critério de avaliação.
-
-## Próximos passos técnicos (se for evoluir o código)
-
-1. Adicionar subnets **privadas** e **NAT** ao módulo de rede (ou módulo separado).
-2. Instanciar **EKS** (ou GKE/AKS em outro provider) com node groups mínimos.
-3. Instanciar **RDS PostgreSQL** na VPC, acessível apenas a partir do SG do cluster ou da aplicação.
-4. Opcional: **Helm** ou `kubectl` via `null_resource` / pipeline CI — automatiza “deploy no cluster” após imagem no registry.
+1. Subnets **privadas** + **NAT Gateway** + mover RDS para subnet group privado.
+2. Módulo **EKS** (ou outro Kubernetes gerido) e associar security groups.
+3. Backend Terraform remoto (S3 + lock) para equipa.
