@@ -13,18 +13,18 @@
 - **Persistência**: JPA + Liquibase; repositórios por contexto
 - **Testes**: testes de domínio e integração presentes; cobertura ainda abaixo do desejado para Fase 2 em endpoints e erros
 - **Documentação DDD**: linguagem ubíqua e event storming em Markdown; faltam artefatos visuais versionáveis finais (SVG ou PNG) e Domain Storytelling visual
-- **Infra**: Dockerfile e docker-compose existentes; faltam manifestos Kubernetes dedicados, Terraform em `/infra` e pipeline CI/CD completa conforme enunciado
+- **Infra**: Dockerfile e docker-compose; manifestos em `/k8s`; Terraform em `/infra` (rede AWS); CI com Maven, Terraform validate e imagem GHCR; **deploy em cluster e BD na pipeline** não automatizados (ver README raiz)
+- **README**: alinhado aos entregáveis da Fase 2 (objetivos, arquitetura, fluxo de deploy, links Swagger/OpenAPI; vídeo a publicar)
 
 ## Lacunas em relação à Fase 2
 
-| Área | Lacuna |
-|------|--------|
-| Arquitetura | Organização ainda em camadas por contexto; é necessário evoluir para hexagonal explícita (domain, application, adapters, ports) sem quebrar comportamento |
-| APIs | Listagem administrativa com ordenação por prioridade de status e exclusão lógica de finalizadas e entregues; endpoint de notificação externa de aprovação ou recusa com idempotência e segurança |
-| Notificação | Adapter de e-mail desacoplado do domínio; MailHog ou equivalente no compose local |
-| Testes | Ampliar integração de API, erros, transições inválidas, estoque e autenticação onde aplicável |
-| DDD | Domain Storytelling visual, Event Storming visual final, diagrama de agregados, dicionário ubíquo reforçado com sinônimos rejeitados |
-| Entrega | `/k8s` e `/infra` (Terraform) presentes; GitHub Actions com build, testes e imagem; deploy e smoke test ainda opcionais; README em evolução para Fase 2 |
+| Área | Lacuna / próximo passo |
+|------|-------------------------|
+| Arquitetura | Hexagonal em evolução nos bounded contexts; continuar extraindo portas e adaptadores onde fizer sentido |
+| Testes | Ampliar integração de API, erros, estoque e autenticação onde o enunciado exigir reforço |
+| DDD | Artefatos **visuais** versionáveis (SVG/PNG) em `docs/ddd/` — ver item 12 |
+| CI/CD (enunciado) | Pipeline com **deploy** no cluster, **deploy do BD** e **apply** dos YAML — **fora** do workflow atual; documentado no README como manual ou evolução futura |
+| Entrega académica | PDF no portal, vídeo (≤15 min), partilha do repo com **soat-architecture**, diagrama no PDF |
 
 ## Backlog fatiado (ordem sugerida)
 
@@ -40,7 +40,7 @@
 10. **terraform**: módulos ou stacks reproduzíveis, documentação de apply e destroy — feito (`infra/`, módulo `network` AWS, `infra/README.md`)
 11. **cicd**: pipeline com jobs separados, cache, imagem, deploy e smoke — GitHub Actions: `mvn -Pci verify` + **Terraform** `fmt`/`validate` em `infra/` + build/push da imagem para **GHCR** em push a `develop`/`master` (após build e terraform OK); deploy/smoke pendente
 12. **ddd-visual-artifacts**: drawio, PlantUML ou Mermaid com export SVG ou PNG em `docs/ddd/`
-13. **documentacao-readme-fase2**: README, arquitetura, execução local, deploy e links exigidos pelo enunciado
+13. **documentacao-readme-fase2**: README, arquitetura, execução local, deploy e links exigidos pelo enunciado — feito (README raiz); **link do vídeo** a preencher após publicação
 
 ## Riscos e mitigação
 
