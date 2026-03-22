@@ -214,6 +214,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 ### IntelliJ IDEA (Maven)
 
 - No Maven **não existe** a fase `build` (gera *Unknown lifecycle phase "build"*). Use **`clean package`**, **`clean verify`** ou a run configuration **«Oficina — clean verify (ci)»** em [`.idea/runConfigurations/`](.idea/runConfigurations/) (mesmo comando do CI: `mvn -B -Pci clean verify`).
+- **`mvn verify` sem `-Pci`** inclui `ContextLoadsTest` e `OrdemServicoFlowIntegrationTest` (Testcontainers). **Sem Docker a correr**, falham. O perfil **`ci`** exclui esses testes (igual ao GitHub Actions).
 - Script na raiz: `.\scripts\mvn-verify.ps1`
 - O ficheiro [`.mvn/jvm.config`](.mvn/jvm.config) fixa **UTF-8** para o Maven (reduz conflitos com `JAVA_TOOL_OPTIONS` em IBM850).
 
