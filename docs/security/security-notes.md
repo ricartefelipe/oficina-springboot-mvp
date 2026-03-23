@@ -27,6 +27,12 @@ Definir decisoes de seguranca e trade-offs do MVP, alinhado ao enunciado.
   - o header e retornado em todas as respostas, inclusive 401/403.
 - Logs incluem `correlationId` via MDC.
 
+## Dependencias e CVEs (baseline)
+- **Fonte de verdade de versoes:** `spring-boot-starter-parent` (BOM) — atualizar **minor/patch** do Spring Boot para absorver correcoes em Logback, Tomcat, Spring Framework, drivers, etc.
+- **Excecoes:** apenas versoes declaradas no `pom.xml` quando nao geridas pelo BOM (ex.: `springdoc`, `logstash-logback-encoder`, Testcontainers) ou override pontual documentado.
+- **SCA (Mend, OWASP Dependency-Check, Trivy):** reexecutar apos upgrades; alertas "Insufficient Information" ou falsos positivos exigem triagem manual.
+- **CI:** `mvn -Pci verify` alinha com exclusao de testes que exigem Docker local; o repositorio usa **Dependabot** (`.github/dependabot.yml`) para propor PRs de atualizacao.
+
 ## Trade-offs do MVP
 - Keycloak adiciona peso ao docker-compose, mas entrega um fluxo realista de JWT/roles.
 - Credenciais default e secrets sao apenas para DEV (nao producao).
