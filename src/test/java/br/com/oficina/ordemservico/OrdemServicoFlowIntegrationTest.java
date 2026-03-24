@@ -1,12 +1,12 @@
 package br.com.oficina.ordemservico;
 
+import br.com.oficina.support.KeycloakJwtRequestPostProcessor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -24,7 +24,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -45,12 +44,10 @@ class OrdemServicoFlowIntegrationTest {
             .withPassword("oficina");
 
     @DynamicPropertySource
-    static void registerProps(DynamicPropertyRegistry registry) {
+    static void registerPgProps(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
-
-        // Evita dependencias externas (Keycloak) para executar os testes.
         registry.add("security.jwt.jwk-set-uri", () -> "http://localhost/dummy");
         registry.add("security.jwt.allowed-issuers", () -> "");
     }
@@ -64,17 +61,17 @@ class OrdemServicoFlowIntegrationTest {
     @Test
     void endpointsAdminDevemExigirJwtComRoleAdmin() throws Exception {
         // Sem token -> 401
-        mockMvc.perform(get("/api/admin/clientes"))
+        mockMvc.perform(get("/admin/clientes"))
                 .andExpect(status().isUnauthorized());
 
         // Com token, mas sem role ADMIN -> 403
-        mockMvc.perform(get("/api/admin/clientes")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"))))
+        mockMvc.perform(get("/admin/clientes")
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("USER")))
                 .andExpect(status().isForbidden());
 
         // Com role ADMIN -> 200
-        mockMvc.perform(get("/api/admin/clientes")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        mockMvc.perform(get("/admin/clientes")
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk());
     }
 
@@ -108,8 +105,8 @@ class OrdemServicoFlowIntegrationTest {
         );
 
         // 1) Criar OS (RECEBIDA)
-        MvcResult createdResult = mockMvc.perform(post("/api/admin/ordens-servico")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+        MvcResult createdResult = mockMvc.perform(post("/admin/ordens-servico")
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN"))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isCreated())
@@ -127,26 +124,26 @@ class OrdemServicoFlowIntegrationTest {
         assertEquals(0, new BigDecimal("220.00").compareTo(orcamentoTotal));
 
         // 2) Iniciar diagnostico
-        mockMvc.perform(post("/api/admin/ordens-servico/{id}/diagnostico/iniciar", osId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        mockMvc.perform(post("/admin/ordens-servico/{id}/diagnostico/iniciar", osId)
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("EM_DIAGNOSTICO"));
 
         // 3) Enviar orcamento
-        mockMvc.perform(post("/api/admin/ordens-servico/{id}/orcamento/enviar", osId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        mockMvc.perform(post("/admin/ordens-servico/{id}/orcamento/enviar", osId)
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("AGUARDANDO_APROVACAO"))
                 .andExpect(jsonPath("$.orcamentoEnviadoAt").isNotEmpty());
 
         // 4) Consulta publica por trackingCode
-        mockMvc.perform(get("/api/public/ordens-servico/{trackingCode}", trackingCode))
+        mockMvc.perform(get("/public/ordens-servico/{trackingCode}", trackingCode))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.trackingCode").value(trackingCode))
                 .andExpect(jsonPath("$.status").value("AGUARDANDO_APROVACAO"));
 
         // 5) Aprovar orcamento (public). Ao aprovar entra em EM_EXECUCAO e decrementa estoque
-        mockMvc.perform(post("/api/public/ordens-servico/{trackingCode}/aprovar", trackingCode)
+        mockMvc.perform(post("/public/ordens-servico/{trackingCode}/aprovar", trackingCode)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of("cpfCnpj", cpf))))
                 .andExpect(status().isOk())
@@ -154,26 +151,26 @@ class OrdemServicoFlowIntegrationTest {
                 .andExpect(jsonPath("$.aprovadoAt").isNotEmpty());
 
         // Estoque da peca deve ter decrementado (seed: 50, usado: 2 => 48)
-        mockMvc.perform(get("/api/admin/pecas/{id}", PECA_FILTRO_OLEO_ID)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        mockMvc.perform(get("/admin/pecas/{id}", PECA_FILTRO_OLEO_ID)
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estoqueAtual").value(48));
 
         // 6) Finalizar execucao
-        mockMvc.perform(post("/api/admin/ordens-servico/{id}/execucao/finalizar", osId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        mockMvc.perform(post("/admin/ordens-servico/{id}/execucao/finalizar", osId)
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("FINALIZADA"));
 
         // 7) Registrar entrega
-        mockMvc.perform(post("/api/admin/ordens-servico/{id}/entrega/registrar", osId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        mockMvc.perform(post("/admin/ordens-servico/{id}/entrega/registrar", osId)
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("ENTREGUE"));
 
         // 8) Metricas (tempo medio execucao) deve considerar ao menos 1 OS
-        MvcResult metricasResult = mockMvc.perform(get("/api/admin/metricas/tempo-medio-execucao")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        MvcResult metricasResult = mockMvc.perform(get("/admin/metricas/tempo-medio-execucao")
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -203,8 +200,8 @@ class OrdemServicoFlowIntegrationTest {
                 )
         );
 
-        MvcResult createdResult = mockMvc.perform(post("/api/admin/ordens-servico")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
+        MvcResult createdResult = mockMvc.perform(post("/admin/ordens-servico")
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN"))
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isCreated())
@@ -215,16 +212,16 @@ class OrdemServicoFlowIntegrationTest {
         String trackingCode = created.get("trackingCode").asText();
 
         // diagnostico + enviar orcamento
-        mockMvc.perform(post("/api/admin/ordens-servico/{id}/diagnostico/iniciar", osId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        mockMvc.perform(post("/admin/ordens-servico/{id}/diagnostico/iniciar", osId)
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/admin/ordens-servico/{id}/orcamento/enviar", osId)
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+        mockMvc.perform(post("/admin/ordens-servico/{id}/orcamento/enviar", osId)
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk());
 
         // cpf errado -> 409
-        mockMvc.perform(post("/api/public/ordens-servico/{trackingCode}/aprovar", trackingCode)
+        mockMvc.perform(post("/public/ordens-servico/{trackingCode}/aprovar", trackingCode)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of("cpfCnpj", "111.444.777-35"))))
                 .andExpect(status().isConflict())

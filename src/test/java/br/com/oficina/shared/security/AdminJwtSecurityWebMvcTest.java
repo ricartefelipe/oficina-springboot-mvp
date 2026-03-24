@@ -3,6 +3,7 @@ package br.com.oficina.shared.security;
 import br.com.oficina.cadastros.cliente.api.admin.AdminClienteController;
 import br.com.oficina.cadastros.cliente.application.ClienteService;
 import br.com.oficina.cadastros.cliente.domain.Cliente;
+import br.com.oficina.support.KeycloakJwtRequestPostProcessor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -10,13 +11,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,14 +44,14 @@ class AdminJwtSecurityWebMvcTest {
     @Test
     void listarComJwtSemRoleAdminRetorna403() throws Exception {
         mockMvc.perform(get("/admin/clientes")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"))))
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("USER")))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void listarComRoleAdminRetorna200() throws Exception {
         mockMvc.perform(get("/admin/clientes")
-                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                        .with(KeycloakJwtRequestPostProcessor.realmRoles("ADMIN")))
                 .andExpect(status().isOk());
     }
 
