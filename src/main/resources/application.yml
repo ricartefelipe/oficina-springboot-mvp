@@ -15,7 +15,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    open-in-view: false
+    # OSIV: permite montar OrdemServicoDetalheResponse.from após o @Transactional do serviço (coleções lazy).
+    open-in-view: true
 
   liquibase:
     enabled: true

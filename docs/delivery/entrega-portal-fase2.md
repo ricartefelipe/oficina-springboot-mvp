@@ -3,7 +3,7 @@
 **Grupo:** Oficina Turbo (106)  
 **Aluno:** Felipe Ricarte Magalhães  
 
-Documento para **entrega no portal** (PDF): repositório, `soat-architecture`, arquitetura e link do vídeo (≤ 15 min). Versão PDF gerada: `entrega-portal-fase2.pdf` (mesma pasta).
+Documento para **entrega no portal** (PDF): repositório, `soat-architecture`, arquitetura e vídeo demonstrativo (≤ 15 min; URL alinhado ao [README](../../README.md)). Versão PDF gerada: `entrega-portal-fase2.pdf` (mesma pasta).
 
 ---
 
@@ -52,11 +52,11 @@ Detalhe do alinhamento ao enunciário (cluster EKS vs. abordagem do repo): [`inf
 
 ---
 
-## 3. Link do vídeo demonstrativo (≤ 15 min)
+## 3. Vídeo demonstrativo (≤ 15 min)
 
 **Plataforma:** YouTube ou Vimeo (público ou não listado).
 
-**Link:** *[COLAR AQUI O URL APÓS PUBLICAR]*
+**Link:** o mesmo URL publicado na tabela **Links rápidos (APIs e vídeo)** do [`README.md`](../../README.md) do repositório (atualizar o README e regenerar este PDF após publicar).
 
 **Conteúdo mínimo (conforme enunciário Fase 2):**
 
@@ -83,9 +83,9 @@ Com a app em `http://localhost:8080`:
 ## 5. Checklist antes de submeter o PDF no portal
 
 - [ ] Convite **`soat-architecture`** aceite no repositório  
-- [ ] PDF contém **link do GitHub**, **diagramas/arquitetura** e **link do vídeo**  
+- [ ] PDF contém **link do GitHub**, **diagramas/arquitetura** e **URL do vídeo** (consistente com o README)  
 - [ ] Vídeo com duração **≤ 15 minutos** e tópicos do enunciário  
-- [ ] `README.md` no GitHub atualizado com o **mesmo link do vídeo**  
+- [ ] [`README.md`](../../README.md) no GitHub com o link do vídeo na tabela **Links rápidos**  
 
 Documento complementar: [`submission.md`](submission.md) (e [`submission.pdf`](submission.pdf)).
 

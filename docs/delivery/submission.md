@@ -15,7 +15,7 @@
   - **Acesso ao avaliador SOAT:** utilizador de organização **`soat-architecture`** com permissão de leitura (ou conforme o enunciado). Passos: [Convidar o utilizador no GitHub](#1-convidar-soat-architecture-no-repositório).
 - **Documento para o PDF do portal (Fase 2):** [`entrega-portal-fase2.md`](entrega-portal-fase2.md) — *estrutura alinhada ao enunciário (repo, arquitetura, vídeo, Swagger).*
 - **Swagger (local):** http://localhost:8080/api/swagger-ui/index.html
-- **Vídeo demonstrativo (≤ 15 min):** *colar aqui o URL público (YouTube ou Vimeo) após publicação — e o mesmo na tabela de “Links rápidos (APIs e vídeo)” no [README](../../README.md).*
+- **Vídeo demonstrativo (≤ 15 min):** o URL público (YouTube ou Vimeo) será o mesmo indicado na tabela **Links rápidos (APIs e vídeo)** do [README](../../README.md) quando estiver publicado.
 - **PDF deste documento (gerado):** `submission.pdf` (na mesma pasta; ver [Conversão para PDF](#conversão-para-pdf-offline)).
 
 ## Diagramas de arquitetura (DDD)
@@ -46,15 +46,7 @@
 
 ### 3. Vídeo (≤ 15 minutos)
 
-1. Grava o vídeo (deploy, CI/CD, consumo de APIs, escalabilidade — ver [`docs/video-script.md`](../video-script.md)).
-2. Publica no **YouTube** (não listado ou público) ou **Vimeo**.
-3. Cola o **link público** em:
-   - este ficheiro (linha “Vídeo demonstrativo” em [Links do projeto](#links-do-projeto));
-   - o [README](../../README.md) na tabela “Links rápidos (APIs e vídeo)”.
-
-### 4. Link do vídeo no README (para não esquecer)
-
-No ficheiro `README.md`, na tabela da secção **Links rápidos (APIs e vídeo)**, substitui a célula do vídeo (texto *Substituir pelo link após publicar…*) pelo URL real do vídeo.
+Roteiro e tópicos obrigatórios: [`docs/video-script.md`](../video-script.md). Após publicar no **YouTube** ou **Vimeo**, atualiza o URL no [README](../../README.md) (tabela **Links rápidos**); o documento de portal [`entrega-portal-fase2.md`](entrega-portal-fase2.md) deve refletir o mesmo link na respetiva secção.
 
 ---
 
