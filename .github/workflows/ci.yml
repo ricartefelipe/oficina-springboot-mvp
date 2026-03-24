@@ -24,9 +24,6 @@ jobs:
 
   terraform:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: infra
     steps:
       - uses: actions/checkout@v6
 
@@ -35,14 +32,25 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      - name: Terraform fmt (check)
+      - name: Terraform fmt (check) — AWS
+        working-directory: infra
         run: terraform fmt -check -recursive
 
-      - name: Terraform init
-        run: terraform init -backend=false
+      - name: Terraform fmt (check) — Kind
+        working-directory: infra/kind
+        run: terraform fmt -check -recursive
 
-      - name: Terraform validate
-        run: terraform validate
+      - name: Terraform init/validate — AWS
+        working-directory: infra
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Terraform init/validate — Kind
+        working-directory: infra/kind
+        run: |
+          terraform init -backend=false
+          terraform validate
 
   docker:
     needs: [build, terraform]

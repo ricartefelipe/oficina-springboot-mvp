@@ -31,7 +31,7 @@ Para facilitar a migração para Miro (ou ferramenta equivalente), usaremos uma 
 
 > Observação: o código do MVP não precisa necessariamente ter classes explícitas de evento; o Event Storming documenta a linguagem do domínio e o comportamento, independente de implementação.
 
-## 3) Fluxo 1 — Criação e acompanhamento da OS
+## 3) Fluxo 1 - Criação e acompanhamento da OS
 
 ### Atores
 - **Admin** (usuário interno): cria OS, inicia diagnóstico, envia orçamento, finaliza execução, registra entrega.
@@ -113,7 +113,7 @@ Para facilitar a migração para Miro (ou ferramenta equivalente), usaremos uma 
 - `trackingCode` é gerado na criação e é a chave de consulta pública.
 - Aprovação exige validação adicional via CPF/CNPJ (sem login do cliente no MVP).
 
-## 4) Fluxo 2 — Gestão de peças e insumos (estoque)
+## 4) Fluxo 2 - Gestão de peças e insumos (estoque)
 
 ### Atores
 - **Admin**: mantém catálogo de peças/insumos e estoque.

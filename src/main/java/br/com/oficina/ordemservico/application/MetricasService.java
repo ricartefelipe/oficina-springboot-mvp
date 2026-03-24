@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Service
 public class MetricasService {
@@ -20,8 +21,11 @@ public class MetricasService {
 
     @Transactional(readOnly = true)
     public TempoMedioExecucao calcularTempoMedioExecucao(OffsetDateTime from, OffsetDateTime to) {
-        Double avgSeconds = ordemServicoPersistence.avgExecutionSeconds(from, to);
-        Long count = ordemServicoPersistence.countExecutionMeasured(from, to);
+        OffsetDateTime fromEff = from != null ? from : OffsetDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        OffsetDateTime toEff = to != null ? to : OffsetDateTime.of(9999, 12, 31, 23, 59, 59, 999_999_999, ZoneOffset.UTC);
+
+        Double avgSeconds = ordemServicoPersistence.avgExecutionSeconds(fromEff, toEff);
+        Long count = ordemServicoPersistence.countExecutionMeasured(fromEff, toEff);
 
         if (avgSeconds == null || count == null || count == 0) {
             return new TempoMedioExecucao(from, to, 0L, BigDecimal.ZERO, "PT0S");
