@@ -12,8 +12,8 @@
 - **Segurança**: JWT com Keycloak para admin; rotas públicas para consulta e aprovação com validações
 - **Persistência**: JPA + Liquibase; repositórios por contexto
 - **Testes**: testes de domínio e integração presentes; cobertura ainda abaixo do desejado para Fase 2 em endpoints e erros
-- **Documentação DDD**: linguagem ubíqua e event storming em Markdown; faltam artefatos visuais versionáveis finais (SVG ou PNG) e Domain Storytelling visual
-- **Infra**: Dockerfile e docker-compose; `/k8s`; Terraform **rede + RDS opcional**; CI Maven + Terraform validate + GHCR; **workflows manuais** Deploy Kubernetes e Terraform AWS (RDS com `enable_rds`); EKS não versionado
+- **Documentação DDD**: linguagem ubíqua e event storming em Markdown; diagramas **SVG** em `docs/ddd/diagrams/`; opcional evoluir Domain Storytelling visual dedicado se o docente reforçar feedback da Fase 1
+- **Infra**: Dockerfile e docker-compose; `/k8s`; Terraform **AWS** (rede + RDS opcional) e **Kind local** em `infra/kind`; CI Maven + Terraform validate (AWS + Kind) + GHCR; **workflows manuais** Deploy Kubernetes e Terraform AWS; **EKS** na AWS não está no Terraform (cluster gerido seria evolução)
 - **README**: alinhado aos entregáveis da Fase 2 (objetivos, arquitetura, fluxo de deploy, links Swagger/OpenAPI; URL do vídeo na tabela **Links rápidos** quando publicado)
 
 ## Lacunas em relação à Fase 2
