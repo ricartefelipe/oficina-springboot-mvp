@@ -49,7 +49,8 @@ public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, U
             "transicoesStatus"
     })
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<OrdemServico> findDetailedByIdForUpdate(UUID id);
+    @Query("select o from OrdemServico o where o.id = :id")
+    Optional<OrdemServico> findDetailedByIdForUpdate(@Param("id") UUID id);
 
     @EntityGraph(attributePaths = {
             "cliente",
@@ -64,14 +65,14 @@ public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, U
 
     @Query(
             value = """
-                    select avg(extract(epoch from (t_final.ocorrido_em - t_exec.ocorrido_em)))
+                    select avg(extract(epoch from t_final.ocorrido_em) - extract(epoch from t_exec.ocorrido_em))
                     from os_transicoes_status t_exec
                     join os_transicoes_status t_final
                       on t_final.ordem_servico_id = t_exec.ordem_servico_id
                     where t_exec.para_status = 'EM_EXECUCAO'
                       and t_final.para_status = 'FINALIZADA'
-                      and (:from is null or t_final.ocorrido_em >= :from)
-                      and (:to is null or t_final.ocorrido_em <= :to)
+                      and t_final.ocorrido_em >= :from
+                      and t_final.ocorrido_em <= :to
                     """,
             nativeQuery = true
     )
@@ -85,8 +86,8 @@ public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, U
                       on t_final.ordem_servico_id = t_exec.ordem_servico_id
                     where t_exec.para_status = 'EM_EXECUCAO'
                       and t_final.para_status = 'FINALIZADA'
-                      and (:from is null or t_final.ocorrido_em >= :from)
-                      and (:to is null or t_final.ocorrido_em <= :to)
+                      and t_final.ocorrido_em >= :from
+                      and t_final.ocorrido_em <= :to
                     """,
             nativeQuery = true
     )

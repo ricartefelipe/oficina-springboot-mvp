@@ -119,7 +119,7 @@ Com a aplicação a correr em `http://localhost:8080` e `server.servlet.context-
 |---------|-----|
 | **Swagger UI** | [http://localhost:8080/api/swagger-ui/index.html](http://localhost:8080/api/swagger-ui/index.html) |
 | **OpenAPI (JSON)** | [http://localhost:8080/api/openapi](http://localhost:8080/api/openapi) — *importar no Postman: File → Import → cole o URL do OpenAPI.* |
-| **Vídeo demonstrativo** (≤ 15 min — YouTube ou Vimeo) | *Substituir pelo link após publicar. Roteiro: [`docs/video-script.md`](docs/video-script.md). PDF portal: [`docs/delivery/entrega-portal-fase2.md`](docs/delivery/entrega-portal-fase2.md). Checklist: [`docs/delivery/submission.md`](docs/delivery/submission.md#checklist-entrega-fase-2).* |
+| **Vídeo demonstrativo** (≤ 15 min — YouTube ou Vimeo) | *URL a publicar aqui quando o vídeo estiver no ar. Roteiro: [`docs/video-script.md`](docs/video-script.md). PDF portal: [`docs/delivery/entrega-portal-fase2.md`](docs/delivery/entrega-portal-fase2.md). Checklist: [`docs/delivery/submission.md`](docs/delivery/submission.md#checklist-entrega-fase-2).* |
 
 ---
 
