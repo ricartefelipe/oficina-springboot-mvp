@@ -1,9 +1,16 @@
 # Infraestrutura (Terraform)
 
-Stack reproduzível em AWS:
+Dois stacks Terraform no repositório:
+
+| Pasta | Finalidade |
+|-------|------------|
+| **`infra/`** (raiz) | **AWS**: VPC, subnets públicas, IGW; **RDS PostgreSQL opcional** (`enable_rds`). |
+| **[`kind/`](kind/)** | **Kubernetes local** com [Kind](https://kind.sigs.k8s.io/) (Docker) - cumpre o enunciário de *provisionamento do cluster Kubernetes (local ou cloud)* em ambiente de laboratório. |
+
+## Stack AWS (`infra/`)
 
 - **Módulo `network`**: VPC, duas **subnets públicas** em AZs distintas, **Internet Gateway** e rota `0.0.0.0/0`.
-- **Módulo `database` (opcional)**: PostgreSQL **RDS** quando `enable_rds = true` — ver secção abaixo.
+- **Módulo `database` (opcional)**: PostgreSQL **RDS** quando `enable_rds = true` - ver secção abaixo.
 
 ## Pré-requisitos
 
@@ -13,7 +20,7 @@ Stack reproduzível em AWS:
 
 ## Estado (backend local)
 
-Por defeito o estado fica em ficheiros locais (`terraform.tfstate`). **Não commite** o estado nem segredos — estão no `.gitignore` na raiz do repositório.
+Por defeito o estado fica em ficheiros locais (`terraform.tfstate`). **Não commite** o estado nem segredos - estão no `.gitignore` na raiz do repositório.
 
 Para equipa/produção, use backend remoto (S3 + DynamoDB lock, Terraform Cloud, etc.) e documente no vosso processo.
 
@@ -67,13 +74,13 @@ terraform destroy
 
 A instância fica nas **subnets públicas** com `publicly_accessible = true` (cenário de laboratório; **não** é padrão de produção). O **Security Group** permite Postgres (5432) apenas a partir do **CIDR da VPC** (`vpc_cidr`).
 
-Após `apply` com RDS, use os outputs **`rds_jdbc_url`** e **`rds_master_password`** (sensíveis) para preencher o Secret Kubernetes (`DB_URL`, `DB_USER`, `DB_PASS`) — ver [`../k8s/README.md`](../k8s/README.md).
+Após `apply` com RDS, use os outputs **`rds_jdbc_url`** e **`rds_master_password`** (sensíveis) para preencher o Secret Kubernetes (`DB_URL`, `DB_USER`, `DB_PASS`) - ver [`../k8s/README.md`](../k8s/README.md).
 
 ## Outputs
 
 Após `apply`: `vpc_id`, `public_subnet_ids`, `availability_zones_used`. Com RDS: `rds_endpoint` e outputs sensíveis `rds_jdbc_url`, `rds_master_password`.
 
-## GitHub Actions — Terraform na AWS
+## GitHub Actions - Terraform na AWS
 
 O workflow [`.github/workflows/terraform-aws.yml`](../.github/workflows/terraform-aws.yml) (manual) executa `terraform plan` ou `apply` na pasta `infra/`. Requer secrets **`AWS_ACCESS_KEY_ID`** e **`AWS_SECRET_ACCESS_KEY`**. A região pode ser escolhida no formulário do workflow (por defeito `sa-east-1`). O campo **enable_rds** corresponde a `-var enable_rds=...`.
 
@@ -89,4 +96,5 @@ VPC, subnets e IGW **não têm custo** por si. **RDS** e tráfego geram cobranç
 | `variables.tf` / `outputs.tf` | Variáveis e outputs da raiz |
 | `modules/network/` | VPC, subnets públicas, IGW, rota default |
 | `modules/database/` | RDS PostgreSQL 16 (opcional) |
-| `docs/terraform-vs-enunciado.md` | Alinhamento com o enunciado (EKS, custos, próximos passos) |
+| `kind/` | Terraform para cluster **Kind** local (ver [`kind/README.md`](kind/README.md)) |
+| `docs/terraform-vs-enunciado.md` | Alinhamento com o enunciário (EKS, custos, próximos passos) |

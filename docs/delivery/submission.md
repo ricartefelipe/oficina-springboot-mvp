@@ -1,4 +1,4 @@
-# Tech Challenge — Fases 1 e 2 — Documento de entrega (back-end Oficina)
+# Tech Challenge - Fases 1 e 2 - Documento de entrega (back-end Oficina)
 
 ## Identificação do grupo
 
@@ -7,22 +7,22 @@
 
 ## Participantes (nome + Discord)
 
-- **Felipe Ricarte Magalhães** — Discord: **@felipe.ricarte**
+- **Felipe Ricarte Magalhães** - Discord: **@felipe.ricarte**
 
 ## Links do projeto
 
 - **Repositório (privado):** https://github.com/ricartefelipe/oficina-springboot-mvp  
   - **Acesso ao avaliador SOAT:** utilizador de organização **`soat-architecture`** com permissão de leitura (ou conforme o enunciado). Passos: [Convidar o utilizador no GitHub](#1-convidar-soat-architecture-no-repositório).
-- **Documento para o PDF do portal (Fase 2):** [`entrega-portal-fase2.md`](entrega-portal-fase2.md) — *estrutura alinhada ao enunciário (repo, arquitetura, vídeo, Swagger).*
+- **Documento para o PDF do portal (Fase 2):** [`entrega-portal-fase2.md`](entrega-portal-fase2.md) - *estrutura alinhada ao enunciário (repo, arquitetura, vídeo, Swagger).*
 - **Swagger (local):** http://localhost:8080/api/swagger-ui/index.html
 - **Vídeo demonstrativo (≤ 15 min):** o URL público (YouTube ou Vimeo) será o mesmo indicado na tabela **Links rápidos (APIs e vídeo)** do [README](../../README.md) quando estiver publicado.
 - **PDF deste documento (gerado):** `submission.pdf` (na mesma pasta; ver [Conversão para PDF](#conversão-para-pdf-offline)).
 
 ## Diagramas de arquitetura (DDD)
 
-![Diagrama — agregado Ordem de Serviço](../ddd/diagrams/ordem-servico-agregado.svg)
+![Diagrama - agregado Ordem de Serviço](../ddd/diagrams/ordem-servico-agregado.svg)
 
-![Diagrama — event storming (contextos)](../ddd/diagrams/event-storming-contextos.svg)
+![Diagrama - event storming (contextos)](../ddd/diagrams/event-storming-contextos.svg)
 
 ---
 

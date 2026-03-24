@@ -1,4 +1,4 @@
-# Tech Challenge — Fase 2 — Entrega no portal do aluno (PDF)
+# Tech Challenge - Fase 2 - Entrega no portal do aluno (PDF)
 
 **Grupo:** Oficina Turbo (106)  
 **Aluno:** Felipe Ricarte Magalhães  
@@ -33,11 +33,11 @@ Diagramas DDD versionados no repositório:
 | Agregado Ordem de Serviço | [`docs/ddd/diagrams/ordem-servico-agregado.svg`](../ddd/diagrams/ordem-servico-agregado.svg) |
 | Event storming (contextos) | [`docs/ddd/diagrams/event-storming-contextos.svg`](../ddd/diagrams/event-storming-contextos.svg) |
 
-**Figuras (desenho da arquitetura — DDD):**
+**Figuras (desenho da arquitetura - DDD):**
 
-![Diagrama — agregado Ordem de Serviço](../ddd/diagrams/ordem-servico-agregado.svg)
+![Diagrama - agregado Ordem de Serviço](../ddd/diagrams/ordem-servico-agregado.svg)
 
-![Diagrama — event storming (contextos)](../ddd/diagrams/event-storming-contextos.svg)
+![Diagrama - event storming (contextos)](../ddd/diagrams/event-storming-contextos.svg)
 
 ### 2.2 Infraestrutura e automação
 
@@ -45,7 +45,7 @@ Diagramas DDD versionados no repositório:
 |--------|---------|
 | Contêineres | `Dockerfile`, `docker-compose.yml` |
 | Orquestração | Manifestos em `/k8s` (Deployment, Service, ConfigMap, Secret, HPA) |
-| IaC | Terraform em `/infra` (rede AWS; RDS PostgreSQL opcional) |
+| IaC | Terraform: `/infra` (rede AWS; RDS PostgreSQL opcional) e `/infra/kind` (cluster Kubernetes local com Kind) |
 | CI/CD | GitHub Actions: build Maven, testes, validação Terraform, imagem GHCR; workflows manuais para deploy em Kubernetes e Terraform na AWS |
 
 Detalhe do alinhamento ao enunciário (cluster EKS vs. abordagem do repo): [`infra/docs/terraform-vs-enunciado.md`](../../infra/docs/terraform-vs-enunciado.md).
