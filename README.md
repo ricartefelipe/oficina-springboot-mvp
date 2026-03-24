@@ -79,7 +79,7 @@ flowchart TB
 |----------|----------|
 | **Docker** | `Dockerfile` multi-stage; `docker-compose.yml` (app, PostgreSQL, Keycloak, MailHog). |
 | **`/k8s`** | Namespace, Deployment, Service, ConfigMap, exemplo de Secret, HPA, probes — ver [`k8s/README.md`](k8s/README.md). |
-| **`/infra` (Terraform)** | **Rede** (VPC, subnets públicas, IGW) e **RDS PostgreSQL opcional** (`enable_rds`). Cluster gerido (EKS) não está versionado aqui — ver [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md). |
+| **`/infra` (Terraform)** | **AWS:** rede (VPC, subnets públicas, IGW) e **RDS PostgreSQL opcional** (`enable_rds`). **Kubernetes local:** [`infra/kind`](infra/kind) (Kind + Docker). Detalhe de escopos: [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md). |
 | **CI** | GitHub Actions: build Maven, testes, validação Terraform, build/push da imagem para **GHCR**. |
 | **DDD (visual)** | Diagramas SVG em [`docs/ddd/diagrams/`](docs/ddd/diagrams/) (agregado OS, event storming resumido). |
 
@@ -190,7 +190,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
   - gera orçamento automaticamente (serviços + peças)
   - gera `trackingCode` para o cliente
   - contrato da API: com `server.servlet.context-path=/api`, a abertura é `POST /api/admin/ordens-servico`; o corpo deve ter ao menos um item em `servicos`; violações de validação respondem com HTTP 400 e Problem Details; testes em `src/test/java/br/com/oficina/ordemservico/api/admin/`
-  - listagem `GET /api/admin/ordens-servico`: por defeito **não** retorna `FINALIZADA`, `ENTREGUE` nem `CANCELADA`, ordenando por prioridade operacional (execução → aguardando aprovação → diagnóstico → recebida) e, no mesmo status, pela OS **mais antiga** primeiro; use `incluirEncerradas=true` para incluir todos os status (ordenados pela criação mais recente primeiro)
+  - listagem `GET /api/admin/ordens-servico`: por defeito **não** retorna `FINALIZADA` nem `ENTREGUE` (conforme enunciário), ordenando por prioridade operacional (execução → aguardando aprovação → diagnóstico → recebida) e, no mesmo status, pela OS **mais antiga** primeiro; `CANCELADA` e outros estados ativos entram na listagem com prioridade mais baixa que `RECEBIDA`; use `incluirEncerradas=true` para incluir também finalizadas e entregues (ordenados pela criação mais recente primeiro)
 - Ações administrativas:
   - iniciar diagnóstico → `EM_DIAGNOSTICO`
   - enviar orçamento → `AGUARDANDO_APROVACAO`
