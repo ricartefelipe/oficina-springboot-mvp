@@ -12,6 +12,10 @@ public interface OrdemServicoPersistencePort {
 
     OrdemServico save(OrdemServico entity);
 
+    Optional<OrdemServico> findById(UUID id);
+
+    Optional<OrdemServico> findByTrackingCode(String trackingCode);
+
     Optional<OrdemServico> findDetailedById(UUID id);
 
     /**
