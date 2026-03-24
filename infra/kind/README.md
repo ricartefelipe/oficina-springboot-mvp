@@ -16,7 +16,7 @@ terraform plan
 terraform apply
 ```
 
-Apos o `apply`, configure o kubectl (exemplo — ajuste ao output real):
+Apos o `apply`, configure o kubectl (exemplo - ajuste ao output real):
 
 ```bash
 terraform output -raw kubeconfig > "$HOME/.kube/oficina-kind-config"
