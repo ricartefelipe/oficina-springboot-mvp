@@ -1,4 +1,4 @@
-# Kubernetes — aplicação Oficina
+# Kubernetes - aplicação Oficina
 
 Manifestos para o namespace `oficina`: **Deployment**, **Service**, **ConfigMap**, **Secret** (exemplo), **HPA** e probes HTTP nos endpoints do Actuator (`/actuator/health/*`).
 

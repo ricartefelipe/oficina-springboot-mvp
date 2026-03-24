@@ -4,14 +4,14 @@ Este roteiro cobre o MVP (Fase 1) e deve ser **complementado** com os blocos obr
 
 Sugestao: grave em 1080p, com fonte grande e zoom (se necessario). Evite mostrar tokens completos em tela.
 
-## Fase 2 — O que o enunciario exige no video (prioridade)
+## Fase 2 - O que o enunciario exige no video (prioridade)
 
 Reserve tempo para mostrar **nesta ordem** (pode encurtar secoes 5–8 da Fase 1 se precisar de minutos):
 
-1. **Deploy da aplicacao** — `docker compose up` e/ou `kubectl apply` (manifestos em `/k8s`), rollout.
-2. **CI/CD** — GitHub Actions: workflow `ci.yml` (build, testes, Terraform validate, imagem GHCR); mencionar workflows manuais `deploy-kubernetes.yml` / `terraform-aws.yml` se usar.
-3. **Consumo das APIs** — Swagger ou `curl` (abertura OS, consulta status, listagem admin, resposta externa ao orcamento se aplicavel).
-4. **Escalabilidade automatica** — HPA em `/k8s/hpa.yaml` (metricas CPU/memoria) e/ou simulacao de varias OS ou carga; explicar em 1 frase o comportamento esperado.
+1. **Deploy da aplicacao** - `docker compose up` e/ou `kubectl apply` (manifestos em `/k8s`), rollout.
+2. **CI/CD** - GitHub Actions: workflow `ci.yml` (build, testes, Terraform validate, imagem GHCR); mencionar workflows manuais `deploy-kubernetes.yml` / `terraform-aws.yml` se usar.
+3. **Consumo das APIs** - Swagger ou `curl` (abertura OS, consulta status, listagem admin, resposta externa ao orcamento se aplicavel).
+4. **Escalabilidade automatica** - HPA em `/k8s/hpa.yaml` (metricas CPU/memoria) e/ou simulacao de varias OS ou carga; explicar em 1 frase o comportamento esperado.
 
 Referencia: [`docs/delivery/entrega-portal-fase2.md`](delivery/entrega-portal-fase2.md).
 
