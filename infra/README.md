@@ -1,6 +1,13 @@
 # Infraestrutura (Terraform)
 
-Stack reproduzível em AWS:
+Dois stacks Terraform no repositório:
+
+| Pasta | Finalidade |
+|-------|------------|
+| **`infra/`** (raiz) | **AWS**: VPC, subnets públicas, IGW; **RDS PostgreSQL opcional** (`enable_rds`). |
+| **[`kind/`](kind/)** | **Kubernetes local** com [Kind](https://kind.sigs.k8s.io/) (Docker) — cumpre o enunciário de *provisionamento do cluster Kubernetes (local ou cloud)* em ambiente de laboratório. |
+
+## Stack AWS (`infra/`)
 
 - **Módulo `network`**: VPC, duas **subnets públicas** em AZs distintas, **Internet Gateway** e rota `0.0.0.0/0`.
 - **Módulo `database` (opcional)**: PostgreSQL **RDS** quando `enable_rds = true` — ver secção abaixo.
@@ -89,4 +96,5 @@ VPC, subnets e IGW **não têm custo** por si. **RDS** e tráfego geram cobranç
 | `variables.tf` / `outputs.tf` | Variáveis e outputs da raiz |
 | `modules/network/` | VPC, subnets públicas, IGW, rota default |
 | `modules/database/` | RDS PostgreSQL 16 (opcional) |
-| `docs/terraform-vs-enunciado.md` | Alinhamento com o enunciado (EKS, custos, próximos passos) |
+| `kind/` | Terraform para cluster **Kind** local (ver [`kind/README.md`](kind/README.md)) |
+| `docs/terraform-vs-enunciado.md` | Alinhamento com o enunciário (EKS, custos, próximos passos) |
