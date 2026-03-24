@@ -31,6 +31,7 @@ k8s/secret.yaml
 
 # Terraform (estado local e overrides; commitar .terraform.lock.hcl)
 infra/.terraform/
+infra/kind/.terraform/
 infra/*.tfstate
 infra/*.tfstate.*
 infra/terraform.tfvars
