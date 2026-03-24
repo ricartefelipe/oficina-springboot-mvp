@@ -2,12 +2,12 @@
 
 Este documento consolida os diagramas do MVP (Fase 1) do Sistema Integrado de Atendimento e Execução de Serviços de uma oficina.
 
-## Artefatos visuais (SVG — Fase 2)
+## Artefatos visuais (SVG - Fase 2)
 
 Versões exportadas para inclusão em PDFs ou apresentações:
 
 - [Agregado Ordem de Serviço](diagrams/ordem-servico-agregado.svg)
-- [Event storming — contextos (resumo)](diagrams/event-storming-contextos.svg)
+- [Event storming - contextos (resumo)](diagrams/event-storming-contextos.svg)
 
 Conteúdo:
 - Context Map (Bounded Contexts em monólito)
@@ -148,7 +148,7 @@ classDiagram
   OrdemServicoItemPeca "*" --> "1" PecaInsumo
 ```
 
-## 3) Sequência — Criação da OS (Admin)
+## 3) Sequência - Criação da OS (Admin)
 
 ```mermaid
 sequenceDiagram
@@ -171,7 +171,7 @@ sequenceDiagram
   API-->>Admin: 201 Created (OS)
 ```
 
-## 4) Sequência — Enviar orçamento (Admin)
+## 4) Sequência - Enviar orçamento (Admin)
 
 ```mermaid
 sequenceDiagram
@@ -191,7 +191,7 @@ sequenceDiagram
   API-->>Admin: 200 OK
 ```
 
-## 5) Sequência — Aprovar orçamento (Cliente) com baixa de estoque
+## 5) Sequência - Aprovar orçamento (Cliente) com baixa de estoque
 
 ```mermaid
 sequenceDiagram
@@ -213,7 +213,7 @@ sequenceDiagram
   API-->>Cliente: 200 OK
 ```
 
-## 6) Sequência — Finalizar e entregar (Admin)
+## 6) Sequência - Finalizar e entregar (Admin)
 
 ```mermaid
 sequenceDiagram
@@ -236,7 +236,7 @@ sequenceDiagram
   App-->>API: detalhe
 ```
 
-## 7) Métrica — Tempo médio de execução
+## 7) Métrica - Tempo médio de execução
 
 Definição do MVP:
 - Tempo de execução de uma OS = `timestamp(FINALIZADA) - timestamp(EM_EXECUCAO)`
