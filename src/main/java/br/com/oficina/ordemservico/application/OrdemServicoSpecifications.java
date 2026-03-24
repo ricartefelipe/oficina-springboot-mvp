@@ -39,20 +39,17 @@ public final class OrdemServicoSpecifications {
             if (excluirEncerradas) {
                 predicates.add(cb.not(root.get("status").in(
                         StatusOrdemServico.FINALIZADA,
-                        StatusOrdemServico.ENTREGUE,
-                        StatusOrdemServico.CANCELADA
+                        StatusOrdemServico.ENTREGUE
                 )));
             }
 
             if (placaNormalized != null && !placaNormalized.isBlank()) {
                 Join<Object, Object> veiculo = root.join("veiculo");
-                // Veiculo.placa.value (embeddable)
                 predicates.add(cb.equal(veiculo.get("placa").get("value"), placaNormalized));
             }
 
             if (cpfCnpjDigits != null && !cpfCnpjDigits.isBlank()) {
                 Join<Object, Object> cliente = root.join("cliente");
-                // Cliente.cpfCnpj.value (embeddable)
                 predicates.add(cb.equal(cliente.get("cpfCnpj").get("value"), cpfCnpjDigits));
             }
 

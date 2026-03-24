@@ -1,4 +1,4 @@
-# Oficina Service — Tech Challenge (Fases 1 e 2) — Back-end Spring Boot
+# Oficina Service - Tech Challenge (Fases 1 e 2) - Back-end Spring Boot
 
 Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para oficina mecânica: gestão de clientes, veículos, catálogo, peças/estoque e **ordens de serviço (OS)** com fluxo completo, consulta pública por `trackingCode`, JWT (Keycloak) e notificações por e-mail.
 
@@ -9,7 +9,7 @@ Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para
 | **Fase 1** | MVP funcional: APIs, persistência, Docker, testes, DDD em Markdown, segurança admin/público. |
 | **Fase 2** | **Resiliência e escalabilidade**: Clean Code e **arquitetura hexagonal**, testes nos fluxos críticos, **contêineres**, **Kubernetes** (`/k8s`), **IaC** (`/infra`), **CI/CD** (GitHub Actions), preparação para picos de carga (HPA, imagem no registry). |
 
-> Requisitos oficiais e entregáveis: documento **Tech Challenge — Fase 2** (disciplina SOAT).
+> Requisitos oficiais e entregáveis: documento **Tech Challenge - Fase 2** (disciplina SOAT).
 
 ### Entrega oficial (portal + repositório)
 
@@ -17,7 +17,7 @@ Conforme o enunciário: **repositório** atualizado (código, `/k8s`, `/infra`, 
 
 | Documento | Uso |
 |-----------|-----|
-| [**Entrega PDF — portal (Fase 2)**](docs/delivery/entrega-portal-fase2.md) | Conteúdo Markdown; **PDF pronto:** [`docs/delivery/entrega-portal-fase2.pdf`](docs/delivery/entrega-portal-fase2.pdf) (submeter no portal). |
+| [**Entrega PDF - portal (Fase 2)**](docs/delivery/entrega-portal-fase2.md) | Conteúdo Markdown; **PDF pronto:** [`docs/delivery/entrega-portal-fase2.pdf`](docs/delivery/entrega-portal-fase2.pdf) (submeter no portal). |
 | [Submissão / checklist](docs/delivery/submission.md) | Documento longo; **PDF pronto:** [`docs/delivery/submission.pdf`](docs/delivery/submission.pdf). |
 | [Roteiro do vídeo](docs/video-script.md) | Inclui blocos **Fase 2** obrigatórios no início do ficheiro. |
 
@@ -27,7 +27,7 @@ Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-
 
 ## Sumário
 
-- [Fase 2 — visão da solução e arquitetura](#fase-2--visão-da-solução-e-arquitetura)
+- [Fase 2 - visão da solução e arquitetura](#fase-2--visão-da-solução-e-arquitetura)
 - [Fluxo de deploy e CI/CD](#fluxo-de-deploy-e-cicd)
 - [Links rápidos (APIs e vídeo)](#links-rápidos-apis-e-vídeo)
 - [1. Stack e decisões técnicas](#1-stack-e-decisões-técnicas)
@@ -40,7 +40,7 @@ Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-
 
 ---
 
-## Fase 2 — visão da solução e arquitetura
+## Fase 2 - visão da solução e arquitetura
 
 ### Componentes da aplicação
 
@@ -78,8 +78,8 @@ flowchart TB
 | Artefato | Conteúdo |
 |----------|----------|
 | **Docker** | `Dockerfile` multi-stage; `docker-compose.yml` (app, PostgreSQL, Keycloak, MailHog). |
-| **`/k8s`** | Namespace, Deployment, Service, ConfigMap, exemplo de Secret, HPA, probes — ver [`k8s/README.md`](k8s/README.md). |
-| **`/infra` (Terraform)** | **Rede** (VPC, subnets públicas, IGW) e **RDS PostgreSQL opcional** (`enable_rds`). Cluster gerido (EKS) não está versionado aqui — ver [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md). |
+| **`/k8s`** | Namespace, Deployment, Service, ConfigMap, exemplo de Secret, HPA, probes - ver [`k8s/README.md`](k8s/README.md). |
+| **`/infra` (Terraform)** | **AWS:** rede (VPC, subnets públicas, IGW) e **RDS PostgreSQL opcional** (`enable_rds`). **Kubernetes local:** [`infra/kind`](infra/kind) (Kind + Docker). Detalhe de escopos: [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md). |
 | **CI** | GitHub Actions: build Maven, testes, validação Terraform, build/push da imagem para **GHCR**. |
 | **DDD (visual)** | Diagramas SVG em [`docs/ddd/diagrams/`](docs/ddd/diagrams/) (agregado OS, event storming resumido). |
 
@@ -95,17 +95,17 @@ flowchart LR
     I[docker build + push GHCR]
   end
   B --> T --> I
-  subgraph Manual["Deploy alvo — fora da pipeline atual"]
+  subgraph Manual["Deploy alvo - fora da pipeline atual"]
     K[kubectl apply -f k8s/]
     TF[terraform apply em infra/]
   end
   I -.->|imagem| K
 ```
 
-1. **Desenvolvimento local**: `docker compose up --build` — sobe aplicação, PostgreSQL, Keycloak e MailHog (ver secção 4).
+1. **Desenvolvimento local**: `docker compose up --build` - sobe aplicação, PostgreSQL, Keycloak e MailHog (ver secção 4).
 2. **Integração contínua (repositório)**: em cada push a `develop` ou `master`, o workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) executa **build e testes** (`mvn -B -Pci verify`), **validação Terraform** em `infra/` (sem credenciais cloud) e **build/push da imagem Docker** para `ghcr.io/<org>/<repo>`. Em pull requests rodam build e Terraform; **não** há publicação de imagem.
 3. **Deploy em Kubernetes**: `kubectl apply` conforme [`k8s/README.md`](k8s/README.md) **ou** workflow [`.github/workflows/deploy-kubernetes.yml`](.github/workflows/deploy-kubernetes.yml) (secret **`KUBE_CONFIG_B64`**, rollout e smoke opcionais, imagem opcional). Secret JDBC a partir do RDS Terraform ou outro Postgres: `k8s/secret.example.yaml`.
-4. **Terraform na AWS (workflow manual)**: [`.github/workflows/terraform-aws.yml`](.github/workflows/terraform-aws.yml) — secrets **`AWS_ACCESS_KEY_ID`** e **`AWS_SECRET_ACCESS_KEY`**, `plan`/`apply` e **enable_rds** para RDS (custo). Em alternativa, CLI em [`infra/README.md`](infra/README.md).
+4. **Terraform na AWS (workflow manual)**: [`.github/workflows/terraform-aws.yml`](.github/workflows/terraform-aws.yml) - secrets **`AWS_ACCESS_KEY_ID`** e **`AWS_SECRET_ACCESS_KEY`**, `plan`/`apply` e **enable_rds** para RDS (custo). Em alternativa, CLI em [`infra/README.md`](infra/README.md).
 5. **Rede e BD (Terraform)**: `terraform apply` com `enable_rds` conforme necessidade; `terraform destroy` para remover. Contexto do enunciado: [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md).
 6. **Migrações de esquema**: **Liquibase** na subida da aplicação (sem job DDL separado na pipeline).
 
@@ -118,8 +118,8 @@ Com a aplicação a correr em `http://localhost:8080` e `server.servlet.context-
 | Recurso | URL |
 |---------|-----|
 | **Swagger UI** | [http://localhost:8080/api/swagger-ui/index.html](http://localhost:8080/api/swagger-ui/index.html) |
-| **OpenAPI (JSON)** | [http://localhost:8080/api/openapi](http://localhost:8080/api/openapi) — *importar no Postman: File → Import → cole o URL do OpenAPI.* |
-| **Vídeo demonstrativo** (≤ 15 min — YouTube ou Vimeo) | *URL a publicar aqui quando o vídeo estiver no ar. Roteiro: [`docs/video-script.md`](docs/video-script.md). PDF portal: [`docs/delivery/entrega-portal-fase2.md`](docs/delivery/entrega-portal-fase2.md). Checklist: [`docs/delivery/submission.md`](docs/delivery/submission.md#checklist-entrega-fase-2).* |
+| **OpenAPI (JSON)** | [http://localhost:8080/api/openapi](http://localhost:8080/api/openapi) - *importar no Postman: File → Import → cole o URL do OpenAPI.* |
+| **Vídeo demonstrativo** (≤ 15 min - YouTube ou Vimeo) | *URL a publicar aqui quando o vídeo estiver no ar. Roteiro: [`docs/video-script.md`](docs/video-script.md). PDF portal: [`docs/delivery/entrega-portal-fase2.md`](docs/delivery/entrega-portal-fase2.md). Checklist: [`docs/delivery/submission.md`](docs/delivery/submission.md#checklist-entrega-fase-2).* |
 
 ---
 
@@ -190,7 +190,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
   - gera orçamento automaticamente (serviços + peças)
   - gera `trackingCode` para o cliente
   - contrato da API: com `server.servlet.context-path=/api`, a abertura é `POST /api/admin/ordens-servico`; o corpo deve ter ao menos um item em `servicos`; violações de validação respondem com HTTP 400 e Problem Details; testes em `src/test/java/br/com/oficina/ordemservico/api/admin/`
-  - listagem `GET /api/admin/ordens-servico`: por defeito **não** retorna `FINALIZADA`, `ENTREGUE` nem `CANCELADA`, ordenando por prioridade operacional (execução → aguardando aprovação → diagnóstico → recebida) e, no mesmo status, pela OS **mais antiga** primeiro; use `incluirEncerradas=true` para incluir todos os status (ordenados pela criação mais recente primeiro)
+  - listagem `GET /api/admin/ordens-servico`: por defeito **não** retorna `FINALIZADA` nem `ENTREGUE` (conforme enunciário), ordenando por prioridade operacional (execução → aguardando aprovação → diagnóstico → recebida) e, no mesmo status, pela OS **mais antiga** primeiro; `CANCELADA` e outros estados ativos entram na listagem com prioridade mais baixa que `RECEBIDA`; use `incluirEncerradas=true` para incluir também finalizadas e entregues (ordenados pela criação mais recente primeiro)
 - Ações administrativas:
   - iniciar diagnóstico → `EM_DIAGNOSTICO`
   - enviar orçamento → `AGUARDANDO_APROVACAO`
@@ -213,7 +213,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
 
 ### IntelliJ IDEA (Maven)
 
-- No Maven **não existe** a fase `build` (gera *Unknown lifecycle phase "build"*). Use **`clean package`**, **`clean verify`** ou a run configuration **«Oficina — clean verify (ci)»** em [`.idea/runConfigurations/`](.idea/runConfigurations/) (mesmo comando do CI: `mvn -B -Pci clean verify`).
+- No Maven **não existe** a fase `build` (gera *Unknown lifecycle phase "build"*). Use **`clean package`**, **`clean verify`** ou a run configuration **«Oficina - clean verify (ci)»** em [`.idea/runConfigurations/`](.idea/runConfigurations/) (mesmo comando do CI: `mvn -B -Pci clean verify`).
 - **`mvn verify` sem `-Pci`** inclui `ContextLoadsTest` e `OrdemServicoFlowIntegrationTest` (Testcontainers). **Sem Docker a correr**, falham. O perfil **`ci`** exclui esses testes (igual ao GitHub Actions).
 - Script na raiz: `.\scripts\mvn-verify.ps1`
 - O ficheiro [`.mvn/jvm.config`](.mvn/jvm.config) fixa **UTF-8** para o Maven (reduz conflitos com `JAVA_TOOL_OPTIONS` em IBM850).

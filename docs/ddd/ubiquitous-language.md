@@ -27,7 +27,7 @@ Este glossário padroniza os termos usados no domínio do MVP (Fase 1) do Sistem
 - **Peça/Insumo**: item de estoque usado na execução do serviço (ex.: óleo, filtro). Possui:
   - **Preço unitário**
   - **Estoque atual**
-  - **Estoque mínimo** (ponto de atenção — não bloqueia automaticamente, mas sinaliza)
+  - **Estoque mínimo** (ponto de atenção - não bloqueia automaticamente, mas sinaliza)
 
 - **Ordem de Serviço (OS)**: registro do atendimento do veículo, incluindo itens de serviço e peças, orçamento, status e histórico.
 - **Tracking Code**: código gerado na criação da OS para permitir **consulta pública** (cliente) sem login.
