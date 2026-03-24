@@ -118,7 +118,7 @@ public class OrdemServicoService {
     @Transactional(readOnly = true)
     public OrdemServico obterPorTrackingCode(String trackingCode) {
         String tc = Strings.requireNonBlank(trackingCode, "trackingCode").trim().toUpperCase();
-        return ordemServicoPersistence.findDetailedByTrackingCode(tc)
+        return ordemServicoPersistence.findByTrackingCode(tc)
                 .orElseThrow(() -> new NotFoundException("Ordem de Servico nao encontrada"));
     }
 
@@ -151,7 +151,7 @@ public class OrdemServicoService {
 
     @Transactional
     public OrdemServico iniciarDiagnostico(UUID osId) {
-        OrdemServico os = obterDetalhe(osId);
+        OrdemServico os = carregarDetalheParaMutacao(osId);
         os.iniciarDiagnostico();
         OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("os_status_alterado osId={} status={}", saved.getId(), saved.getStatus());
@@ -160,7 +160,7 @@ public class OrdemServicoService {
 
     @Transactional
     public OrdemServico enviarOrcamento(UUID osId) {
-        OrdemServico os = obterDetalhe(osId);
+        OrdemServico os = carregarDetalheParaMutacao(osId);
         os.enviarOrcamento();
         OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("orcamento_enviado osId={} trackingCode={} orcamentoTotal={}", saved.getId(), saved.getTrackingCode(), saved.getOrcamentoTotal());
@@ -170,7 +170,7 @@ public class OrdemServicoService {
 
     @Transactional
     public OrdemServico finalizarExecucao(UUID osId) {
-        OrdemServico os = obterDetalhe(osId);
+        OrdemServico os = carregarDetalheParaMutacao(osId);
         os.finalizarExecucao();
         OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("os_status_alterado osId={} status={}", saved.getId(), saved.getStatus());
@@ -179,7 +179,7 @@ public class OrdemServicoService {
 
     @Transactional
     public OrdemServico registrarEntrega(UUID osId) {
-        OrdemServico os = obterDetalhe(osId);
+        OrdemServico os = carregarDetalheParaMutacao(osId);
         os.registrarEntrega();
         OrdemServico saved = ordemServicoPersistence.save(os);
         log.info("os_status_alterado osId={} status={}", saved.getId(), saved.getStatus());
@@ -277,6 +277,17 @@ public class OrdemServicoService {
         log.info("orcamento_aprovado osId={} trackingCode={} status={}", saved.getId(), saved.getTrackingCode(), saved.getStatus());
         notificarSeguro(n -> n.aoOrcamentoAprovado(saved));
         return saved;
+    }
+
+    /**
+     * Carrega OS com grafo de detalhe dentro da mesma transação de escrita (sem auto-invocação de
+     * {@link #obterDetalhe(UUID)} com {@code readOnly=true}).
+     */
+    private OrdemServico carregarDetalheParaMutacao(UUID osId) {
+        // findDetailedById usa @EntityGraph; em alguns cenários o Hibernate pode marcar o resultado como
+        // somente leitura, falhando no flush (InvalidDataAccessApiUsageException). Para mutação usamos findById simples.
+        return ordemServicoPersistence.findById(osId)
+                .orElseThrow(() -> new NotFoundException("Ordem de Servico nao encontrada"));
     }
 
     private void notificarSeguro(Consumer<NotificacaoOrdemServicoPort> acao) {
