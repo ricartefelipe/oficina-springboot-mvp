@@ -25,6 +25,16 @@ public class OrdemServicoPersistenceAdapter implements OrdemServicoPersistencePo
     }
 
     @Override
+    public Optional<OrdemServico> findById(UUID id) {
+        return jpa.findById(id);
+    }
+
+    @Override
+    public Optional<OrdemServico> findByTrackingCode(String trackingCode) {
+        return jpa.findByTrackingCode(trackingCode);
+    }
+
+    @Override
     public Optional<OrdemServico> findDetailedById(UUID id) {
         return jpa.findDetailedById(id);
     }

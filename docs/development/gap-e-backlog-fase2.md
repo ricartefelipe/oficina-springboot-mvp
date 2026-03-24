@@ -14,7 +14,7 @@
 - **Testes**: testes de domínio e integração presentes; cobertura ainda abaixo do desejado para Fase 2 em endpoints e erros
 - **Documentação DDD**: linguagem ubíqua e event storming em Markdown; faltam artefatos visuais versionáveis finais (SVG ou PNG) e Domain Storytelling visual
 - **Infra**: Dockerfile e docker-compose; `/k8s`; Terraform **rede + RDS opcional**; CI Maven + Terraform validate + GHCR; **workflows manuais** Deploy Kubernetes e Terraform AWS (RDS com `enable_rds`); EKS não versionado
-- **README**: alinhado aos entregáveis da Fase 2 (objetivos, arquitetura, fluxo de deploy, links Swagger/OpenAPI; vídeo a publicar)
+- **README**: alinhado aos entregáveis da Fase 2 (objetivos, arquitetura, fluxo de deploy, links Swagger/OpenAPI; URL do vídeo na tabela **Links rápidos** quando publicado)
 
 ## Lacunas em relação à Fase 2
 
