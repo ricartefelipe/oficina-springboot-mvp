@@ -1,5 +1,23 @@
 # Event Storming (Fase 1)
 
+## Figuras visuais (elementos no quadro)
+
+Versões **SVG** versionadas no repositório (podem ser importadas ou replicadas no **Miro** com post-its coloridos):
+
+- [Contextos / visão geral](diagrams/event-storming-contextos.svg)
+- [Lousa com atores, comandos [C], agregado [A], eventos [E], políticas [P], read models [R] e fluxos alternativos](diagrams/event-storming-lousa-elementos.svg)
+- [Diagrama de agregado Ordem de Serviço](diagrams/ordem-servico-agregado.svg)
+
+## Conformidade com o feedback da Fase 1
+
+O relatório de avaliação pedia explicitamente: **diagramas visuais** com atores, comandos, eventos, políticas, modelos de leitura e fluxos alternativos, além do **diagrama de agregados** na forma final do Event Storming. Este repositório passa a incluir:
+
+- [Domain Storytelling](domain-storytelling.md) (narrativa em cenas)
+- [Dicionário de Linguagem Ubíqua](dicionario-linguagem-ubiqua.md) (tabela)
+- Os **SVG** acima como base visual imediata; o texto abaixo detalha comandos e eventos para transcrição ao quadro
+
+---
+
 Este documento representa o **Event Storming completo** dos fluxos obrigatórios do MVP do back-end da oficina, conforme o enunciado do Tech Challenge (Fase 1). 
 
 Escopo do Event Storming:
@@ -155,6 +173,14 @@ B) **Baixa automática de estoque na execução**
 
 ### Read models
 - **[R] ListagemAdminPecas** com indicação `abaixoDoMinimo`.
+
+### Fluxos alternativos (obrigatório no quadro final)
+
+- **[C] ResponderOrcamentoExternamente** (integração / admin): aprovar ou recusar via endpoint idempotente; **[E] OrcamentoRecusado** leva a **CANCELADA** quando aplicável.
+- **Estoque insuficiente** na aprovação: comando falha; OS permanece **AGUARDANDO_APROVACAO** até correção de estoque ou recusa.
+- **Reprocessamento seguro**: mesma decisão externa não aplica efeito duas vezes (**idempotência** por chave).
+
+Ver também representação visual em [event-storming-lousa-elementos.svg](diagrams/event-storming-lousa-elementos.svg).
 
 ## 5) Como “colar” no Miro (ou equivalente)
 

@@ -8,8 +8,11 @@ Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para
 |------|------|
 | **Fase 1** | MVP funcional: APIs, persistência, Docker, testes, DDD em Markdown, segurança admin/público. |
 | **Fase 2** | **Resiliência e escalabilidade**: Clean Code e **arquitetura hexagonal**, testes nos fluxos críticos, **contêineres**, **Kubernetes** (`/k8s`), **IaC** (`/infra`), **CI/CD** (GitHub Actions), preparação para picos de carga (HPA, imagem no registry). |
+| **Fase 3** | **Operação corporativa**: **API Gateway**, autenticação **CPF** com **função serverless** e **JWT**, **quatro repositórios** com CI/CD e deploy na nuvem, **BD gerido**, **Kubernetes**, **Terraform**, **observabilidade** (métricas, logs, traces, dashboards). |
 
-> Requisitos oficiais e entregáveis: documento **Tech Challenge - Fase 2** (disciplina SOAT).
+> Requisitos oficiais: **Fase 2** e **Fase 3** - documentos Tech Challenge (disciplina SOAT).
+
+**Planeamento Fase 3 (arquitetura, ADRs, RFC, backlog):** [`docs/fase3/README.md`](docs/fase3/README.md).
 
 ### Entrega oficial (portal + repositório)
 
@@ -27,6 +30,7 @@ Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-
 
 ## Sumário
 
+- [Fase 3 - documentação de arquitetura (transição)](#fase-3---documentação-de-arquitetura-transição)
 - [Fase 2 - visão da solução e arquitetura](#fase-2--visão-da-solução-e-arquitetura)
 - [Fluxo de deploy e CI/CD](#fluxo-de-deploy-e-cicd)
 - [Links rápidos (APIs e vídeo)](#links-rápidos-apis-e-vídeo)
@@ -40,7 +44,15 @@ Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-
 
 ---
 
+## Fase 3 - documentação de arquitetura (transição)
+
+A Fase 3 exige **quatro repositórios Git** separados (Lambda, Terraform K8s, Terraform BD, aplicação). Este repositório concentra o **plano** e as **decisões** até a separação: ver **[`docs/fase3/`](docs/fase3/README.md)** (visão de componentes, sequência auth/OS, repositórios planejados, backlog), **[`docs/adr/`](docs/adr/README.md)** (ADRs) e **[RFC auth](docs/fase3/rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md)**.
+
+---
+
 ## Fase 2 - visão da solução e arquitetura
+
+**Checklist de conclusão (enunciário vs. repositório):** [`docs/delivery/fase2-concluida.md`](docs/delivery/fase2-concluida.md).
 
 ### Componentes da aplicação
 
@@ -81,7 +93,7 @@ flowchart TB
 | **`/k8s`** | Namespace, Deployment, Service, ConfigMap, exemplo de Secret, HPA, probes - ver [`k8s/README.md`](k8s/README.md). |
 | **`/infra` (Terraform)** | **AWS:** rede (VPC, subnets públicas, IGW) e **RDS PostgreSQL opcional** (`enable_rds`). **Kubernetes local:** [`infra/kind`](infra/kind) (Kind + Docker). Detalhe de escopos: [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md). |
 | **CI** | GitHub Actions: build Maven, testes, validação Terraform, build/push da imagem para **GHCR**. |
-| **DDD (visual)** | Diagramas SVG em [`docs/ddd/diagrams/`](docs/ddd/diagrams/) (agregado OS, event storming resumido). |
+| **DDD (visual + texto)** | Índice em [`docs/ddd/README.md`](docs/ddd/README.md): Domain Storytelling, dicionário, Event Storming, SVG em [`docs/ddd/diagrams/`](docs/ddd/diagrams/). |
 
 ---
 
@@ -250,6 +262,6 @@ Rede AWS reproduzível em [`infra/README.md`](infra/README.md). Requer credencia
 
 ### Documentação complementar (Fase 1 e artefatos)
 
-- [Event Storming](docs/ddd/event-storming.md) · [Linguagem ubíqua](docs/ddd/ubiquitous-language.md) · [Diagramas DDD](docs/ddd/diagramas.md)
+- [Índice DDD](docs/ddd/README.md) · [Domain Storytelling](docs/ddd/domain-storytelling.md) · [Dicionário linguagem ubíqua](docs/ddd/dicionario-linguagem-ubiqua.md) · [Event Storming](docs/ddd/event-storming.md) · [Linguagem ubíqua (extenso)](docs/ddd/ubiquitous-language.md) · [Diagramas DDD](docs/ddd/diagramas.md)
 - [Roteiro de vídeo](docs/video-script.md) · [Submissão / entrega](docs/delivery/submission.md)
 - [Notas de segurança](docs/security/security-notes.md) · [Relatório de vulnerabilidades](docs/security/vulnerability-report.md)
