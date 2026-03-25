@@ -1,5 +1,25 @@
 # AWS + GitHub com OIDC (passo a passo)
 
+## Modo fácil (recomendado)
+
+1. Instala o [AWS CLI](https://aws.amazon.com/cli/) e corre **`aws configure`** com uma chave IAM (só para este setup; depois o GitHub usa OIDC).
+2. Na raiz do monorepo, no PowerShell:
+
+```powershell
+Set-Location c:\wks\oficina-springboot-mvp
+.\scripts\fase3\setup-github-oidc-aws.ps1 -GitHubOwner "TEU_USER_OU_ORG" -GitHubRepo "NOME_DO_REPO"
+```
+
+Exemplo: `-GitHubOwner "ricartefelipe" -GitHubRepo "oficina-springboot-mvp"`.
+
+3. O script imprime o **ARN** — cola no GitHub: **Settings → Secrets → Actions** → secret **`AWS_ROLE_ARN`**.
+
+Script: [`scripts/fase3/setup-github-oidc-aws.ps1`](../../scripts/fase3/setup-github-oidc-aws.ps1) (cria o OIDC provider se faltar, cria/atualiza a role e anexa `PowerUserAccess` por defeito).
+
+---
+
+## Modo manual (consola AWS)
+
 O workflow **Terraform AWS** neste repositório já usa `role-to-assume` e `id-token: write`. Falta só configurar **uma vez** na AWS e colar o ARN no GitHub.
 
 Substitui nos exemplos abaixo:
