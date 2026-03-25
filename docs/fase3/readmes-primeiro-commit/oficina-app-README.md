@@ -43,6 +43,10 @@ docker compose up --build
 
 - **Swagger / OpenAPI:** `/api/swagger-ui` (com `context-path` `/api`).
 
+## Padrões de desenvolvimento
+
+- Camadas DDD e verificação automática de fronteiras (ArchUnit): no monólito de origem ver `docs/development/architecture-standards.md`. Após extrair este repositório, copiar o teste em `src/test/java/br/com/oficina/architecture/` e manter a regra no CI (`mvn -Pci verify`).
+
 ## Convite
 
 Adicionar **`soat-architecture`** com leitura (portal SOAT).
