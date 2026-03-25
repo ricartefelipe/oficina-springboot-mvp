@@ -256,6 +256,7 @@ Rede AWS reproduzível em [`infra/README.md`](infra/README.md). Requer credencia
 ## Fluxo de branches e documentos de apoio
 
 - [Convenções de branches e integração](docs/development/gitflow.md)
+- [Padrões de arquitetura e desenvolvimento](docs/development/architecture-standards.md)
 - [Diagnóstico de lacunas e backlog Fase 2](docs/development/gap-e-backlog-fase2.md)
 
 **Manutenção:** integrar trabalho em `develop` via pull request; promover para `master` quando houver uma linha estável (outro PR `develop` → `master`), como referência de entrega.
