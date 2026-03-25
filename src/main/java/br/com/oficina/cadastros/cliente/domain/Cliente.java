@@ -4,6 +4,8 @@ import br.com.oficina.shared.domain.Strings;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,6 +37,10 @@ public class Cliente {
     @Embedded
     private CpfCnpj cpfCnpj;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ClienteStatus status = ClienteStatus.ATIVO;
+
     @CreationTimestamp
     private OffsetDateTime createdAt;
 
@@ -45,15 +51,16 @@ public class Cliente {
         // JPA
     }
 
-    private Cliente(String nome, CpfCnpj cpfCnpj) {
+    private Cliente(String nome, CpfCnpj cpfCnpj, ClienteStatus status) {
         this.nome = nome;
         this.cpfCnpj = cpfCnpj;
+        this.status = status != null ? status : ClienteStatus.ATIVO;
     }
 
     public static Cliente novo(String nome, CpfCnpj cpfCnpj) {
         String normalizedNome = Strings.requireNonBlank(nome, "nome");
         Objects.requireNonNull(cpfCnpj, "cpfCnpj nao pode ser null");
-        return new Cliente(normalizedNome, cpfCnpj);
+        return new Cliente(normalizedNome, cpfCnpj, ClienteStatus.ATIVO);
     }
 
     public UUID getId() {
@@ -66,6 +73,10 @@ public class Cliente {
 
     public CpfCnpj getCpfCnpj() {
         return cpfCnpj;
+    }
+
+    public ClienteStatus getStatus() {
+        return status;
     }
 
     public OffsetDateTime getCreatedAt() {

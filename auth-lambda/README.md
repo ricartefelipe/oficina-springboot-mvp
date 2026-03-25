@@ -6,8 +6,8 @@ Codigo destinado a viver num **repositorio proprio** (`oficina-auth-lambda`) com
 
 1. Receber **CPF** (API Gateway ou integracao direta).
 2. Validar formato e digitos verificadores.
-3. Consultar **clientes** na base PostgreSQL (`clientes.cpf_cnpj`).
-4. Emitir **JWT** HS256 com `issuer`, `sub`, `cliente_id`, `authorities: [ROLE_CLIENTE]` consumivel pela aplicacao Spring (`security.cpf-jwt`).
+3. Consultar **clientes** na base PostgreSQL (`clientes.cpf_cnpj`, `clientes.status`: ATIVO/INATIVO).
+4. Emitir **JWT** HS256 com `issuer`, `sub`, `cliente_id`, `cliente_status`, `authorities: [ROLE_CLIENTE]` consumivel pela aplicacao Spring (`security.cpf-jwt`). Resposta JSON inclui `cliente_id` e `cliente_status`.
 
 ## Variaveis
 
