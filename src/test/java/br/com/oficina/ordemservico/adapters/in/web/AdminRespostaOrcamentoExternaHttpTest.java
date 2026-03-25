@@ -4,6 +4,7 @@ import br.com.oficina.cadastros.cliente.domain.Cliente;
 import br.com.oficina.cadastros.cliente.domain.CpfCnpj;
 import br.com.oficina.cadastros.veiculo.domain.Placa;
 import br.com.oficina.cadastros.veiculo.domain.Veiculo;
+import br.com.oficina.ordemservico.application.OrdemServicoObservability;
 import br.com.oficina.ordemservico.application.OrdemServicoService;
 import br.com.oficina.ordemservico.testsupport.NotificacaoOrdemServicoPortNoop;
 import br.com.oficina.ordemservico.domain.DecisaoRespostaOrcamentoExterna;
@@ -15,6 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -70,7 +73,7 @@ class AdminRespostaOrcamentoExternaHttpTest {
         boolean chamouServico;
 
         RespostaExternaStub(OrdemServico resposta) {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE);
+            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
             this.resposta = resposta;
         }
 

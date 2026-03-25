@@ -15,6 +15,9 @@ Requisitos oficiais: documento **Tech Challenge - Fase 3** (disciplina SOAT).
 | [repositorios-planejados.md](repositorios-planejados.md) | Quatro repositorios, fronteiras e responsabilidades |
 | [backlog-fase3.md](backlog-fase3.md) | Fases de entrega, dependencias e criterios de pronto |
 | [executar-fase3.md](executar-fase3.md) | Script local para quatro pastas-gêmeas, checklist GitHub/AWS e entrega |
+| [readmes-primeiro-commit/](readmes-primeiro-commit/) | README.md prontos para copiar para cada um dos 4 repositórios |
+| [PROMPT-FASE3.md](PROMPT-FASE3.md) | Prompt mestre do enunciário (guia de implementação e vídeo) |
+| [observabilidade-prometheus.md](observabilidade-prometheus.md) | Métricas Prometheus, logs `k8s`, correlação, Grafana |
 | [../adr/README.md](../adr/README.md) | ADRs (decisoes arquiteturais permanentes) |
 | [rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md](rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md) | RFC: fluxo de autenticacao e contratos |
 
@@ -30,3 +33,5 @@ O repositorio **oficina-springboot-mvp** evolui para o **repositorio da aplicaca
 | API **GET /api/cliente/sessao** (protegida `ROLE_CLIENTE`) | `br.com.oficina.cpf.api.ClienteSessaoController` |
 | Funcao **Python** (validacao CPF, consulta `clientes`, JWT) | `auth-lambda/` |
 | CI workflow Python | `.github/workflows/auth-lambda-ci.yml` |
+| **Cliente.status** (`ATIVO`/`INATIVO`) + Lambda devolve `cliente_status` | Liquibase `0005`; `auth-lambda` |
+| **Prometheus** + contador `oficina.os.criadas`; perfil **`k8s`** (logs JSON) | `micrometer-registry-prometheus`; `logback-spring.xml` |
