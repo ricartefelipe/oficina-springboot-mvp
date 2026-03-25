@@ -2,11 +2,11 @@ name: Auth Lambda (Python)
 
 on:
   push:
-    branches: [develop, master]
+    branches: [develop, master, hml, prd]
     paths:
       - "auth-lambda/**"
   pull_request:
-    branches: [develop, master]
+    branches: [develop, master, hml, prd]
     paths:
       - "auth-lambda/**"
 

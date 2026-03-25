@@ -20,7 +20,7 @@ Por defeito cria a pasta `c:\wks\oficina-fase3-repos\` (ao lado do monorepo, **n
 | `oficina-auth-lambda` | Código copiado de `auth-lambda/`, CI na raiz |
 | `oficina-infra-database` | Stack Terraform AWS (VPC + RDS opcional), sem `kind/` |
 | `oficina-infra-kubernetes` | Stack Terraform Kind (laboratório); roadmap EKS no README |
-| `oficina-app` | Cópia do código da aplicação (exclui `.git`, `target`, `.terraform`) |
+| `oficina-app` | Cópia do código da aplicação (exclui `.git`, `target`, `.terraform`) + CI + **deploy K8s por branch** |
 
 Opções úteis:
 
@@ -32,13 +32,45 @@ Opções úteis:
 .\scripts\fase3\bootstrap-repos.ps1 -DestinationRoot D:\repos\fase3
 ```
 
-Depois, em **cada** pasta: `git add -A`, `git commit`, criar repositório vazio no GitHub e `git remote add` + `git push`.
+O bootstrap inicializa Git em cada pasta com branch **`main`** (primeiro commit local).
+
+### Publicar os quatro repositórios no GitHub (CLI)
+
+Com [GitHub CLI](https://cli.github.com/) instalado e sessão iniciada (`gh auth login`):
+
+```powershell
+.\scripts\fase3\publish-fase3-repos.ps1
+```
+
+- Por defeito cria repositórios **privados** e faz push da `main`. Use `-Public` se quiseres repositórios públicos.
+- `-Owner minha-org` se os repositórios forem na organização (requer permissões na org).
+- Se o repositório remoto **já existir** no GitHub, o script associa `origin` e faz push em vez de falhar.
+
+Alternativa manual: criar os quatro repositórios vazios no site e, em cada pasta, `git remote add origin git@github.com:OWNER/NOME.git` e `git push -u origin main`.
+
+## Branches `hml` e `prd` (CI e deploy)
+
+Política suportada pelos workflows copiados pelo bootstrap e pelo monólito:
+
+| Branch | Papel típico | CI | Deploy automático (só **oficina-app**) |
+|--------|----------------|-----|----------------------------------------|
+| `develop` | integração | sim | não |
+| `master` / `main` | linha estável | sim + imagem GHCR | não |
+| `hml` | homologação | sim + imagem `ghcr.io/...:hml` | sim — ambiente **homologacao** |
+| `prd` | produção | sim + imagem `ghcr.io/...:prd` | sim — ambiente **producao** |
+
+1. Cria as branches a partir de `main`/`develop` (`git checkout -b hml`, `git push -u origin hml`, idem para `prd`).
+2. No repositório **oficina-app** (ou no monólito), em **Settings → Environments**, cria **homologacao** e **producao**.
+3. Em cada ambiente, define o secret **`KUBE_CONFIG_B64`** (kubeconfig em Base64) do cluster correspondente. Opcional: aprovadores antes do deploy (regra de proteção do ambiente).
+4. O workflow `deploy-k8s-branch.yml` corre em **push** para `hml` ou `prd`: aplica `k8s/*.yaml` e faz `kubectl set image` para `ghcr.io/<repo>:hml` ou `:prd`.
+
+Repositórios **Lambda** e **Terraform** apenas correm **validação CI** nessas branches (sem deploy automático neste modelo).
 
 ## O que só tu (ou a equipa) podes fazer
 
 ### GitHub
 
-1. Criar os quatro repositórios (vazios ou com README) na organização ou conta desejada.
+1. Criar os quatro repositórios (vazios ou com README) na organização ou conta desejada — ou usar `publish-fase3-repos.ps1`.
 2. Adicionar o utilizador **`soat-architecture`** com permissão de leitura em **todos** os quatro.
 3. **Branch protection** na branch principal (ex.: `main` ou `master`):
    - Exigir pull request antes do merge.
@@ -49,7 +81,7 @@ Se usares [GitHub CLI](https://cli.github.com/) (`gh`), podes aplicar regras sem
 
 4. **Secrets** por repositório (exemplos):
    - Infra AWS: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (ou OIDC com AWS, preferível em produção).
-   - Deploy K8s / app: kubeconfig, registry, tokens conforme o pipeline.
+   - Deploy K8s / app: `KUBE_CONFIG_B64` por **environment** (`homologacao` / `producao`) ou ao nível do repositório para testes.
 
 ### AWS
 
@@ -67,8 +99,9 @@ Se usares [GitHub CLI](https://cli.github.com/) (`gh`), podes aplicar regras sem
 ## Ordem sugerida
 
 1. Correr `bootstrap-repos.ps1` e rever os quatro diretórios.
-2. Criar repos no GitHub e fazer o primeiro push.
+2. Correr `publish-fase3-repos.ps1` (ou criar repos e fazer push manualmente).
 3. Configurar branch protection e `soat-architecture`.
-4. Adicionar secrets e testar CI (sem `apply` destrutivo em produção até validares o plano).
+4. Criar branches `hml`/`prd` e environments com `KUBE_CONFIG_B64` quando o cluster existir.
+5. Adicionar secrets AWS e testar CI (sem `apply` destrutivo em produção até validares o plano).
 
 Para o mapa de responsabilidades e stacks, ver também [`repositorios-planejados.md`](repositorios-planejados.md).
