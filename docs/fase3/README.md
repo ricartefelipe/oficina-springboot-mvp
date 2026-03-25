@@ -18,6 +18,7 @@ Requisitos oficiais: documento **Tech Challenge - Fase 3** (disciplina SOAT).
 | [readmes-primeiro-commit/](readmes-primeiro-commit/) | README.md prontos para copiar para cada um dos 4 repositórios |
 | [PROMPT-FASE3.md](PROMPT-FASE3.md) | Prompt mestre do enunciário (guia de implementação e vídeo) |
 | [observabilidade-prometheus.md](observabilidade-prometheus.md) | Métricas Prometheus, logs `k8s`, correlação, Grafana |
+| [../development/architecture-standards.md](../development/architecture-standards.md) | Padrões de camadas, testes ArchUnit, qualidade |
 | [../adr/README.md](../adr/README.md) | ADRs (decisoes arquiteturais permanentes) |
 | [rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md](rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md) | RFC: fluxo de autenticacao e contratos |
 
@@ -35,3 +36,4 @@ O repositorio **oficina-springboot-mvp** evolui para o **repositorio da aplicaca
 | CI workflow Python | `.github/workflows/auth-lambda-ci.yml` |
 | **Cliente.status** (`ATIVO`/`INATIVO`) + Lambda devolve `cliente_status` | Liquibase `0005`; `auth-lambda` |
 | **Prometheus** + contador `oficina.os.criadas`; perfil **`k8s`** (logs JSON) | `micrometer-registry-prometheus`; `logback-spring.xml` |
+| **ArchUnit** + normas em `architecture-standards` | `src/test/java/br/com/oficina/architecture/`; `docs/development/architecture-standards.md` |
