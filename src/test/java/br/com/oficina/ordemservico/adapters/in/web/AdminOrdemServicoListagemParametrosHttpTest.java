@@ -1,5 +1,6 @@
 package br.com.oficina.ordemservico.adapters.in.web;
 
+import br.com.oficina.ordemservico.application.OrdemServicoObservability;
 import br.com.oficina.ordemservico.application.OrdemServicoService;
 import br.com.oficina.ordemservico.testsupport.NotificacaoOrdemServicoPortNoop;
 import br.com.oficina.ordemservico.domain.OrdemServico;
@@ -10,6 +11,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,7 +48,7 @@ class AdminOrdemServicoListagemParametrosHttpTest {
         boolean ultimoIncluirEncerradas;
 
         ListarStub() {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE);
+            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
         }
 
         @Override

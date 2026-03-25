@@ -12,7 +12,7 @@ Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para
 
 > Requisitos oficiais: **Fase 2** e **Fase 3** - documentos Tech Challenge (disciplina SOAT).
 
-**Planeamento Fase 3 (arquitetura, ADRs, RFC, backlog):** [`docs/fase3/README.md`](docs/fase3/README.md).
+**Planeamento Fase 3 (arquitetura, ADRs, RFC, backlog, prompt, observabilidade):** [`docs/fase3/README.md`](docs/fase3/README.md) · [Prompt Fase 3](docs/fase3/PROMPT-FASE3.md) · [Prometheus / logs](docs/fase3/observabilidade-prometheus.md).
 
 ### Entrega oficial (portal + repositório)
 
@@ -256,6 +256,7 @@ Rede AWS reproduzível em [`infra/README.md`](infra/README.md). Requer credencia
 ## Fluxo de branches e documentos de apoio
 
 - [Convenções de branches e integração](docs/development/gitflow.md)
+- [Padrões de arquitetura e desenvolvimento](docs/development/architecture-standards.md)
 - [Diagnóstico de lacunas e backlog Fase 2](docs/development/gap-e-backlog-fase2.md)
 
 **Manutenção:** integrar trabalho em `develop` via pull request; promover para `master` quando houver uma linha estável (outro PR `develop` → `master`), como referência de entrega.

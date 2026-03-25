@@ -27,6 +27,7 @@
 
     <jacoco.version>0.8.14</jacoco.version>
     <testcontainers.version>1.21.4</testcontainers.version>
+    <archunit.version>1.4.1</archunit.version>
   </properties>
 
   <dependencies>
@@ -71,6 +72,12 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <!-- Métricas Prometheus (Fase 3 - observabilidade) -->
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
     </dependency>
 
     <!-- E-mail (SMTP; MailHog em desenvolvimento) -->
@@ -126,6 +133,14 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
       <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Regras de arquitetura (camadas DDD / hexagonal) -->
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <version>${archunit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
