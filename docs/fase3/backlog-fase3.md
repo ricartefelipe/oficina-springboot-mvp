@@ -48,4 +48,6 @@ Trabalho que **ja** esta no codigo ou documentacao de `oficina-springboot-mvp` a
 | 11 | Prometheus + metrica `oficina.os.criadas`; dashboards cloud ainda por definir |
 | — | ArchUnit + `docs/development/architecture-standards.md` |
 
-**Pendente fora deste repo:** itens 2–4 (Terraform BD/K8s isolados), 6 (API Gateway), 9 (pipelines hml/prd por branch), 12 (alertas), 13–15 (entrega final e video).
+**Pendente fora deste repo:** itens 2–4 (Terraform BD/K8s isolados), 6 (API Gateway), 12 (alertas), 13–15 (entrega final e video).
+
+**Pipelines por branch (item 9):** workflows e script `publish-fase3-repos.ps1` no monorepo; após criar os quatro repos, criar branches `hml`/`prd` e configurar GitHub Environments + `KUBE_CONFIG_B64` (ver [`executar-fase3.md`](executar-fase3.md)).

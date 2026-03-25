@@ -1,0 +1,57 @@
+# Deploy automático quando há push em hml ou prd (após a imagem ser publicada pelo CI).
+# Configure em GitHub: Settings → Environments → homologacao / producao (secrets por ambiente).
+
+name: Deploy Kubernetes (hml / prd)
+
+on:
+  push:
+    branches: [hml, prd]
+
+concurrency:
+  group: deploy-k8s-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Secrets específicos por ambiente (ex.: KUBE_CONFIG_B64 diferente em homologacao vs producao)
+    environment: ${{ github.ref_name == 'hml' && 'homologacao' || 'producao' }}
+    permissions:
+      contents: read
+    env:
+      NS: oficina
+      DEPLOY_NAME: oficina-app
+      CONTAINER_NAME: app
+      IMAGE: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Instalar kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.30.0"
+
+      - name: Configurar kubeconfig
+        env:
+          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG_B64 }}
+        run: |
+          if [ -z "$KUBE_CONFIG_B64" ]; then
+            echo "::error::Defina o secret KUBE_CONFIG_B64 no Environment (homologacao ou producao) ou no repositório."
+            exit 1
+          fi
+          mkdir -p "$HOME/.kube"
+          echo "$KUBE_CONFIG_B64" | base64 -d > "$HOME/.kube/config"
+
+      - name: Aplicar manifestos base
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/hpa.yaml
+
+      - name: Atualizar imagem para a tag da branch
+        run: kubectl -n "$NS" set image "deployment/$DEPLOY_NAME" "$CONTAINER_NAME=$IMAGE" --record=true
+
+      - name: Rollout
+        run: kubectl -n "$NS" rollout status "deployment/$DEPLOY_NAME" --timeout=180s
