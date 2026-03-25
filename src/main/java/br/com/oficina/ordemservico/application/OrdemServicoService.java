@@ -49,6 +49,7 @@ public class OrdemServicoService {
     private final PecaInsumoJpaRepository pecaRepository;
     private final OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository;
     private final NotificacaoOrdemServicoPort notificacaoOrdemServicoPort;
+    private final OrdemServicoObservability observability;
 
     public OrdemServicoService(
             OrdemServicoPersistencePort ordemServicoPersistence,
@@ -57,7 +58,8 @@ public class OrdemServicoService {
             ServicoCatalogoService servicoCatalogoService,
             PecaInsumoJpaRepository pecaRepository,
             OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository,
-            NotificacaoOrdemServicoPort notificacaoOrdemServicoPort
+            NotificacaoOrdemServicoPort notificacaoOrdemServicoPort,
+            OrdemServicoObservability observability
     ) {
         this.ordemServicoPersistence = ordemServicoPersistence;
         this.clienteService = clienteService;
@@ -66,6 +68,7 @@ public class OrdemServicoService {
         this.pecaRepository = pecaRepository;
         this.orcamentoRespostaIdempotenciaRepository = orcamentoRespostaIdempotenciaRepository;
         this.notificacaoOrdemServicoPort = notificacaoOrdemServicoPort;
+        this.observability = observability;
     }
 
     @Transactional
@@ -105,6 +108,7 @@ public class OrdemServicoService {
         }
 
         OrdemServico saved = ordemServicoPersistence.save(os);
+        observability.registrarOsCriada();
         log.info("os_criada osId={} trackingCode={} status={} orcamentoTotal={}", saved.getId(), saved.getTrackingCode(), saved.getStatus(), saved.getOrcamentoTotal());
         return saved;
     }
