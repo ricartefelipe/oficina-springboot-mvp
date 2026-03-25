@@ -25,10 +25,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(controllers = AdminClienteController.class)
 @Import({SecurityConfig.class, AdminJwtSecurityWebMvcTest.ClienteServiceStubConfig.class})
-@EnableConfigurationProperties(SecurityJwtProperties.class)
+@EnableConfigurationProperties({SecurityJwtProperties.class, SecurityCpfJwtProperties.class})
 @TestPropertySource(properties = {
         "security.jwt.jwk-set-uri=http://localhost/dummy",
-        "security.jwt.allowed-issuers="
+        "security.jwt.allowed-issuers=",
+        "security.cpf-jwt.enabled=false",
+        "security.cpf-jwt.issuer=https://oficina.local/auth/cpf",
+        "security.cpf-jwt.secret="
 })
 class AdminJwtSecurityWebMvcTest {
 
