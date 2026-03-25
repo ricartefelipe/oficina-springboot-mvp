@@ -33,24 +33,41 @@ jobs:
         working-directory: infra
     permissions:
       contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v6
 
-      - name: Verificar credenciais AWS
+      - name: Verificar credenciais AWS (OIDC ou chaves)
         env:
+          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
-            echo "::error::Defina os secrets AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY no repositorio."
-            exit 1
+          if [ -n "$AWS_ROLE_ARN" ]; then
+            echo "Autenticacao AWS: OIDC (role)"
+            exit 0
           fi
+          if [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
+            echo "Autenticacao AWS: access keys"
+            exit 0
+          fi
+          echo "::error::Defina AWS_ROLE_ARN (OIDC) ou o par AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY."
+          exit 1
 
       - uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: 1.9.8
 
-      - uses: aws-actions/configure-aws-credentials@v6
+      - name: Configurar AWS (OIDC)
+        if: ${{ secrets.AWS_ROLE_ARN != '' }}
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ inputs.aws_region || 'sa-east-1' }}
+
+      - name: Configurar AWS (access keys)
+        if: ${{ secrets.AWS_ROLE_ARN == '' }}
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

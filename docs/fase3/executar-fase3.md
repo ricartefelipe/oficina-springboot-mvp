@@ -80,7 +80,8 @@ Repositórios **Lambda** e **Terraform** apenas correm **validação CI** nessas
 Se usares [GitHub CLI](https://cli.github.com/) (`gh`), podes aplicar regras semelhantes por API; o portal também permite configurar em **Settings → Branches → Branch protection rules**.
 
 4. **Secrets** por repositório (exemplos):
-   - Infra AWS: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (ou OIDC com AWS, preferível em produção).
+   - Infra AWS com **OIDC** (recomendado): um único secret **`AWS_ROLE_ARN`** com o ARN do papel IAM (ver [`aws-oidc-github.md`](aws-oidc-github.md)).
+   - Alternativa: `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY` (sem `AWS_ROLE_ARN`).
    - Deploy K8s / app: `KUBE_CONFIG_B64` por **environment** (`homologacao` / `producao`) ou ao nível do repositório para testes.
 
 ### AWS
