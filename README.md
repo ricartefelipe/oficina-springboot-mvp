@@ -52,6 +52,8 @@ A Fase 3 exige **quatro repositórios Git** separados (Lambda, Terraform K8s, Te
 
 ## Fase 2 - visão da solução e arquitetura
 
+**Checklist de conclusão (enunciário vs. repositório):** [`docs/delivery/fase2-concluida.md`](docs/delivery/fase2-concluida.md).
+
 ### Componentes da aplicação
 
 - **API HTTP** (Spring MVC): rotas **admin** (`/api/admin/**`, JWT + role `ADMIN`) e **públicas** (`/api/public/**`, `trackingCode` e validações para aprovação).
@@ -91,7 +93,7 @@ flowchart TB
 | **`/k8s`** | Namespace, Deployment, Service, ConfigMap, exemplo de Secret, HPA, probes - ver [`k8s/README.md`](k8s/README.md). |
 | **`/infra` (Terraform)** | **AWS:** rede (VPC, subnets públicas, IGW) e **RDS PostgreSQL opcional** (`enable_rds`). **Kubernetes local:** [`infra/kind`](infra/kind) (Kind + Docker). Detalhe de escopos: [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md). |
 | **CI** | GitHub Actions: build Maven, testes, validação Terraform, build/push da imagem para **GHCR**. |
-| **DDD (visual)** | Diagramas SVG em [`docs/ddd/diagrams/`](docs/ddd/diagrams/) (agregado OS, event storming resumido). |
+| **DDD (visual + texto)** | Índice em [`docs/ddd/README.md`](docs/ddd/README.md): Domain Storytelling, dicionário, Event Storming, SVG em [`docs/ddd/diagrams/`](docs/ddd/diagrams/). |
 
 ---
 
@@ -260,6 +262,6 @@ Rede AWS reproduzível em [`infra/README.md`](infra/README.md). Requer credencia
 
 ### Documentação complementar (Fase 1 e artefatos)
 
-- [Event Storming](docs/ddd/event-storming.md) · [Linguagem ubíqua](docs/ddd/ubiquitous-language.md) · [Diagramas DDD](docs/ddd/diagramas.md)
+- [Índice DDD](docs/ddd/README.md) · [Domain Storytelling](docs/ddd/domain-storytelling.md) · [Dicionário linguagem ubíqua](docs/ddd/dicionario-linguagem-ubiqua.md) · [Event Storming](docs/ddd/event-storming.md) · [Linguagem ubíqua (extenso)](docs/ddd/ubiquitous-language.md) · [Diagramas DDD](docs/ddd/diagramas.md)
 - [Roteiro de vídeo](docs/video-script.md) · [Submissão / entrega](docs/delivery/submission.md)
 - [Notas de segurança](docs/security/security-notes.md) · [Relatório de vulnerabilidades](docs/security/vulnerability-report.md)

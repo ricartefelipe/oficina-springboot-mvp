@@ -29,7 +29,7 @@ Na raiz do projeto, mostre:
 - `docker-compose.yml` (PostgreSQL + Keycloak + app)
 - `Dockerfile` (build da aplicacao)
 - `src/main/java` (organizacao por bounded contexts)
-- `docs/ddd/*` (Event Storming, diagramas, linguagem ubiqua)
+- `docs/ddd/README.md` (indice: Domain Storytelling, dicionario, Event Storming, SVG)
 - `docs/security/*` (notas de seguranca e, na Parte 7, relatorio de vulnerabilidades)
 
 Mencione stack:
