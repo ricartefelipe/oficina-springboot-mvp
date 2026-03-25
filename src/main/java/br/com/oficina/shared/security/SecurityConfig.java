@@ -90,7 +90,8 @@ public class SecurityConfig {
                         // Health checks
                         .requestMatchers(
                                 "/actuator/health/**",
-                                "/actuator/info/**"
+                                "/actuator/info/**",
+                                "/actuator/prometheus"
                         ).permitAll()
 
                         .requestMatchers("/cliente/**").hasAuthority("ROLE_CLIENTE")

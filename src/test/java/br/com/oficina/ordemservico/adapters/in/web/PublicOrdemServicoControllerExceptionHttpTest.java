@@ -1,5 +1,6 @@
 package br.com.oficina.ordemservico.adapters.in.web;
 
+import br.com.oficina.ordemservico.application.OrdemServicoObservability;
 import br.com.oficina.ordemservico.application.OrdemServicoService;
 import br.com.oficina.ordemservico.domain.OrdemServico;
 import br.com.oficina.ordemservico.testsupport.NotificacaoOrdemServicoPortNoop;
@@ -11,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import static org.mockito.Mockito.mock;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,7 +55,7 @@ class PublicOrdemServicoControllerExceptionHttpTest {
     private static final class NotFoundStub extends OrdemServicoService {
 
         NotFoundStub() {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE);
+            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
         }
 
         @Override
@@ -64,7 +67,7 @@ class PublicOrdemServicoControllerExceptionHttpTest {
     private static final class ConflictStub extends OrdemServicoService {
 
         ConflictStub() {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE);
+            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
         }
 
         @Override
