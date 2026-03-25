@@ -1,0 +1,30 @@
+name: Auth Lambda (Python)
+
+on:
+  push:
+    branches: [develop, master]
+    paths:
+      - "auth-lambda/**"
+  pull_request:
+    branches: [develop, master]
+    paths:
+      - "auth-lambda/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: auth-lambda
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Syntax check
+        run: python -m compileall -q src

@@ -4,18 +4,24 @@ import br.com.oficina.shared.infra.http.CorrelationIdFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -26,28 +32,32 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(SecurityJwtProperties props) {
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(props.jwkSetUri()).build();
-
+    public JwtDecoder jwtDecoder(SecurityJwtProperties props, SecurityCpfJwtProperties cpfJwt) {
+        NimbusJwtDecoder keycloak = NimbusJwtDecoder.withJwkSetUri(props.jwkSetUri()).build();
         OAuth2TokenValidator<Jwt> withTimestamp = new JwtTimestampValidator();
         OAuth2TokenValidator<Jwt> withIssuer = new AllowedIssuersValidator(props.allowedIssuersList());
-
-        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer));
-        return decoder;
+        keycloak.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withTimestamp, withIssuer));
+        if (!cpfJwt.ready()) {
+            return keycloak;
+        }
+        SecretKeySpec key = new SecretKeySpec(cpfJwt.secret().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        NimbusJwtDecoder cpfDecoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
+        OAuth2TokenValidator<Jwt> cpfIss = new AllowedIssuersValidator(List.of(cpfJwt.issuer()));
+        cpfDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(new JwtTimestampValidator(), cpfIss));
+        return new MultiIssuerJwtDecoder(keycloak, cpfDecoder, cpfJwt.issuer());
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(new KeycloakRealmRoleConverter());
-        return converter;
+    public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter(SecurityCpfJwtProperties cpfJwt) {
+        String iss = cpfJwt.ready() ? cpfJwt.issuer() : "";
+        return new IssuerRoutingJwtAuthenticationConverter(iss);
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    CorrelationIdFilter correlationIdFilter,
                                                    JwtDecoder jwtDecoder,
-                                                   JwtAuthenticationConverter jwtAuthenticationConverter,
+                                                   Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter,
                                                    ObjectMapper objectMapper) throws Exception {
 
         var authEntryPoint = new ProblemDetailsAuthEntryPoint(objectMapper);
@@ -83,7 +93,8 @@ public class SecurityConfig {
                                 "/actuator/info/**"
                         ).permitAll()
 
-                        // Admin protegido por JWT + role ADMIN
+                        .requestMatchers("/cliente/**").hasAuthority("ROLE_CLIENTE")
+
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // Negar por padrao

@@ -20,9 +20,13 @@
 
 ## Diagramas de arquitetura (DDD)
 
+Artefatos de texto: [índice DDD](../ddd/README.md), [Domain Storytelling](../ddd/domain-storytelling.md), [Dicionário linguagem ubíqua](../ddd/dicionario-linguagem-ubiqua.md).
+
 ![Diagrama - agregado Ordem de Serviço](../ddd/diagrams/ordem-servico-agregado.svg)
 
 ![Diagrama - event storming (contextos)](../ddd/diagrams/event-storming-contextos.svg)
+
+![Diagrama - event storming lousa (elementos C/A/E/P/R)](../ddd/diagrams/event-storming-lousa-elementos.svg)
 
 ---
 
@@ -54,6 +58,7 @@ Roteiro e tópicos obrigatórios: [`docs/video-script.md`](../video-script.md). 
 
 ### Fase 1 (MVP)
 
+- Reforço pós-feedback do docente: [Domain Storytelling](../ddd/domain-storytelling.md), [Dicionário de linguagem ubíqua](../ddd/dicionario-linguagem-ubiqua.md), Event Storming com [figuras SVG](../ddd/README.md) (incl. lousa com elementos e agregados), além do texto já existente.
 - CRUDs administrativos: clientes, veículos, serviços, peças/insumos (estoque)
 - Ordens de serviço: criação, orçamento automático, transições de estado, listagem e detalhe
 - Consulta pública por `trackingCode` e aprovação de orçamento com validações (CPF/CNPJ)
