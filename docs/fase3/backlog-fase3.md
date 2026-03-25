@@ -33,3 +33,19 @@
 - Fluxo CPF - Lambda - JWT - API protegida demonstravel.
 - Dashboards e alertas minimos conforme enunciario.
 - `soat-architecture` em todos os repos.
+
+## Estado neste monorepo (referencia)
+
+Trabalho que **ja** esta no codigo ou documentacao de `oficina-springboot-mvp` antes da separacao em quatro repositorios remotos:
+
+| Itens | Coberto |
+|-------|---------|
+| 1 | ADRs e RFC em `docs/adr/`, `docs/fase3/rfc/`; decisoes em `visao-arquitetura-fase3.md` |
+| 5 | `auth-lambda/` + CI `.github/workflows/auth-lambda-ci.yml` |
+| 7 | JWT CPF (HS256) + `MultiIssuerJwtDecoder`; ver `security.cpf-jwt` |
+| 8 | `SecurityConfig` + rotas publicas/admin/cliente; `ClienteSessaoController` |
+| 10 | Perfil `k8s` log JSON; `CorrelationIdFilter`; extensao futura: Grafana/OTel |
+| 11 | Prometheus + metrica `oficina.os.criadas`; dashboards cloud ainda por definir |
+| — | ArchUnit + `docs/development/architecture-standards.md` |
+
+**Pendente fora deste repo:** itens 2–4 (Terraform BD/K8s isolados), 6 (API Gateway), 9 (pipelines hml/prd por branch), 12 (alertas), 13–15 (entrega final e video).
