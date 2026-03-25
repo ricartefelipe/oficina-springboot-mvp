@@ -78,7 +78,7 @@ def handler(event, context):
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id::text FROM clientes WHERE cpf_cnpj = %s LIMIT 1",
+                    "SELECT id::text, status FROM clientes WHERE cpf_cnpj = %s LIMIT 1",
                     (cpf,),
                 )
                 row = cur.fetchone()
@@ -99,13 +99,24 @@ def handler(event, context):
         }
 
     cliente_id = row[0]
-    token = jwt.encode(_jwt_payload(cliente_id), secret, algorithm="HS256")
+    cliente_status = row[1] if len(row) > 1 else "ATIVO"
+    payload = _jwt_payload(cliente_id)
+    payload["cliente_status"] = cliente_status
+    token = jwt.encode(payload, secret, algorithm="HS256")
     if isinstance(token, bytes):
         token = token.decode("utf-8")
     return {
         "statusCode": 200,
         "headers": {"Content-Type": "application/json"},
-        "body": json.dumps({"access_token": token, "token_type": "Bearer", "expires_in": 3600}),
+        "body": json.dumps(
+            {
+                "access_token": token,
+                "token_type": "Bearer",
+                "expires_in": 3600,
+                "cliente_id": cliente_id,
+                "cliente_status": cliente_status,
+            }
+        ),
     }
 
 
