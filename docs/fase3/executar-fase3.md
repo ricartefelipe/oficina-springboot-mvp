@@ -62,7 +62,7 @@ Política suportada pelos workflows copiados pelo bootstrap e pelo monólito:
 1. Cria as branches a partir de `main`/`develop` (`git checkout -b hml`, `git push -u origin hml`, idem para `prd`).
 2. No repositório **oficina-app** (ou no monólito), em **Settings → Environments**, cria **homologacao** e **producao**.
 3. Em cada ambiente, define o secret **`KUBE_CONFIG_B64`** (kubeconfig em Base64) do cluster correspondente. Opcional: aprovadores antes do deploy (regra de proteção do ambiente).
-4. O workflow `deploy-k8s-branch.yml` corre em **push** para `hml` ou `prd`: aplica `k8s/*.yaml` e faz `kubectl set image` para `ghcr.io/<repo>:hml` ou `:prd`.
+4. O workflow `deploy-k8s-branch.yml` corre **depois** do workflow `CI` concluir com sucesso no mesmo push (evita usar a imagem antes de existir no GHCR): aplica `k8s/*.yaml` e faz `kubectl set image` para `ghcr.io/<repo>:hml` ou `:prd`.
 
 Repositórios **Lambda** e **Terraform** apenas correm **validação CI** nessas branches (sem deploy automático neste modelo).
 
