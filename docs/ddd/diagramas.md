@@ -8,6 +8,7 @@ Versões exportadas para inclusão em PDFs ou apresentações:
 
 - [Agregado Ordem de Serviço](diagrams/ordem-servico-agregado.svg)
 - [Event storming - contextos (resumo)](diagrams/event-storming-contextos.svg)
+- [Event storming - lousa com elementos C/A/E/P/R e fluxos alternativos](diagrams/event-storming-lousa-elementos.svg)
 
 Conteúdo:
 - Context Map (Bounded Contexts em monólito)
