@@ -37,4 +37,26 @@ class AdminOrdemServicoControllerHttpTest {
                         .content(body))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void criar_cpfInvalido_retorna400() throws Exception {
+        String body = """
+                {"cliente":{"nome":"Joao","cpfCnpj":"11111111111"},"veiculo":{"placa":"ABC1D23","marca":"F","modelo":"Fi","ano":2020},"servicos":[{"servicoId":"00000000-0000-0000-0000-000000000001","quantidade":1}]}
+                """;
+        mockMvc.perform(post("/admin/ordens-servico")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void criar_placaInvalida_retorna400() throws Exception {
+        String body = """
+                {"cliente":{"nome":"Joao","cpfCnpj":"52998224725"},"veiculo":{"placa":"INVALID","marca":"F","modelo":"Fi","ano":2020},"servicos":[{"servicoId":"00000000-0000-0000-0000-000000000001","quantidade":1}]}
+                """;
+        mockMvc.perform(post("/admin/ordens-servico")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
 }

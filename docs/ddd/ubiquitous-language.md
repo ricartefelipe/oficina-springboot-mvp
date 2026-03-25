@@ -1,5 +1,7 @@
 # Linguagem Ubíqua (Ubiquitous Language)
 
+> **Dicionário resumido (tabela):** [dicionario-linguagem-ubiqua.md](dicionario-linguagem-ubiqua.md) — use-o no PDF do portal se o enunciário pedir o “dicionário” explicitamente.
+
 Este glossário padroniza os termos usados no domínio do MVP (Fase 1) do Sistema Integrado de Atendimento e Execução de Serviços de uma oficina mecânica.
 
 > Regra: os nomes abaixo são os termos oficiais do produto. Evite sinônimos nos fluxos, APIs e código. Ex.: use **Ordem de Serviço** (OS), não “ordem”, “chamado” ou “serviço”.
