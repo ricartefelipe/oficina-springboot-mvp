@@ -39,6 +39,10 @@ security:
   jwt:
     jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8180/realms/oficina/protocol/openid-connect/certs}
     allowed-issuers: ${JWT_ALLOWED_ISSUERS:http://localhost:8180/realms/oficina}
+  cpf-jwt:
+    enabled: ${JWT_CPF_ENABLED:false}
+    issuer: ${JWT_CPF_ISSUER:https://oficina.local/auth/cpf}
+    secret: ${JWT_CPF_SECRET:}
 
 # Notificações (e-mail). MailHog local: UI http://localhost:8025 SMTP 1025
 app:
