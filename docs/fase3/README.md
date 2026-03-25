@@ -14,6 +14,7 @@ Requisitos oficiais: documento **Tech Challenge - Fase 3** (disciplina SOAT).
 | [diagrama-sequencia-auth-os.md](diagrama-sequencia-auth-os.md) | Sequencia: autenticacao com CPF e abertura de ordem de servico |
 | [repositorios-planejados.md](repositorios-planejados.md) | Quatro repositorios, fronteiras e responsabilidades |
 | [backlog-fase3.md](backlog-fase3.md) | Fases de entrega, dependencias e criterios de pronto |
+| [executar-fase3.md](executar-fase3.md) | Script local para quatro pastas-gêmeas, checklist GitHub/AWS e entrega |
 | [../adr/README.md](../adr/README.md) | ADRs (decisoes arquiteturais permanentes) |
 | [rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md](rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md) | RFC: fluxo de autenticacao e contratos |
 
