@@ -8,8 +8,11 @@ Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para
 |------|------|
 | **Fase 1** | MVP funcional: APIs, persistência, Docker, testes, DDD em Markdown, segurança admin/público. |
 | **Fase 2** | **Resiliência e escalabilidade**: Clean Code e **arquitetura hexagonal**, testes nos fluxos críticos, **contêineres**, **Kubernetes** (`/k8s`), **IaC** (`/infra`), **CI/CD** (GitHub Actions), preparação para picos de carga (HPA, imagem no registry). |
+| **Fase 3** | **Operação corporativa**: **API Gateway**, autenticação **CPF** com **função serverless** e **JWT**, **quatro repositórios** com CI/CD e deploy na nuvem, **BD gerido**, **Kubernetes**, **Terraform**, **observabilidade** (métricas, logs, traces, dashboards). |
 
-> Requisitos oficiais e entregáveis: documento **Tech Challenge - Fase 2** (disciplina SOAT).
+> Requisitos oficiais: **Fase 2** e **Fase 3** - documentos Tech Challenge (disciplina SOAT).
+
+**Planeamento Fase 3 (arquitetura, ADRs, RFC, backlog):** [`docs/fase3/README.md`](docs/fase3/README.md).
 
 ### Entrega oficial (portal + repositório)
 
@@ -27,6 +30,7 @@ Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-
 
 ## Sumário
 
+- [Fase 3 - documentação de arquitetura (transição)](#fase-3---documentação-de-arquitetura-transição)
 - [Fase 2 - visão da solução e arquitetura](#fase-2--visão-da-solução-e-arquitetura)
 - [Fluxo de deploy e CI/CD](#fluxo-de-deploy-e-cicd)
 - [Links rápidos (APIs e vídeo)](#links-rápidos-apis-e-vídeo)
@@ -37,6 +41,12 @@ Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-
 - [Kubernetes (`/k8s`)](k8s/README.md)
 - [Terraform (`/infra`)](infra/README.md)
 - [Fluxo de branches e documentos de apoio](#fluxo-de-branches-e-documentos-de-apoio)
+
+---
+
+## Fase 3 - documentação de arquitetura (transição)
+
+A Fase 3 exige **quatro repositórios Git** separados (Lambda, Terraform K8s, Terraform BD, aplicação). Este repositório concentra o **plano** e as **decisões** até a separação: ver **[`docs/fase3/`](docs/fase3/README.md)** (visão de componentes, sequência auth/OS, repositórios planejados, backlog), **[`docs/adr/`](docs/adr/README.md)** (ADRs) e **[RFC auth](docs/fase3/rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md)**.
 
 ---
 
