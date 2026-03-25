@@ -17,6 +17,7 @@ Requisitos oficiais: documento **Tech Challenge - Fase 3** (disciplina SOAT).
 | [executar-fase3.md](executar-fase3.md) | Script local para quatro pastas-gêmeas, checklist GitHub/AWS e entrega |
 | [readmes-primeiro-commit/](readmes-primeiro-commit/) | README.md prontos para copiar para cada um dos 4 repositórios |
 | [PROMPT-FASE3.md](PROMPT-FASE3.md) | Prompt mestre do enunciário (guia de implementação e vídeo) |
+| [aws-oidc-github.md](aws-oidc-github.md) | OIDC: secret `AWS_ROLE_ARN` e workflow Terraform |
 | [observabilidade-prometheus.md](observabilidade-prometheus.md) | Métricas Prometheus, logs `k8s`, correlação, Grafana |
 | [../development/architecture-standards.md](../development/architecture-standards.md) | Padrões de camadas, testes ArchUnit, qualidade |
 | [../adr/README.md](../adr/README.md) | ADRs (decisoes arquiteturais permanentes) |
