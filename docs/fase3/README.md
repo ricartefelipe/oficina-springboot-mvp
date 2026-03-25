@@ -20,3 +20,12 @@ Requisitos oficiais: documento **Tech Challenge - Fase 3** (disciplina SOAT).
 ## Relacao com o codigo atual
 
 O repositorio **oficina-springboot-mvp** evolui para o **repositorio da aplicacao principal** (container no Kubernetes). Os outros tres repositorios sao **novos** (Lambda, Terraform K8s, Terraform BD). A divisao exata e o momento do extracao estao no [backlog](backlog-fase3.md).
+
+## Implementacao iniciada (neste mono-repo)
+
+| Item | Local |
+|------|--------|
+| JWT com **issuer** do fluxo CPF (HS256) + coexistencia Keycloak | `security.cpf-jwt` em `application.yml`; `MultiIssuerJwtDecoder` |
+| API **GET /api/cliente/sessao** (protegida `ROLE_CLIENTE`) | `br.com.oficina.cpf.api.ClienteSessaoController` |
+| Funcao **Python** (validacao CPF, consulta `clientes`, JWT) | `auth-lambda/` |
+| CI workflow Python | `.github/workflows/auth-lambda-ci.yml` |
