@@ -1,28 +1,32 @@
-# Igual ao template em scripts/fase3/templates/deploy-k8s-branch.yml — deploy por branch hml/prd.
+# Corre após o workflow "CI" concluir com sucesso num push a hml/prd (evita deploy antes da imagem no GHCR).
 
 name: Deploy Kubernetes (hml / prd)
 
 on:
-  push:
-    branches: [hml, prd]
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
 
 concurrency:
-  group: deploy-k8s-${{ github.ref }}
+  group: deploy-k8s-${{ github.event.workflow_run.head_branch }}
   cancel-in-progress: false
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.head_branch == 'hml' || github.event.workflow_run.head_branch == 'prd') }}
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'hml' && 'homologacao' || 'producao' }}
+    environment: ${{ github.event.workflow_run.head_branch == 'hml' && 'homologacao' || 'producao' }}
     permissions:
       contents: read
     env:
       NS: oficina
       DEPLOY_NAME: oficina-app
       CONTAINER_NAME: app
-      IMAGE: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+      IMAGE: ghcr.io/${{ github.repository }}:${{ github.event.workflow_run.head_branch }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Instalar kubectl
         uses: azure/setup-kubectl@v4
