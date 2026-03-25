@@ -29,3 +29,10 @@
 ## Base para releases
 
 - Quando houver necessidade de estabilizar uma linha para entrega formal, o coordenador do repositório pode promover `develop` para `main` via pull request ou merge controlado, conforme política do time
+
+## Fase 3 (multi-repositorio)
+
+- Cada um dos **quatro** repositorios deve ter `main` (ou `master`) **protegida**, **sem push direto**; integracao apenas via **Pull Request**.
+- Branches de **homologacao** e **producao** com **deploy automatico** ficam definidas nas pipelines de cada repo (nomes de branch: `develop`, `hml`, `release/*` ou `main` conforme politica acordada).
+- Features neste repositorio (app) seguem: `feature/<nome-kebab>` a partir de `develop` atualizado, PR para `develop`, depois release para `main` quando estavel.
+- Decisoes de fronteira e ordem de deploy estao em [`docs/fase3/backlog-fase3.md`](../fase3/backlog-fase3.md).
