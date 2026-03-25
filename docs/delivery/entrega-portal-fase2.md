@@ -13,7 +13,7 @@ Documento para **entrega no portal** (PDF): repositório, `soat-architecture`, a
 
 **Acesso ao avaliador SOAT:** o repositório deve estar partilhado com o utilizador **`soat-architecture`** (convite em *Settings → Collaborators*).  
 
-**Documentação principal:** [`README.md`](../../README.md) (objetivos Fase 2, arquitetura, fluxo de deploy, execução local, Kubernetes, Terraform, links Swagger/OpenAPI e vídeo).
+**Documentação principal:** [`README.md`](../../README.md) (objetivos Fase 2, arquitetura, fluxo de deploy, execução local, Kubernetes, Terraform, links Swagger/OpenAPI e vídeo). **Critérios vs. enunciário:** [`fase2-concluida.md`](fase2-concluida.md).
 
 ---
 
@@ -32,12 +32,17 @@ Diagramas DDD versionados no repositório:
 |--------|------------------|
 | Agregado Ordem de Serviço | [`docs/ddd/diagrams/ordem-servico-agregado.svg`](../ddd/diagrams/ordem-servico-agregado.svg) |
 | Event storming (contextos) | [`docs/ddd/diagrams/event-storming-contextos.svg`](../ddd/diagrams/event-storming-contextos.svg) |
+| Event storming (lousa: C/A/E/P/R) | [`docs/ddd/diagrams/event-storming-lousa-elementos.svg`](../ddd/diagrams/event-storming-lousa-elementos.svg) |
+
+**Artefatos DDD em texto:** [`docs/ddd/README.md`](../ddd/README.md) (Domain Storytelling, dicionário, Event Storming).
 
 **Figuras (desenho da arquitetura - DDD):**
 
 ![Diagrama - agregado Ordem de Serviço](../ddd/diagrams/ordem-servico-agregado.svg)
 
 ![Diagrama - event storming (contextos)](../ddd/diagrams/event-storming-contextos.svg)
+
+![Diagrama - event storming lousa](../ddd/diagrams/event-storming-lousa-elementos.svg)
 
 ### 2.2 Infraestrutura e automação
 

@@ -18,3 +18,5 @@ O utilizador **`soat-architecture`** deve ser adicionado a **todos** os quatro r
 ## README em cada um
 
 Cada repositorio deve ter: proposito, stack, passos de execucao e deploy, diagrama **especifico** daquele repo, link para Swagger/API quando aplicavel.
+
+Para gerar localmente as quatro pastas e o checklist (GitHub, AWS, convite **soat-architecture**), ver [executar-fase3.md](executar-fase3.md).
