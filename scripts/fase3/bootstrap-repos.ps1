@@ -66,6 +66,7 @@ function Initialize-GitRepo {
     try {
         if (-not (Test-Path ".git")) {
             git init
+            git branch -M main 2>$null
             git add -A
             git -c user.email="local@bootstrap" -c user.name="bootstrap" commit -m "chore: scaffold inicial (Fase 3)" 2>$null
             if ($LASTEXITCODE -ne 0) {
@@ -137,7 +138,8 @@ Scaffold gerado com ``-SkipAppCopy``. Copie o código do monorepo manualmente ou
         "node_modules",
         ".terraform",
         "oficina-fase3-repos",
-        "_fase3-bootstrap-test"
+        "_fase3-bootstrap-test",
+        "_tmp-fase3-bootstrap"
     )
     $wfApp = Join-Path $app ".github\workflows"
     foreach ($obsolete in @("terraform-aws.yml", "auth-lambda-ci.yml")) {
@@ -147,11 +149,13 @@ Scaffold gerado com ``-SkipAppCopy``. Copie o código do monorepo manualmente ou
         }
     }
     Copy-GitHubWorkflow -RepoPath $app -TemplateFileName "ci-app-standalone.yml" -TargetFileName "ci.yml"
+    Copy-GitHubWorkflow -RepoPath $app -TemplateFileName "deploy-k8s-branch.yml" -TargetFileName "deploy-k8s-branch.yml"
     $readmeAppExtra = Join-Path $app "README-FASE3.md"
     @"
 # Notas Fase 3 (oficina-app)
 
 - **Lambda** e **Terraform** estão em repositórios separados; este repo contém a aplicação Spring Boot e artefactos relacionados (ex.: ``k8s/``, Docker).
+- CI publica imagem em GHCR; pushes em ``hml`` ou ``prd`` disparam ``deploy-k8s-branch.yml`` (requer secrets por ambiente — ver monorepo ``docs/fase3/executar-fase3.md``).
 - Adicionar **soat-architecture** como leitor.
 "@ | Set-Content -Path $readmeAppExtra -Encoding utf8
 }
