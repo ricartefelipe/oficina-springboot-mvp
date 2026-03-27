@@ -24,6 +24,7 @@ on:
 
 env:
   TF_IN_AUTOMATION: "true"
+  AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
 
 jobs:
   terraform:
@@ -39,7 +40,6 @@ jobs:
 
       - name: Verificar credenciais AWS (OIDC ou chaves)
         env:
-          AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
@@ -59,14 +59,14 @@ jobs:
           terraform_version: 1.9.8
 
       - name: Configurar AWS (OIDC)
-        if: ${{ secrets.AWS_ROLE_ARN != '' }}
+        if: ${{ env.AWS_ROLE_ARN != '' }}
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ inputs.aws_region || 'sa-east-1' }}
 
       - name: Configurar AWS (access keys)
-        if: ${{ secrets.AWS_ROLE_ARN == '' }}
+        if: ${{ env.AWS_ROLE_ARN == '' }}
         uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
