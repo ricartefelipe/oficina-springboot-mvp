@@ -1,19 +1,17 @@
 <#
 .SYNOPSIS
-    Cria na AWS o Identity Provider OIDC do GitHub e uma IAM Role que só confia no teu repositório.
+    Configure GitHub OIDC provider and IAM role in AWS.
 .DESCRIPTION
-    Requer AWS CLI instalado e credenciais locais (aws configure ou variáveis de ambiente).
-    No fim imprime o ARN para colares no GitHub como secret AWS_ROLE_ARN.
+    Requires AWS CLI configured locally (aws configure or env vars).
+    Prints IAM role ARN to use as GitHub secret AWS_ROLE_ARN.
 .PARAMETER GitHubOwner
-    Utilizador ou organização GitHub (ex.: ricartefelipe).
+    GitHub user or org (example: ricartefelipe).
 .PARAMETER GitHubRepo
-    Nome do repositório (ex.: oficina-springboot-mvp).
+    GitHub repository name (example: oficina-infra-database).
 .PARAMETER RoleName
-    Nome da role IAM a criar (por defeito: GitHubActionsTerraform).
+    IAM role name to create/update.
 .PARAMETER PolicyArn
-    Política gerida a anexar (por defeito: PowerUserAccess — suficiente para Terraform de lab).
-.EXAMPLE
-    .\setup-github-oidc-aws.ps1 -GitHubOwner "ricartefelipe" -GitHubRepo "oficina-springboot-mvp"
+    Managed policy ARN attached to the role.
 #>
 param(
     [Parameter(Mandatory = $true)]
@@ -27,94 +25,95 @@ param(
 $ErrorActionPreference = "Stop"
 
 if (-not (Get-Command aws -ErrorAction SilentlyContinue)) {
-    Write-Error "Instala o AWS CLI v2 e configura credenciais: https://aws.amazon.com/cli/"
+    Write-Error "AWS CLI not found. Install: https://aws.amazon.com/cli/"
 }
 
 $account = aws sts get-caller-identity --query Account --output text 2>$null
 if (-not $account -or $account -match "error|None") {
-    Write-Error "Falha ao obter a conta AWS. Executa 'aws configure' ou define AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY."
+    Write-Error "Unable to read AWS account. Run aws configure first."
 }
 
-Write-Host "Conta AWS: $account" -ForegroundColor Cyan
+Write-Host "AWS account: $account" -ForegroundColor Cyan
 
-# --- OIDC provider (uma vez por conta) ---
-$providersJson = aws iam list-open-id-connect-providers --output json 2>$null
+$providers = aws iam list-open-id-connect-providers --output json 2>$null
 $hasGithub = $false
-if ($providersJson) {
-    $hasGithub = $providersJson -match "token\.actions\.githubusercontent\.com"
+if ($providers) {
+    $hasGithub = $providers -match "token\.actions\.githubusercontent\.com"
 }
+
 if (-not $hasGithub) {
-    Write-Host "A criar OIDC provider token.actions.githubusercontent.com ..." -ForegroundColor Cyan
+    Write-Host "Creating GitHub OIDC provider..." -ForegroundColor Cyan
     $thumb = "6938fd4d98bab03faadb97b34396831e3780aea1"
     aws iam create-open-id-connect-provider `
         --url "https://token.actions.githubusercontent.com" `
         --client-id-list "sts.amazonaws.com" `
-        --thumbprint-list $thumb
+        --thumbprint-list $thumb | Out-Null
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "create-open-id-connect-provider falhou."
+        Write-Error "Failed to create OIDC provider."
     }
 } else {
-    Write-Host "OIDC provider do GitHub já existe nesta conta." -ForegroundColor Green
+    Write-Host "GitHub OIDC provider already exists." -ForegroundColor Green
 }
 
-$fedArn = "arn:aws:iam::${account}:oidc-provider/token.actions.githubusercontent.com"
-$subClaim = "repo:${GitHubOwner}/${GitHubRepo}:*"
+$federatedArn = "arn:aws:iam::${account}:oidc-provider/token.actions.githubusercontent.com"
+$subject = "repo:${GitHubOwner}/${GitHubRepo}:*"
 
-$trust = [ordered]@{
-    Version   = "2012-10-17"
+$trust = @{
+    Version = "2012-10-17"
     Statement = @(
         @{
-            Sid       = "GitHubActions"
-            Effect    = "Allow"
-            Principal = @{ Federated = $fedArn }
-            Action    = "sts:AssumeRoleWithWebIdentity"
+            Sid = "GitHubActions"
+            Effect = "Allow"
+            Principal = @{ Federated = $federatedArn }
+            Action = "sts:AssumeRoleWithWebIdentity"
             Condition = @{
-                StringEquals = @{
-                    "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-                }
-                StringLike   = @{
-                    "token.actions.githubusercontent.com:sub" = $subClaim
-                }
+                StringEquals = @{ "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com" }
+                StringLike = @{ "token.actions.githubusercontent.com:sub" = $subject }
             }
         }
     )
 }
 
 $trustJson = $trust | ConvertTo-Json -Depth 10 -Compress
-$trustFile = Join-Path ([System.IO.Path]::GetTempPath()) "github-oidc-trust-$([Guid]::NewGuid().ToString('N')).json"
+$trustFile = Join-Path ([System.IO.Path]::GetTempPath()) ("github-oidc-trust-" + [Guid]::NewGuid().ToString("N") + ".json")
 [System.IO.File]::WriteAllText($trustFile, $trustJson, [System.Text.UTF8Encoding]::new($false))
-# AWS CLI no Windows aceita file:// com barras normais
-$trustFileUri = "file://$($trustFile -replace '\\', '/')"
+$trustUri = "file://$($trustFile -replace '\\', '/')"
 
 aws iam get-role --role-name $RoleName --output json 2>$null | Out-Null
 $roleExists = ($LASTEXITCODE -eq 0)
 
 if ($roleExists) {
-    Write-Host "Role '$RoleName' já existe — a atualizar trust policy ..." -ForegroundColor Yellow
-    aws iam update-assume-role-policy --role-name $RoleName --policy-document $trustFileUri
-    if ($LASTEXITCODE -ne 0) { Write-Error "update-assume-role-policy falhou." }
+    Write-Host "Updating trust policy on role $RoleName..." -ForegroundColor Yellow
+    aws iam update-assume-role-policy --role-name $RoleName --policy-document $trustUri | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to update trust policy."
+    }
 } else {
-    Write-Host "A criar role '$RoleName' ..." -ForegroundColor Cyan
-    aws iam create-role --role-name $RoleName --assume-role-policy-document $trustFileUri
-    if ($LASTEXITCODE -ne 0) { Write-Error "create-role falhou." }
+    Write-Host "Creating role $RoleName..." -ForegroundColor Cyan
+    aws iam create-role --role-name $RoleName --assume-role-policy-document $trustUri | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to create role."
+    }
 }
 
 $attached = aws iam list-attached-role-policies --role-name $RoleName --output json | ConvertFrom-Json
-$already = $attached.AttachedPolicies | Where-Object { $_.PolicyArn -eq $PolicyArn }
-if (-not $already) {
-    Write-Host "A anexar política: $PolicyArn" -ForegroundColor Cyan
-    aws iam attach-role-policy --role-name $RoleName --policy-arn $PolicyArn
-    if ($LASTEXITCODE -ne 0) { Write-Error "attach-role-policy falhou." }
+$alreadyAttached = $attached.AttachedPolicies | Where-Object { $_.PolicyArn -eq $PolicyArn }
+if (-not $alreadyAttached) {
+    Write-Host "Attaching policy $PolicyArn..." -ForegroundColor Cyan
+    aws iam attach-role-policy --role-name $RoleName --policy-arn $PolicyArn | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to attach policy."
+    }
 } else {
-    Write-Host "Política já anexada." -ForegroundColor Green
+    Write-Host "Policy already attached." -ForegroundColor Green
 }
 
 Remove-Item -LiteralPath $trustFile -Force -ErrorAction SilentlyContinue
 
 $roleArn = "arn:aws:iam::${account}:role/${RoleName}"
 Write-Host ""
-Write-Host "=== Próximo passo no GitHub ===" -ForegroundColor Green
-Write-Host "Settings → Secrets and variables → Actions → New repository secret"
-Write-Host "  Nome:  AWS_ROLE_ARN"
-Write-Host "  Valor: $roleArn"
+Write-Host "Next step in GitHub:" -ForegroundColor Green
+Write-Host "Settings -> Secrets and variables -> Actions -> New repository secret"
+Write-Host "Name: AWS_ROLE_ARN"
+Write-Host "Value: $roleArn"
 Write-Host ""
