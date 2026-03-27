@@ -92,7 +92,7 @@ Initialize-GitRepo -Path $lambda
 # 2) oficina-infra-database (AWS VPC + RDS, sem kind)
 $db = Join-Path $DestinationRoot "oficina-infra-database"
 Write-Host "`n[2/4] oficina-infra-database"
-Invoke-RobocopyMirror -Source (Join-Path $repoRoot "infra") -Destination $db -ExcludeDirs @("kind")
+Invoke-RobocopyMirror -Source (Join-Path $repoRoot "infra") -Destination $db -ExcludeDirs @((Join-Path $repoRoot "infra\kind"))
 Copy-GitHubWorkflow -RepoPath $db -TemplateFileName "terraform-aws-ci-pr.yml" -TargetFileName "terraform-validate.yml"
 Copy-GitHubWorkflow -RepoPath $db -TemplateFileName "terraform-aws-standalone.yml" -TargetFileName "terraform-aws.yml"
 Initialize-GitRepo -Path $db
@@ -133,7 +133,7 @@ Scaffold gerado com ``-SkipAppCopy``. Copie o código do monorepo manualmente ou
         ".git",
         "target",
         "auth-lambda",
-        "infra",
+        (Join-Path $repoRoot "infra"),
         ".idea",
         "node_modules",
         ".terraform",
