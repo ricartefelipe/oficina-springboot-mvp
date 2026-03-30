@@ -110,10 +110,12 @@ Links obtidos em **2026-03-30** (último run com `success` à data da conclusão
 
 ## Como gerar o PDF
 
-1. **Forma mais rápida:** no repositório existe **`entrega-portal-fase3.docx`** (gerado a partir deste `.md`). Abre no Word → **Ficheiro → Guardar como → PDF** (ou **Imprimir → Microsoft Print to PDF**).
-2. **A partir do Markdown:** abre `entrega-portal-fase3.md` no GitHub ou no editor, **preenche** nome e turma na secção 1, depois cola no Word/Google Docs e exporta PDF.
-3. **Pandoc para PDF** (requer motor PDF, ex. MiKTeX/pdflatex):  
-   `pandoc entrega-portal-fase3.md -o entrega-portal-fase3.pdf`
+1. **Já existe no repositório:** **`entrega-portal-fase3.pdf`** na mesma pasta que este ficheiro — podes fazer download direto e submeter no portal (preenche nome/turma no PDF com um editor de PDF ou regenera após editar o `.md`).
+2. **Alternativa Word:** **`entrega-portal-fase3.docx`** → Guardar como PDF.
+3. **Regenerar o PDF a partir deste `.md` (Windows, Edge):**  
+   `pandoc entrega-portal-fase3.md -o _tmp.html --standalone`  
+   depois Edge em modo headless:  
+   `"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless --disable-gpu --print-to-pdf=entrega-portal-fase3.pdf file:///C:/caminho/completo/_tmp.html`
 
 ---
 
