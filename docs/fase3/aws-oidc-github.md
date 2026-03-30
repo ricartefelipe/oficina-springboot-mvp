@@ -14,7 +14,17 @@ Exemplo: `-GitHubOwner "ricartefelipe" -GitHubRepo "oficina-springboot-mvp"`.
 
 3. O script imprime o **ARN** — cola no GitHub: **Settings → Secrets → Actions** → secret **`AWS_ROLE_ARN`**.
 
-Script: [`scripts/fase3/setup-github-oidc-aws.ps1`](../../scripts/fase3/setup-github-oidc-aws.ps1) (cria o OIDC provider se faltar, cria/atualiza a role e anexa `PowerUserAccess` por defeito).
+Script: [`scripts/fase3/setup-github-oidc-aws.ps1`](../../scripts/fase3/setup-github-oidc-aws.ps1) (cria o OIDC provider se faltar, cria/atualiza a role e anexa `PowerUserAccess` por defeito). Para confiar em mais do que um repositório na mesma role: `-GitHubReposExtra` (ex.: `-GitHubReposExtra "oficina-infra-kubernetes-"`).
+
+### AWS CloudShell (sem AWS CLI no PC)
+
+Na consola AWS, abre **CloudShell** (ícone terminal no topo). Já tens credenciais IAM na sessão.
+
+1. Copia o ficheiro [`scripts/fase3/cloudshell-github-oidc.sh`](../../scripts/fase3/cloudshell-github-oidc.sh) para o CloudShell (ou cola o conteúdo num ficheiro `cloudshell-github-oidc.sh`).
+2. `chmod +x cloudshell-github-oidc.sh && ./cloudshell-github-oidc.sh`
+3. Copia o **ARN** impresso e no teu PC (com `gh auth login`):  
+   `gh secret set AWS_ROLE_ARN -b "ARN_AQUI" -R ricartefelipe/oficina-infra-database`  
+   Alternativa: uma linha com o ARN em `scripts/fase3/aws-role-arn.txt` no monorepo (ficheiro ignorado pelo git).
 
 ---
 

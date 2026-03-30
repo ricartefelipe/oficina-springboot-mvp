@@ -48,23 +48,21 @@ Com [GitHub CLI](https://cli.github.com/) instalado e sessão iniciada (`gh auth
 
 Alternativa manual: criar os quatro repositórios vazios no site e, em cada pasta, `git remote add origin git@github.com:OWNER/NOME.git` e `git push -u origin main`.
 
-## Branches `hml` e `prd` (CI e deploy)
+## Branches `develop` e `master` (CI e deploy)
 
 Política suportada pelos workflows copiados pelo bootstrap e pelo monólito:
 
-| Branch | Papel típico | CI | Deploy automático (só **oficina-app**) |
-|--------|----------------|-----|----------------------------------------|
-| `develop` | integração | sim | não |
-| `master` / `main` | linha estável | sim + imagem GHCR | não |
-| `hml` | homologação | sim + imagem `ghcr.io/...:hml` | sim — ambiente **homologacao** |
-| `prd` | produção | sim + imagem `ghcr.io/...:prd` | sim — ambiente **producao** |
+| Branch | Papel | CI | Deploy automático (app com `deploy-k8s-branch.yml`) |
+|--------|--------|-----|------------------------------------------------------|
+| `develop` | integração | sim + imagem `ghcr.io/...:develop` | sim — ambiente **homologacao** |
+| `master` | espelho estável (atualizado a partir de `develop`) | sim + imagem `ghcr.io/...:master` | sim — ambiente **producao** |
 
-1. Cria as branches a partir de `main`/`develop` (`git checkout -b hml`, `git push -u origin hml`, idem para `prd`).
-2. No repositório **oficina-app** (ou no monólito), em **Settings → Environments**, cria **homologacao** e **producao**.
-3. Em cada ambiente, define o secret **`KUBE_CONFIG_B64`** (kubeconfig em Base64) do cluster correspondente. Opcional: aprovadores antes do deploy (regra de proteção do ambiente).
-4. O workflow `deploy-k8s-branch.yml` corre **depois** do workflow `CI` concluir com sucesso no mesmo push (evita usar a imagem antes de existir no GHCR): aplica `k8s/*.yaml` e faz `kubectl set image` para `ghcr.io/<repo>:hml` ou `:prd`.
+1. Trabalho diário em `develop`; após PR/revisão, fazer merge de `develop` → `master` para manter `master` alinhada.
+2. No repositório da app (ou monólito), em **Settings → Environments**, cria **homologacao** e **producao**.
+3. Em cada ambiente, define o secret **`KUBE_CONFIG_B64`** (kubeconfig em Base64) do cluster correspondente.
+4. O workflow `deploy-k8s-branch.yml` corre **depois** do `CI` concluir com sucesso no mesmo push: aplica `k8s/*.yaml` e faz `kubectl set image` para `ghcr.io/<repo>:develop` ou `:master` conforme a branch.
 
-Repositórios **Lambda** e **Terraform** apenas correm **validação CI** nessas branches (sem deploy automático neste modelo).
+Repositórios **Lambda** e **Terraform** apenas correm **validação CI** nestas branches (sem deploy K8s neste modelo).
 
 ## O que só tu (ou a equipa) podes fazer
 
@@ -72,7 +70,7 @@ Repositórios **Lambda** e **Terraform** apenas correm **validação CI** nessas
 
 1. Criar os quatro repositórios (vazios ou com README) na organização ou conta desejada — ou usar `publish-fase3-repos.ps1`.
 2. Adicionar o utilizador **`soat-architecture`** com permissão de leitura em **todos** os quatro.
-3. **Branch protection** na branch principal (ex.: `main` ou `master`):
+3. **Branch protection** na branch principal (`master`):
    - Exigir pull request antes do merge.
    - Exigir aprovação de revisão (se aplicável à equipa).
    - Opcional: exigir que os checks de CI passem.
@@ -102,7 +100,7 @@ Se usares [GitHub CLI](https://cli.github.com/) (`gh`), podes aplicar regras sem
 1. Correr `bootstrap-repos.ps1` e rever os quatro diretórios.
 2. Correr `publish-fase3-repos.ps1` (ou criar repos e fazer push manualmente).
 3. Configurar branch protection e `soat-architecture`.
-4. Criar branches `hml`/`prd` e environments com `KUBE_CONFIG_B64` quando o cluster existir.
+4. Configurar environments com `KUBE_CONFIG_B64` quando o cluster existir (deploy a partir de `develop` / `master`).
 5. Adicionar secrets AWS e testar CI (sem `apply` destrutivo em produção até validares o plano).
 
 Para o mapa de responsabilidades e stacks, ver também [`repositorios-planejados.md`](repositorios-planejados.md).
