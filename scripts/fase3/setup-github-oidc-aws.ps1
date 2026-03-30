@@ -59,24 +59,34 @@ if (-not $hasGithub) {
     Write-Host "GitHub OIDC provider already exists." -ForegroundColor Green
 }
 
-$federatedArn = "arn:aws:iam::${account}:oidc-provider/token.actions.githubusercontent.com"
+$oidcArn = "arn:aws:iam::${account}:oidc-provider/token.actions.githubusercontent.com"
 $allRepos = @($GitHubRepo) + $GitHubReposExtra
-$statements = @()
-$i = 0
+Write-Host "Registando client IDs no OIDC (sts + URL do repo)..." -ForegroundColor Cyan
+aws iam add-client-id-to-open-id-connect-provider --open-id-connect-provider-arn $oidcArn --client-id "sts.amazonaws.com" 2>$null | Out-Null
 foreach ($r in $allRepos) {
-    $sid = "GitHubRepo$i"
+    $cid = "https://github.com/${GitHubOwner}/${r}"
+    aws iam add-client-id-to-open-id-connect-provider --open-id-connect-provider-arn $oidcArn --client-id $cid 2>$null | Out-Null
+}
+
+$federatedArn = $oidcArn
+$statements = @()
+$n = 0
+foreach ($r in $allRepos) {
     $sub = "repo:${GitHubOwner}/${r}:*"
-    $statements += @{
-        Sid       = $sid
-        Effect    = "Allow"
-        Principal = @{ Federated = $federatedArn }
-        Action    = "sts:AssumeRoleWithWebIdentity"
-        Condition = @{
-            StringEquals = @{ "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com" }
-            StringLike   = @{ "token.actions.githubusercontent.com:sub" = $sub }
+    foreach ($aud in @("sts.amazonaws.com", "https://github.com/${GitHubOwner}/${r}")) {
+        $sid = "GitHub$n"
+        $statements += @{
+            Sid       = $sid
+            Effect    = "Allow"
+            Principal = @{ Federated = $federatedArn }
+            Action    = "sts:AssumeRoleWithWebIdentity"
+            Condition = @{
+                StringEquals = @{ "token.actions.githubusercontent.com:aud" = $aud }
+                StringLike   = @{ "token.actions.githubusercontent.com:sub" = $sub }
+            }
         }
+        $n++
     }
-    $i++
 }
 
 $trust = @{

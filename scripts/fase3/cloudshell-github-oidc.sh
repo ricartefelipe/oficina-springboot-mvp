@@ -25,6 +25,20 @@ else
   echo "OIDC provider GitHub ja existe."
 fi
 
+OIDC_ARN="arn:aws:iam::${ACCOUNT}:oidc-provider/token.actions.githubusercontent.com"
+echo "A garantir client IDs no OIDC (sts + URL do repo; corrige Incorrect token audience)..."
+for cid in "sts.amazonaws.com"; do
+  aws iam add-client-id-to-open-id-connect-provider \
+    --open-id-connect-provider-arn "${OIDC_ARN}" \
+    --client-id "${cid}" 2>/dev/null && echo "  OK: ${cid}" || true
+done
+for r in "${GITHUB_REPOS[@]}"; do
+  cid="https://github.com/${GITHUB_OWNER}/${r}"
+  aws iam add-client-id-to-open-id-connect-provider \
+    --open-id-connect-provider-arn "${OIDC_ARN}" \
+    --client-id "${cid}" 2>/dev/null && echo "  OK: ${cid}" || true
+done
+
 REPOS_FILE="$(mktemp)"
 printf '%s\n' "${GITHUB_REPOS[@]}" > "${REPOS_FILE}"
 TRUST_FILE="$(mktemp)"
@@ -37,17 +51,21 @@ with open(repos_path, encoding="utf-8") as f:
     repos = [line.strip() for line in f if line.strip()]
 fed = f"arn:aws:iam::{account}:oidc-provider/token.actions.githubusercontent.com"
 stmts = []
-for i, r in enumerate(repos):
-    stmts.append({
-        "Sid": f"GitHubRepo{i}",
-        "Effect": "Allow",
-        "Principal": {"Federated": fed},
-        "Action": "sts:AssumeRoleWithWebIdentity",
-        "Condition": {
-            "StringEquals": {"token.actions.githubusercontent.com:aud": "sts.amazonaws.com"},
-            "StringLike": {"token.actions.githubusercontent.com:sub": f"repo:{owner}/{r}:*"},
-        },
-    })
+n = 0
+for r in repos:
+    sub = f"repo:{owner}/{r}:*"
+    for aud in ("sts.amazonaws.com", f"https://github.com/{owner}/{r}"):
+        stmts.append({
+            "Sid": f"GitHub{n}",
+            "Effect": "Allow",
+            "Principal": {"Federated": fed},
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {"token.actions.githubusercontent.com:aud": aud},
+                "StringLike": {"token.actions.githubusercontent.com:sub": sub},
+            },
+        })
+        n += 1
 print(json.dumps({"Version": "2012-10-17", "Statement": stmts}))
 PY
 
