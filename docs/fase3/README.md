@@ -14,6 +14,8 @@ Requisitos oficiais: documento **Tech Challenge - Fase 3** (disciplina SOAT).
 | [diagrama-sequencia-auth-os.md](diagrama-sequencia-auth-os.md) | Sequencia: autenticacao com CPF e abertura de ordem de servico |
 | [repositorios-planejados.md](repositorios-planejados.md) | Quatro repositorios, fronteiras e responsabilidades |
 | [backlog-fase3.md](backlog-fase3.md) | Fases de entrega, dependencias e criterios de pronto |
+| [TERMINAR-FASE3.md](TERMINAR-FASE3.md) | **Guia curto:** o que falta para fechar a Fase 3 (apos F1/F2) |
+| [terraform-snippet-api-gateway.tf](terraform-snippet-api-gateway.tf) | Snippet Terraform: API Gateway HTTP + Lambda (apos deploy da funcao) |
 | [executar-fase3.md](executar-fase3.md) | Script local para quatro pastas-gêmeas, checklist GitHub/AWS e entrega |
 | [readmes-primeiro-commit/](readmes-primeiro-commit/) | README.md prontos para copiar para cada um dos 4 repositórios |
 | [PROMPT-FASE3.md](PROMPT-FASE3.md) | Prompt mestre do enunciário (guia de implementação e vídeo) |
