@@ -4,10 +4,13 @@
 .DESCRIPTION
     Requires AWS CLI configured locally (aws configure or env vars).
     Prints IAM role ARN to use as GitHub secret AWS_ROLE_ARN.
+    Podes confiar em varios repos na mesma role com -GitHubReposExtra (uma role, varios statements).
 .PARAMETER GitHubOwner
     GitHub user or org (example: ricartefelipe).
 .PARAMETER GitHubRepo
-    GitHub repository name (example: oficina-infra-database).
+    Primeiro repositorio GitHub (example: oficina-infra-database).
+.PARAMETER GitHubReposExtra
+    Repos adicionais com a mesma trust (ex.: oficina-infra-kubernetes-).
 .PARAMETER RoleName
     IAM role name to create/update.
 .PARAMETER PolicyArn
@@ -18,7 +21,8 @@ param(
     [string] $GitHubOwner,
     [Parameter(Mandatory = $true)]
     [string] $GitHubRepo,
-    [string] $RoleName = "GitHubActionsTerraform",
+    [string[]] $GitHubReposExtra = @(),
+    [string] $RoleName = "GitHubActionsTerraformInfra",
     [string] $PolicyArn = "arn:aws:iam::aws:policy/PowerUserAccess"
 )
 
@@ -56,22 +60,28 @@ if (-not $hasGithub) {
 }
 
 $federatedArn = "arn:aws:iam::${account}:oidc-provider/token.actions.githubusercontent.com"
-$subject = "repo:${GitHubOwner}/${GitHubRepo}:*"
+$allRepos = @($GitHubRepo) + $GitHubReposExtra
+$statements = @()
+$i = 0
+foreach ($r in $allRepos) {
+    $sid = "GitHubRepo$i"
+    $sub = "repo:${GitHubOwner}/${r}:*"
+    $statements += @{
+        Sid       = $sid
+        Effect    = "Allow"
+        Principal = @{ Federated = $federatedArn }
+        Action    = "sts:AssumeRoleWithWebIdentity"
+        Condition = @{
+            StringEquals = @{ "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com" }
+            StringLike   = @{ "token.actions.githubusercontent.com:sub" = $sub }
+        }
+    }
+    $i++
+}
 
 $trust = @{
-    Version = "2012-10-17"
-    Statement = @(
-        @{
-            Sid = "GitHubActions"
-            Effect = "Allow"
-            Principal = @{ Federated = $federatedArn }
-            Action = "sts:AssumeRoleWithWebIdentity"
-            Condition = @{
-                StringEquals = @{ "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com" }
-                StringLike = @{ "token.actions.githubusercontent.com:sub" = $subject }
-            }
-        }
-    )
+    Version   = "2012-10-17"
+    Statement = $statements
 }
 
 $trustJson = $trust | ConvertTo-Json -Depth 10 -Compress
@@ -112,8 +122,10 @@ Remove-Item -LiteralPath $trustFile -Force -ErrorAction SilentlyContinue
 
 $roleArn = "arn:aws:iam::${account}:role/${RoleName}"
 Write-Host ""
-Write-Host "Next step in GitHub:" -ForegroundColor Green
-Write-Host "Settings -> Secrets and variables -> Actions -> New repository secret"
-Write-Host "Name: AWS_ROLE_ARN"
-Write-Host "Value: $roleArn"
+Write-Host "Secret no GitHub (Actions):" -ForegroundColor Green
+Write-Host "  Nome: AWS_ROLE_ARN"
+Write-Host "  Valor: $roleArn"
+Write-Host ""
+Write-Host "gh (PowerShell):" -ForegroundColor Green
+Write-Host "  gh secret set AWS_ROLE_ARN -b `"$roleArn`" -R ${GitHubOwner}/${GitHubRepo}"
 Write-Host ""
