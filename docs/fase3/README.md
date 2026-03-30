@@ -16,6 +16,7 @@ Requisitos oficiais: documento **Tech Challenge - Fase 3** (disciplina SOAT).
 | [backlog-fase3.md](backlog-fase3.md) | Fases de entrega, dependencias e criterios de pronto |
 | [TERMINAR-FASE3.md](TERMINAR-FASE3.md) | **Guia curto:** o que falta para fechar a Fase 3 (apos F1/F2) |
 | [entrega-portal-fase3.md](entrega-portal-fase3.md) | **Documento para PDF no portal** (4 repos, soat, evidencias sem video, modo solo) |
+| [entrega-portal-fase3.docx](entrega-portal-fase3.docx) | **Mesmo conteúdo em Word** — Guardar como PDF para submeter |
 | [terraform-snippet-api-gateway.tf](terraform-snippet-api-gateway.tf) | Snippet Terraform: API Gateway HTTP + Lambda (apos deploy da funcao) |
 | [executar-fase3.md](executar-fase3.md) | Script local para quatro pastas-gêmeas, checklist GitHub/AWS e entrega |
 | [readmes-primeiro-commit/](readmes-primeiro-commit/) | README.md prontos para copiar para cada um dos 4 repositórios |
