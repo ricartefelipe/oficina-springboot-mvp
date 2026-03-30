@@ -1,6 +1,7 @@
 name: Terraform (Kind)
 
 on:
+  workflow_dispatch:
   push:
     branches: [main, master, develop, hml, prd]
   pull_request:

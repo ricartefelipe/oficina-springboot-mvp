@@ -1,6 +1,7 @@
 name: Auth Lambda (Python)
 
 on:
+  workflow_dispatch:
   push:
     branches: [develop, master, hml, prd]
     paths:
