@@ -3,11 +3,11 @@ name: Auth Lambda (Python)
 on:
   workflow_dispatch:
   push:
-    branches: [develop, master, hml, prd]
+    branches: [develop, master]
     paths:
       - "auth-lambda/**"
   pull_request:
-    branches: [develop, master, hml, prd]
+    branches: [develop, master]
     paths:
       - "auth-lambda/**"
 
