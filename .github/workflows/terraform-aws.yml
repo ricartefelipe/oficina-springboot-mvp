@@ -54,24 +54,25 @@ jobs:
           echo "::error::Defina AWS_ROLE_ARN (OIDC) ou o par AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY."
           exit 1
 
-      - uses: hashicorp/setup-terraform@v4
-        with:
-          terraform_version: 1.9.8
-
       - name: Configurar AWS (OIDC)
         if: ${{ env.AWS_ROLE_ARN != '' }}
-        uses: aws-actions/configure-aws-credentials@v6
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ inputs.aws_region || 'sa-east-1' }}
+          audience: sts.amazonaws.com
 
       - name: Configurar AWS (access keys)
         if: ${{ env.AWS_ROLE_ARN == '' }}
-        uses: aws-actions/configure-aws-credentials@v6
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ inputs.aws_region || 'sa-east-1' }}
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.9.8
 
       - name: Terraform Init
         run: terraform init -input=false
