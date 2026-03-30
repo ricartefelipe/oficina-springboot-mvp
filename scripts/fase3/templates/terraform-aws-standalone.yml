@@ -21,6 +21,11 @@ on:
         description: "Regiao AWS"
         required: true
         default: "sa-east-1"
+      use_oidc:
+        description: "OIDC com AWS_ROLE_ARN (ligado). Desligue se der erro de audience e use chaves IAM."
+        required: true
+        type: boolean
+        default: true
 
 env:
   TF_IN_AUTOMATION: "true"
@@ -43,35 +48,37 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          if [ -n "$AWS_ROLE_ARN" ]; then
+          USE_OIDC="${{ inputs.use_oidc }}"
+          if [ "$USE_OIDC" = "true" ] && [ -n "$AWS_ROLE_ARN" ]; then
             echo "Autenticacao AWS: OIDC (role)"
             exit 0
           fi
-          if [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
+          if [ "$USE_OIDC" = "false" ] && [ -n "$AWS_ACCESS_KEY_ID" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
             echo "Autenticacao AWS: access keys"
             exit 0
           fi
-          echo "::error::Defina AWS_ROLE_ARN (OIDC) ou o par AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY."
+          echo "::error::Com use_oidc=true precisa de AWS_ROLE_ARN. Com use_oidc=false precisa de AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY."
           exit 1
 
-      - uses: hashicorp/setup-terraform@v4
-        with:
-          terraform_version: 1.9.8
-
       - name: Configurar AWS (OIDC)
-        if: ${{ env.AWS_ROLE_ARN != '' }}
-        uses: aws-actions/configure-aws-credentials@v6
+        if: ${{ inputs.use_oidc && env.AWS_ROLE_ARN != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ inputs.aws_region || 'sa-east-1' }}
+          audience: https://github.com/${{ github.repository }}
 
       - name: Configurar AWS (access keys)
-        if: ${{ env.AWS_ROLE_ARN == '' }}
-        uses: aws-actions/configure-aws-credentials@v6
+        if: ${{ !inputs.use_oidc }}
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ inputs.aws_region || 'sa-east-1' }}
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: 1.9.8
 
       - name: Terraform Init
         run: terraform init -input=false

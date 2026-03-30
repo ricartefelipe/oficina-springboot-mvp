@@ -155,7 +155,7 @@ Scaffold gerado com ``-SkipAppCopy``. Copie o código do monorepo manualmente ou
 # Notas Fase 3 (oficina-app)
 
 - **Lambda** e **Terraform** estão em repositórios separados; este repo contém a aplicação Spring Boot e artefactos relacionados (ex.: ``k8s/``, Docker).
-- CI publica imagem em GHCR; pushes em ``hml`` ou ``prd`` disparam ``deploy-k8s-branch.yml`` (requer secrets por ambiente — ver monorepo ``docs/fase3/executar-fase3.md``).
+- CI publica imagem em GHCR; pushes em ``develop`` ou ``master`` disparam ``deploy-k8s-branch.yml`` (requer secrets por ambiente — ver monorepo ``docs/fase3/executar-fase3.md``).
 - Adicionar **soat-architecture** como leitor.
 "@ | Set-Content -Path $readmeAppExtra -Encoding utf8
 }
