@@ -8,7 +8,8 @@
 
 | Campo | Valor |
 |-------|--------|
-| **Aluno** | *(preenche: nome completo)* |
+| **Aluno** | *(preenche: nome completo no portal académico)* |
+| **Conta GitHub (autor dos repositórios)** | `ricartefelipe` |
 | **Disciplina / turma** | *(preenche)* |
 | **Modalidade** | Trabalho **individual** (sem equipa) |
 
@@ -65,18 +66,21 @@ Substituição aceitável: **prova documental** com links e, opcionalmente, **ca
 
 ### 6.1 CI/CD (GitHub Actions)
 
+Links obtidos em **2026-03-30** (último run com `success` à data da conclusão do projeto). Se o Actions tiver runs mais recentes, podes atualizar na cópia do PDF.
+
 | Repositório | O que demonstra | Evidência (link para run com sucesso) |
 |-------------|-----------------|----------------------------------------|
-| oficina-infra-database | Terraform validate / plan (AWS) | *(cola o URL do último run verde, ex.: Actions → Terraform AWS ou Terraform validate)* |
-| oficina-app | Build, testes, imagem Docker | *(cola URL do run)* |
-| oficina-auth-lambda | CI Python | *(cola URL do run)* |
-| oficina-infra-kubernetes- | Terraform validate | *(cola URL do run)* |
+| oficina-infra-database | Terraform AWS (plan) | https://github.com/ricartefelipe/oficina-infra-database/actions/runs/23729350036 |
+| oficina-app | CI (build, testes, Docker) | https://github.com/ricartefelipe/oficina-app/actions/runs/23727418594 |
+| oficina-auth-lambda | CI (Python) | https://github.com/ricartefelipe/oficina-auth-lambda/actions/runs/23727348096 |
+| oficina-infra-kubernetes- | Terraform (Kind) | https://github.com/ricartefelipe/oficina-infra-kubernetes-/actions/runs/23727349224 |
+| oficina-springboot-mvp | CI monólito (ArchUnit, testes) — referência | https://github.com/ricartefelipe/oficina-springboot-mvp/actions/runs/23729555436 |
 
 ### 6.2 Infraestrutura como código
 
-- **Base de dados (RDS):** código Terraform em `oficina-infra-database`; execução de **`terraform plan`** (e opcionalmente `apply`) na região escolhida — indicar estado: *plan OK / apply aplicado* e **região** (ex.: `sa-east-1`).
-- **Kubernetes:** manifestos no repositório da app (`k8s/`); cluster de laboratório **Kind** ou outro, conforme README do repositório de infra.
-- **API Gateway:** snippet Terraform em `docs/fase3/terraform-snippet-api-gateway.tf` no monólito; deploy na AWS é **opcional** se o custo for limitante — descrever **estado** (ex.: *snippet integrado na stack / pendente apply*).
+- **Base de dados (RDS):** código Terraform em `oficina-infra-database`. O workflow **Terraform AWS** no GitHub Actions executa **`terraform plan`** com sucesso (evidência: link na tabela 6.1). **`apply`** na AWS é opcional por custo — se não aplicaste, mantém-se *plan validado em CI*.
+- **Kubernetes:** Terraform **Kind** em `oficina-infra-kubernetes-` (run verde na 6.1); manifestos da app em `oficina-app` (`k8s/`).
+- **API Gateway + Lambda:** código em `oficina-auth-lambda`; integração HTTP documentada — snippet em `docs/fase3/terraform-snippet-api-gateway.tf` no monólito. Deploy completo na conta AWS é **opcional** se o custo for limitante; o repositório e o CI cobrem a **definição** da infra e da função.
 
 ### 6.3 Observabilidade
 
@@ -106,10 +110,9 @@ Substituição aceitável: **prova documental** com links e, opcionalmente, **ca
 
 ## Como gerar o PDF
 
-1. **Abre este ficheiro** no GitHub (visualização) ou no VS Code / Cursor.
-2. **Copia** para Word ou Google Docs, ajusta tabelas se necessário, **preenche** campos *(preenche)* e **cola** os links reais dos runs do GitHub Actions.
-3. **Exporta** como PDF (**Ficheiro → Imprimir → Guardar como PDF** ou **Ficheiro → Transferir → PDF**).
-4. Alternativa: instala [Pandoc](https://pandoc.org) e, na pasta do ficheiro:  
+1. **Forma mais rápida:** no repositório existe **`entrega-portal-fase3.docx`** (gerado a partir deste `.md`). Abre no Word → **Ficheiro → Guardar como → PDF** (ou **Imprimir → Microsoft Print to PDF**).
+2. **A partir do Markdown:** abre `entrega-portal-fase3.md` no GitHub ou no editor, **preenche** nome e turma na secção 1, depois cola no Word/Google Docs e exporta PDF.
+3. **Pandoc para PDF** (requer motor PDF, ex. MiKTeX/pdflatex):  
    `pandoc entrega-portal-fase3.md -o entrega-portal-fase3.pdf`
 
 ---
