@@ -3,9 +3,9 @@ name: Terraform (Kind)
 on:
   workflow_dispatch:
   push:
-    branches: [develop, master]
+    branches: [develop, main]
   pull_request:
-    branches: [develop, master]
+    branches: [develop, main]
 
 jobs:
   validate:

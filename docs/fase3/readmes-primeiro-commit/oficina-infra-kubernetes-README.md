@@ -31,7 +31,7 @@ Ajustar `variables.tf` / `terraform.tfvars` conforme o repositório.
 ## CI
 
 - `terraform fmt -check`, `init -backend=false`, `validate` em PR.
-- `apply` apenas em pipeline controlada (develop/master) com credenciais.
+- `apply` apenas em pipeline controlada (develop/main) com credenciais.
 
 ## Diagrama (repositório)
 

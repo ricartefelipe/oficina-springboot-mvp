@@ -27,7 +27,7 @@ Todos **privados**, com acesso de leitura ao utilizador **`soat-architecture`** 
 | 4 | https://github.com/ricartefelipe/oficina-app | Aplicação Spring Boot — container, K8s, CI/CD |
 
 **Monólito / documentação central (evolução Fase 1–2 e referência técnica):**  
-https://github.com/ricartefelipe/oficina-springboot-mvp (branch `master`; integração em `develop`)
+https://github.com/ricartefelipe/oficina-springboot-mvp (branch `main`; integração em `develop`)
 
 ---
 
@@ -51,12 +51,12 @@ O enunciado da Fase 3 prevê vídeo de **até 15 minutos**. **Nesta entrega opta
 
 | Documento | URL (GitHub) |
 |-----------|----------------|
-| Índice Fase 3 (diagramas, backlog, execução) | `https://github.com/ricartefelipe/oficina-springboot-mvp/tree/master/docs/fase3` |
-| ADRs | `https://github.com/ricartefelipe/oficina-springboot-mvp/tree/master/docs/adr` |
-| RFC autenticação CPF / JWT | `https://github.com/ricartefelipe/oficina-springboot-mvp/blob/master/docs/fase3/rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md` |
-| Padrões de arquitetura (ArchUnit, camadas) | `https://github.com/ricartefelipe/oficina-springboot-mvp/blob/master/docs/development/architecture-standards.md` |
-| Guia “terminar Fase 3” | `https://github.com/ricartefelipe/oficina-springboot-mvp/blob/master/docs/fase3/TERMINAR-FASE3.md` |
-| Snippet Terraform API Gateway + Lambda | `https://github.com/ricartefelipe/oficina-springboot-mvp/blob/master/docs/fase3/terraform-snippet-api-gateway.tf` |
+| Índice Fase 3 (diagramas, backlog, execução) | `https://github.com/ricartefelipe/oficina-springboot-mvp/tree/main/docs/fase3` |
+| ADRs | `https://github.com/ricartefelipe/oficina-springboot-mvp/tree/main/docs/adr` |
+| RFC autenticação CPF / JWT | `https://github.com/ricartefelipe/oficina-springboot-mvp/blob/main/docs/fase3/rfc/rfc-0001-autenticacao-cpf-jwt-serverless.md` |
+| Padrões de arquitetura (ArchUnit, camadas) | `https://github.com/ricartefelipe/oficina-springboot-mvp/blob/main/docs/development/architecture-standards.md` |
+| Guia “terminar Fase 3” | `https://github.com/ricartefelipe/oficina-springboot-mvp/blob/main/docs/fase3/TERMINAR-FASE3.md` |
+| Snippet Terraform API Gateway + Lambda | `https://github.com/ricartefelipe/oficina-springboot-mvp/blob/main/docs/fase3/terraform-snippet-api-gateway.tf` |
 
 ---
 
