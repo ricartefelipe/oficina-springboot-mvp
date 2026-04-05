@@ -11,7 +11,7 @@
 
 ## Fase B - Aplicacao
 
-7. Ajustar app para validar JWT emitido pela Lambda (JWKS ou segredo partilhado documentado).
+7. Ajustar app para validar JWT emitido pela Lambda (JWKS ou segredo compartilhado documentado).
 8. Endpoints sensiveis protegidos conforme RFC; rotas publicas mantidas onde o dominio exigir.
 9. Pipelines: **develop** e **main** com deploy automatico conforme environments (homologacao / producao).
 
