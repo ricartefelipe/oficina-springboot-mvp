@@ -11,7 +11,7 @@ Documento para **entrega no portal** (PDF): repositório, `soat-architecture`, a
 
 **URL:** https://github.com/ricartefelipe/oficina-springboot-mvp  
 
-**Ramo padrão no GitHub:** `main` (documentação e código estáveis; integração em `develop`).
+**Branches no repositório (nomes literais):** `main` (estável), `develop` (integração).
 
 **Acesso ao avaliador SOAT:** o repositório deve estar compartilhado com o usuário **`soat-architecture`** (convite em *Settings → Collaborators*).  
 
