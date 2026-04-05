@@ -27,7 +27,7 @@ Todos **privados**, com acesso de leitura para o usuário **`soat-architecture`*
 | 4 | https://github.com/ricartefelipe/oficina-app | Aplicação Spring Boot — container, K8s, CI/CD |
 
 **Monólito / documentação central (evolução Fase 1–2 e referência técnica):**  
-https://github.com/ricartefelipe/oficina-springboot-mvp — ramo padrão **`main`**; integração em **`develop`**.
+https://github.com/ricartefelipe/oficina-springboot-mvp — branches **`main`** (estável) e **`develop`** (integração), nomes literais no Git.
 
 ---
 
