@@ -9,11 +9,11 @@ O enunciario exige **quatro repositorios Git separados**, cada um com **CI/CD** 
 | 3 | `oficina-infra-database` | Terraform para RDS (ou Aurora) PostgreSQL, subnets, security groups, backups, parametros | idem |
 | 4 | `oficina-app` (evolucao deste monolito) | Spring Boot, Dockerfile, Helm ou manifests K8s, integracao observabilidade | build, testes, imagem, deploy K8s |
 
-O repositorio atual **oficina-springboot-mvp** pode ser **renomeado** ou **clonado** para `oficina-app` quando a equipa iniciar a separacao; ate la, a documentacao e o backlog vivem aqui.
+O repositorio atual **oficina-springboot-mvp** pode ser **renomeado** ou **clonado** para `oficina-app` quando a equipe iniciar a separacao; ate la, a documentacao e o backlog vivem aqui.
 
 ## Convites
 
-O utilizador **`soat-architecture`** deve ser adicionado a **todos** os quatro repositorios (leitura), conforme portal da Fase 3.
+O usuário **`soat-architecture`** deve ser adicionado a **todos** os quatro repositorios (leitura), conforme portal da Fase 3.
 
 ## README em cada um
 
