@@ -62,7 +62,7 @@ jobs:
 
       - name: Configurar AWS (OIDC)
         if: ${{ inputs.use_oidc && env.AWS_ROLE_ARN != '' }}
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ inputs.aws_region || 'sa-east-1' }}
@@ -70,7 +70,7 @@ jobs:
 
       - name: Configurar AWS (access keys)
         if: ${{ !inputs.use_oidc }}
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
