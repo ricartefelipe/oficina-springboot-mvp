@@ -15,7 +15,7 @@ Documento para **entrega no portal** (PDF): repositório, `soat-architecture`, a
 
 **Acesso ao avaliador SOAT:** o repositório deve estar compartilhado com o usuário **`soat-architecture`** (convite em *Settings → Collaborators*).  
 
-**Documentação principal:** [`README.md`](../../README.md) (objetivos Fase 2, arquitetura, fluxo de deploy, execução local, Kubernetes, Terraform, links Swagger/OpenAPI e vídeo). **Critérios vs. enunciário:** [`fase2-concluida.md`](fase2-concluida.md).
+**Documentação principal:** [`README.md`](../../README.md) (objetivos Fase 2, arquitetura, fluxo de deploy, execução local, Kubernetes, Terraform, links Swagger/OpenAPI e vídeo). **Critérios vs. enunciado:** [`fase2-concluida.md`](fase2-concluida.md). **Checklist de atendimento à crítica do professor:** [`critica-professor-checklist.md`](critica-professor-checklist.md).
 
 ---
 
@@ -95,6 +95,8 @@ Com a app em `http://localhost:8080`:
 - [ ] [`README.md`](../../README.md) no GitHub com o link do vídeo na tabela **Links rápidos**  
 
 Documento complementar: [`submission.md`](submission.md) (e [`submission.pdf`](submission.pdf)).
+
+Para validação rápida do feedback da Fase 1, use também: [`critica-professor-checklist.md`](critica-professor-checklist.md).
 
 ---
 
