@@ -16,15 +16,27 @@ Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para
 
 ### Entrega oficial (portal + repositório)
 
-Conforme o enunciário: **repositório** atualizado (código, `/k8s`, `/infra`, CI/CD) e **PDF no portal** com link do repo (partilhado com **`soat-architecture`**), **desenho da arquitetura** e **link do vídeo** (≤ 15 min: deploy, CI/CD, APIs, escalabilidade).
+Conforme o enunciado: **repositório** atualizado (código, `/k8s`, `/infra`, CI/CD) e **PDF no portal** com link do repo (partilhado com **`soat-architecture`**), **desenho da arquitetura** e **link do vídeo** (≤ 15 min: deploy, CI/CD, APIs, escalabilidade).
 
 | Documento | Uso |
 |-----------|-----|
 | [**Entrega PDF - portal (Fase 2)**](docs/delivery/entrega-portal-fase2.md) | Conteúdo Markdown; **PDF pronto:** [`docs/delivery/entrega-portal-fase2.pdf`](docs/delivery/entrega-portal-fase2.pdf) (submeter no portal). |
 | [Submissão / checklist](docs/delivery/submission.md) | Documento longo; **PDF pronto:** [`docs/delivery/submission.pdf`](docs/delivery/submission.pdf). |
 | [Roteiro do vídeo](docs/video-script.md) | Inclui blocos **Fase 2** obrigatórios no início do ficheiro. |
+| [Checklist crítica do professor](docs/delivery/critica-professor-checklist.md) | Matriz objetiva: crítica, evidência no repositório, status e pendências manuais de entrega. |
 
 Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-to-pdf-edge.ps1 -InputMd "docs\delivery\entrega-portal-fase2.md"` (e o mesmo com `submission.md`). Requer **Pandoc** e **Microsoft Edge** no Windows.
+
+---
+
+## Atendimento à crítica do professor (Fase 1)
+
+Pontos reforçados na avaliação da Fase 1 e como estão cobertos:
+
+- **DDD visual e rastreável:** Event Storming com comandos, agregados, eventos, políticas, read models e fluxos alternativos em `docs/ddd/event-storming.md`, com SVGs em `docs/ddd/diagrams/`.
+- **Clareza de artefatos:** índice único em `docs/ddd/README.md` ligando Domain Storytelling, dicionário de linguagem ubíqua, Event Storming e diagramas.
+- **Evidência de entrega acadêmica:** documentação de submissão em `docs/delivery/submission.md` e checklist focada no feedback em `docs/delivery/critica-professor-checklist.md`.
+- **Qualidade técnica:** suíte de testes e cobertura JaCoCo no pipeline (`mvn -B -Pci verify` em `.github/workflows/ci.yml`).
 
 ---
 
@@ -52,7 +64,7 @@ A Fase 3 exige **quatro repositórios Git** separados (Lambda, Terraform K8s, Te
 
 ## Fase 2 - visão da solução e arquitetura
 
-**Checklist de conclusão (enunciário vs. repositório):** [`docs/delivery/fase2-concluida.md`](docs/delivery/fase2-concluida.md).
+**Checklist de conclusão (enunciado vs. repositório):** [`docs/delivery/fase2-concluida.md`](docs/delivery/fase2-concluida.md).
 
 ### Componentes da aplicação
 
@@ -202,7 +214,7 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
   - gera orçamento automaticamente (serviços + peças)
   - gera `trackingCode` para o cliente
   - contrato da API: com `server.servlet.context-path=/api`, a abertura é `POST /api/admin/ordens-servico`; o corpo deve ter ao menos um item em `servicos`; violações de validação respondem com HTTP 400 e Problem Details; testes em `src/test/java/br/com/oficina/ordemservico/api/admin/`
-  - listagem `GET /api/admin/ordens-servico`: por defeito **não** retorna `FINALIZADA` nem `ENTREGUE` (conforme enunciário), ordenando por prioridade operacional (execução → aguardando aprovação → diagnóstico → recebida) e, no mesmo status, pela OS **mais antiga** primeiro; `CANCELADA` e outros estados ativos entram na listagem com prioridade mais baixa que `RECEBIDA`; use `incluirEncerradas=true` para incluir também finalizadas e entregues (ordenados pela criação mais recente primeiro)
+  - listagem `GET /api/admin/ordens-servico`: por defeito **não** retorna `FINALIZADA` nem `ENTREGUE` (conforme enunciado), ordenando por prioridade operacional (execução → aguardando aprovação → diagnóstico → recebida) e, no mesmo status, pela OS **mais antiga** primeiro; `CANCELADA` e outros estados ativos entram na listagem com prioridade mais baixa que `RECEBIDA`; use `incluirEncerradas=true` para incluir também finalizadas e entregues (ordenados pela criação mais recente primeiro)
 - Ações administrativas:
   - iniciar diagnóstico → `EM_DIAGNOSTICO`
   - enviar orçamento → `AGUARDANDO_APROVACAO`
