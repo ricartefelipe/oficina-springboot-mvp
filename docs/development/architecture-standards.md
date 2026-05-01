@@ -4,14 +4,14 @@ Este documento fixa o que o repositório trata como **referência normativa**.
 
 ## Fronteiras de camada (DDD no monólito)
 
-- **Domínio** (`..domain..` em cada bounded context): regras de negócio, invariantes de agregado e VOs. Não referencia **controllers** (`..api..`), **adaptadores** (`..adapters..`) nem **infra** (`..infra..`) — o modelo é anemic ORM-friendly com JPA nos agregados; isso é aceite, mas **fronteiras** continuam a ser testadas.
+- **Domínio** (`..domain..` em cada bounded context): regras de negócio, invariantes de agregado e VOs **sem** `jakarta.persistence`. Entidades JPA (`*Entity`) vivem em `infra.persistence.entity` ou `adapters.out.persistence.entity`, com mappers para o modelo de domínio.
 - **Aplicação**: orquestra casos de uso, transações e portas (`application.port` / interfaces). Pode usar Spring (`@Service`, `@Transactional`) e repositórios de infra quando ainda não existir porta dedicada; evoluções futuras extraem portas para reduzir acoplamento.
 - **Adaptadores de entrada**: Spring MVC (`adapters.in.web`, `..api..`) — HTTP, DTOs e mapeamento; sem regra de negócio além de validação de contrato.
 - **Adaptadores de saída**: JPA, SMTP, etc. — implementam portas ou expõem detalhes de persistência atrás da porta quando aplicável.
 
 ### Verificação automática
 
-- Testes **ArchUnit** em `src/test/java/br/com/oficina/architecture/ArchitectureRulesTest.java` falham o build se o domínio passar a depender de `br.com.oficina..adapters..`, `br.com.oficina..api..` ou `br.com.oficina..infra..` (o prefixo evita falso positivo com `org.junit.jupiter.api`).
+- Testes **ArchUnit** em `src/test/java/br/com/oficina/architecture/ArchitectureRulesTest.java` falham o build se o domínio passar a depender de `br.com.oficina..adapters..`, `br.com.oficina..api..` ou `br.com.oficina..infra..`, ou de pacotes `jakarta.persistence` nos pacotes `..domain..`.
 
 ## Qualidade e testes
 
