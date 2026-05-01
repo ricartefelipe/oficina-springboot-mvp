@@ -1,6 +1,8 @@
-package br.com.oficina.ordemservico.application;
+package br.com.oficina.ordemservico.adapters.out.persistence;
 
-import br.com.oficina.ordemservico.domain.OrdemServico;
+import br.com.oficina.ordemservico.adapters.out.persistence.entity.OrdemServicoEntity;
+import br.com.oficina.ordemservico.application.OrdemServicoListagemFiltro;
+import br.com.oficina.ordemservico.application.OrdemServicoListagemOrdem;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -11,57 +13,48 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class OrdemServicoSpecifications {
+public final class OrdemServicoEntitySpecifications {
 
-    private OrdemServicoSpecifications() {
+    private OrdemServicoEntitySpecifications() {
     }
 
-    public static Specification<OrdemServico> filtrar(
-            StatusOrdemServico status,
-            String placaNormalized,
-            String cpfCnpjDigits,
-            OffsetDateTime from,
-            OffsetDateTime to,
-            boolean excluirEncerradas,
-            OrdemServicoListagemOrdem ordem
-    ) {
+    public static Specification<OrdemServicoEntity> from(OrdemServicoListagemFiltro f) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
+            if (f.status() != null) {
+                predicates.add(cb.equal(root.get("status"), f.status()));
             }
 
-            if (excluirEncerradas) {
+            if (f.excluirEncerradas()) {
                 predicates.add(cb.not(root.get("status").in(
                         StatusOrdemServico.FINALIZADA,
                         StatusOrdemServico.ENTREGUE
                 )));
             }
 
-            if (placaNormalized != null && !placaNormalized.isBlank()) {
+            if (f.placaNormalized() != null && !f.placaNormalized().isBlank()) {
                 Join<Object, Object> veiculo = root.join("veiculo");
-                predicates.add(cb.equal(veiculo.get("placa").get("value"), placaNormalized));
+                predicates.add(cb.equal(veiculo.get("placa"), f.placaNormalized()));
             }
 
-            if (cpfCnpjDigits != null && !cpfCnpjDigits.isBlank()) {
+            if (f.cpfCnpjDigits() != null && !f.cpfCnpjDigits().isBlank()) {
                 Join<Object, Object> cliente = root.join("cliente");
-                predicates.add(cb.equal(cliente.get("cpfCnpj").get("value"), cpfCnpjDigits));
+                predicates.add(cb.equal(cliente.get("cpfCnpj"), f.cpfCnpjDigits()));
             }
 
-            if (from != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), from));
+            if (f.from() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), f.from()));
             }
 
-            if (to != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), to));
+            if (f.to() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), f.to()));
             }
 
-            aplicarOrdenacao(root, query, cb, ordem);
+            aplicarOrdenacao(root, query, cb, f.ordem());
 
             query.distinct(true);
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -69,7 +62,7 @@ public final class OrdemServicoSpecifications {
     }
 
     private static void aplicarOrdenacao(
-            Root<OrdemServico> root,
+            Root<OrdemServicoEntity> root,
             CriteriaQuery<?> query,
             CriteriaBuilder cb,
             OrdemServicoListagemOrdem ordem
@@ -84,7 +77,7 @@ public final class OrdemServicoSpecifications {
         }
     }
 
-    private static Expression<Integer> prioridadeOperacaoExpression(Root<OrdemServico> root, CriteriaBuilder cb) {
+    private static Expression<Integer> prioridadeOperacaoExpression(Root<OrdemServicoEntity> root, CriteriaBuilder cb) {
         return cb.<Integer>selectCase()
                 .when(cb.equal(root.get("status"), StatusOrdemServico.EM_EXECUCAO), 1)
                 .when(cb.equal(root.get("status"), StatusOrdemServico.AGUARDANDO_APROVACAO), 2)

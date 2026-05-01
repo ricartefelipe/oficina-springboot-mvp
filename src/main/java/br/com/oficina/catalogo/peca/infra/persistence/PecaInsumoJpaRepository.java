@@ -1,6 +1,6 @@
 package br.com.oficina.catalogo.peca.infra.persistence;
 
-import br.com.oficina.catalogo.peca.domain.PecaInsumo;
+import br.com.oficina.catalogo.peca.infra.persistence.entity.PecaInsumoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -10,9 +10,9 @@ import jakarta.persistence.LockModeType;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface PecaInsumoJpaRepository extends JpaRepository<PecaInsumo, UUID> {
+public interface PecaInsumoJpaRepository extends JpaRepository<PecaInsumoEntity, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select p from PecaInsumo p where p.id = :id")
-    Optional<PecaInsumo> findByIdForUpdate(@Param("id") UUID id);
+    @Query("select p from PecaInsumoEntity p where p.id = :id")
+    Optional<PecaInsumoEntity> findByIdForUpdate(@Param("id") UUID id);
 }

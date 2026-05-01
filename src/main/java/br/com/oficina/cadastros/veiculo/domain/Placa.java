@@ -2,8 +2,6 @@ package br.com.oficina.cadastros.veiculo.domain;
 
 import br.com.oficina.shared.domain.Strings;
 import br.com.oficina.shared.domain.ValidationException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,7 +15,6 @@ import java.util.regex.Pattern;
  * - Antigo: ABC-1234 (aceita com ou sem hifen)
  * - Mercosul: ABC1D23
  */
-@Embeddable
 public class Placa implements Serializable {
 
     @Serial
@@ -26,12 +23,7 @@ public class Placa implements Serializable {
     private static final Pattern PLACA_ANTIGA = Pattern.compile("^[A-Z]{3}-?\\d{4}$");
     private static final Pattern PLACA_MERCOSUL = Pattern.compile("^[A-Z]{3}\\d[A-Z]\\d{2}$");
 
-    @Column(name = "placa", nullable = false, length = 7)
-    private String value;
-
-    protected Placa() {
-        // JPA
-    }
+    private final String value;
 
     private Placa(String normalized) {
         this.value = normalized;
@@ -49,6 +41,13 @@ public class Placa implements Serializable {
         }
 
         return new Placa(normalized);
+    }
+
+    /**
+     * Restaura placa ja persistida normalizada (7 caracteres).
+     */
+    public static Placa ofStored(String normalized7) {
+        return of(normalized7);
     }
 
     public String value() {

@@ -1,65 +1,52 @@
 package br.com.oficina.ordemservico.domain;
 
 import br.com.oficina.shared.domain.ValidationException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity
-@Table(name = "os_transicoes_status")
 public class OrdemServicoTransicaoStatus {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ordem_servico_id", nullable = false)
-    private OrdemServico ordemServico;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "de_status", length = 40)
     private StatusOrdemServico deStatus;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "para_status", nullable = false, length = 40)
     private StatusOrdemServico paraStatus;
-
-    @Column(name = "ocorrido_em", nullable = false)
     private OffsetDateTime ocorridoEm;
 
-    protected OrdemServicoTransicaoStatus() {
-        // JPA
+    private OrdemServicoTransicaoStatus() {
     }
 
-    private OrdemServicoTransicaoStatus(OrdemServico ordemServico, StatusOrdemServico deStatus, StatusOrdemServico paraStatus, OffsetDateTime ocorridoEm) {
-        this.ordemServico = ordemServico;
-        this.deStatus = deStatus;
-        this.paraStatus = paraStatus;
-        this.ocorridoEm = ocorridoEm;
-    }
-
-    public static OrdemServicoTransicaoStatus registrar(OrdemServico ordemServico, StatusOrdemServico de, StatusOrdemServico para, OffsetDateTime quando) {
-        Objects.requireNonNull(ordemServico, "ordemServico nao pode ser null");
-        if (para == null) {
+    public static OrdemServicoTransicaoStatus criar(StatusOrdemServico deStatus, StatusOrdemServico paraStatus, OffsetDateTime ocorridoEm) {
+        if (paraStatus == null) {
             throw new ValidationException("paraStatus nao pode ser null");
         }
-        if (quando == null) {
+        if (ocorridoEm == null) {
             throw new ValidationException("ocorridoEm nao pode ser null");
         }
-        return new OrdemServicoTransicaoStatus(ordemServico, de, para, quando);
+        OrdemServicoTransicaoStatus t = new OrdemServicoTransicaoStatus();
+        t.deStatus = deStatus;
+        t.paraStatus = paraStatus;
+        t.ocorridoEm = ocorridoEm;
+        return t;
+    }
+
+    public static OrdemServicoTransicaoStatus restaurar(
+            UUID id,
+            StatusOrdemServico deStatus,
+            StatusOrdemServico paraStatus,
+            OffsetDateTime ocorridoEm
+    ) {
+        Objects.requireNonNull(id, "id");
+        OrdemServicoTransicaoStatus t = new OrdemServicoTransicaoStatus();
+        t.id = id;
+        t.deStatus = deStatus;
+        t.paraStatus = Objects.requireNonNull(paraStatus, "paraStatus");
+        t.ocorridoEm = Objects.requireNonNull(ocorridoEm, "ocorridoEm");
+        return t;
+    }
+
+    void definirId(UUID id) {
+        this.id = id;
     }
 
     public UUID getId() {

@@ -34,9 +34,19 @@ class PublicOrdemServicoControllerExceptionHttpTest {
 
     @Test
     void aprovarComRegraDeNegocioRetorna409() throws Exception {
-        MockMvc mockMvc = mockMvc(new ConflictStub());
+        MockMvc mockMvc = mockMvc(new AprovacaoConflictStub());
 
         mockMvc.perform(post("/public/ordens-servico/TRACK12345678/aprovar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"cpfCnpj\":\"52998224725\"}"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void recusarComRegraDeNegocioRetorna409() throws Exception {
+        MockMvc mockMvc = mockMvc(new RecusaConflictStub());
+
+        mockMvc.perform(post("/public/ordens-servico/TRACK12345678/recusar")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"cpfCnpj\":\"52998224725\"}"))
                 .andExpect(status().isConflict());
@@ -55,7 +65,10 @@ class PublicOrdemServicoControllerExceptionHttpTest {
     private static final class NotFoundStub extends OrdemServicoService {
 
         NotFoundStub() {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
+            super(
+                    null, null, null, null, null, null, null, null,
+                    NotificacaoOrdemServicoPortNoop.INSTANCE,
+                    mock(OrdemServicoObservability.class));
         }
 
         @Override
@@ -64,14 +77,32 @@ class PublicOrdemServicoControllerExceptionHttpTest {
         }
     }
 
-    private static final class ConflictStub extends OrdemServicoService {
+    private static final class AprovacaoConflictStub extends OrdemServicoService {
 
-        ConflictStub() {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
+        AprovacaoConflictStub() {
+            super(
+                    null, null, null, null, null, null, null, null,
+                    NotificacaoOrdemServicoPortNoop.INSTANCE,
+                    mock(OrdemServicoObservability.class));
         }
 
         @Override
         public OrdemServico aprovarOrcamentoPublico(String trackingCode, String cpfCnpjRaw) {
+            throw new BusinessRuleException("CPF/CNPJ nao confere para esta Ordem de Servico");
+        }
+    }
+
+    private static final class RecusaConflictStub extends OrdemServicoService {
+
+        RecusaConflictStub() {
+            super(
+                    null, null, null, null, null, null, null, null,
+                    NotificacaoOrdemServicoPortNoop.INSTANCE,
+                    mock(OrdemServicoObservability.class));
+        }
+
+        @Override
+        public OrdemServico recusarOrcamentoPublico(String trackingCode, String cpfCnpjRaw) {
             throw new BusinessRuleException("CPF/CNPJ nao confere para esta Ordem de Servico");
         }
     }

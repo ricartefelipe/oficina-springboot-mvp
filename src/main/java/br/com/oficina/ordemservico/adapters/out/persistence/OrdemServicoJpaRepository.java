@@ -1,14 +1,14 @@
 package br.com.oficina.ordemservico.adapters.out.persistence;
 
-import br.com.oficina.ordemservico.domain.OrdemServico;
+import br.com.oficina.ordemservico.adapters.out.persistence.entity.OrdemServicoEntity;
 import br.com.oficina.ordemservico.domain.StatusOrdemServico;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.query.Param;
 
 import java.time.OffsetDateTime;
@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, UUID>, JpaSpecificationExecutor<OrdemServico> {
+public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServicoEntity, UUID>, JpaSpecificationExecutor<OrdemServicoEntity> {
 
-    Optional<OrdemServico> findByTrackingCode(String trackingCode);
+    Optional<OrdemServicoEntity> findByTrackingCode(String trackingCode);
 
-    List<OrdemServico> findByStatus(StatusOrdemServico status);
+    List<OrdemServicoEntity> findByStatus(StatusOrdemServico status);
 
     @EntityGraph(attributePaths = {
             "cliente",
             "veiculo"
     })
-    List<OrdemServico> findAll(Specification<OrdemServico> spec);
+    List<OrdemServicoEntity> findAll(Specification<OrdemServicoEntity> spec);
 
     @EntityGraph(attributePaths = {
             "cliente",
@@ -37,7 +37,7 @@ public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, U
             "itensPeca.peca",
             "transicoesStatus"
     })
-    Optional<OrdemServico> findDetailedById(UUID id);
+    Optional<OrdemServicoEntity> findDetailedById(UUID id);
 
     @EntityGraph(attributePaths = {
             "cliente",
@@ -49,8 +49,8 @@ public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, U
             "transicoesStatus"
     })
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select o from OrdemServico o where o.id = :id")
-    Optional<OrdemServico> findDetailedByIdForUpdate(@Param("id") UUID id);
+    @Query("select o from OrdemServicoEntity o where o.id = :id")
+    Optional<OrdemServicoEntity> findDetailedByIdForUpdate(@Param("id") UUID id);
 
     @EntityGraph(attributePaths = {
             "cliente",
@@ -61,7 +61,7 @@ public interface OrdemServicoJpaRepository extends JpaRepository<OrdemServico, U
             "itensPeca.peca",
             "transicoesStatus"
     })
-    Optional<OrdemServico> findDetailedByTrackingCode(String trackingCode);
+    Optional<OrdemServicoEntity> findDetailedByTrackingCode(String trackingCode);
 
     @Query(
             value = """

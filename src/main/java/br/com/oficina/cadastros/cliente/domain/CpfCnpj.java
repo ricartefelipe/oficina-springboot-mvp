@@ -2,8 +2,6 @@ package br.com.oficina.cadastros.cliente.domain;
 
 import br.com.oficina.shared.domain.Strings;
 import br.com.oficina.shared.domain.ValidationException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -12,25 +10,32 @@ import java.util.Objects;
 /**
  * Value Object CPF/CNPJ com validacao real (digitos verificadores).
  */
-@Embeddable
 public class CpfCnpj implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "cpf_cnpj", nullable = false, length = 14)
-    private String value;
-
-    protected CpfCnpj() {
-        // JPA
-    }
+    private final String value;
 
     private CpfCnpj(String normalizedDigits) {
         this.value = normalizedDigits;
     }
 
+    /**
+     * Aceita entrada bruta (com pontuacao) ou apenas digitos.
+     */
     public static CpfCnpj of(String raw) {
         String digits = Strings.onlyDigits(Strings.requireNonBlank(raw, "cpfCnpj"));
+        return ofDigits(digits);
+    }
+
+    /**
+     * Restaura a partir de digitos ja normalizados persistidos (11 ou 14).
+     */
+    public static CpfCnpj ofDigits(String digits) {
+        if (digits == null || digits.isBlank()) {
+            throw new ValidationException("cpfCnpj nao pode ser vazio");
+        }
         if (digits.length() == 11) {
             if (!isValidCpf(digits)) {
                 throw new ValidationException("CPF invalido");

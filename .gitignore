@@ -1,6 +1,9 @@
 /target/
 **/target/
 
+# Cache Maven local do projeto (quando se usa -Dmaven.repo.local=.m2/repository)
+.m2/
+
 # IDEs (ignorar .idea exceto run configurations Maven versionadas)
 .idea/*
 !.idea/runConfigurations/
@@ -20,8 +23,9 @@ Thumbs.db
 build/security/*
 !build/security/.gitkeep
 
-# HTML intermédio da geração de PDF (scripts/delivery/md-to-pdf-edge.ps1)
+# HTML intermédio da geração de PDF (scripts/delivery/md-to-pdf-edge.ps1 / Pandoc)
 docs/delivery/*.html
+docs/delivery/*-tmp.html
 
 # Kubernetes secrets locais (use secret.example.yaml)
 k8s/secret.yaml
