@@ -21,10 +21,10 @@ O **Tech Challenge Fase 2** pede scripts Terraform para **provisionamento do clu
 | **RDS “produção”** | O módulo atual usa subnets **públicas** e `publicly_accessible` para simplificar laboratório; em produção usa-se subnets privadas e SG apenas a partir do cluster. |
 | **Custos** | RDS, NAT e EKS geram cobrança; Kind + `enable_rds = false` evita custo de cloud. |
 
-## Equivalente aceitável (alinhamento com docente)
+## Equivalente aceitável (interpretação do enunciário)
 
 - **RDS via Terraform (AWS)** + **cluster Kind via Terraform (local)** + manifestos em `/k8s` + pipeline com build, testes, imagem e deploy opcional cobre o espírito do enunciário (local + cloud).
-- Confirme com o professor se **EKS obrigatório** ou se **Kind** documentado + vídeo é suficiente para o critério de cluster.
+- Confirme no **texto oficial da disciplina** se **EKS** é obrigatório ou se **Kind** documentado + demonstração é suficiente para o critério de cluster.
 
 ## Próximos passos técnicos (evolução)
 

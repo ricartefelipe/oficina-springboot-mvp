@@ -8,9 +8,9 @@ Versões **SVG** versionadas no repositório (podem ser importadas ou replicadas
 - [Lousa com atores, comandos [C], agregado [A], eventos [E], políticas [P], read models [R] e fluxos alternativos](diagrams/event-storming-lousa-elementos.svg)
 - [Diagrama de agregado Ordem de Serviço](diagrams/ordem-servico-agregado.svg)
 
-## Conformidade com o feedback da Fase 1
+## Elementos DDD cobertos (Tech Challenge — Fase 1)
 
-O relatório de avaliação pedia explicitamente: **diagramas visuais** com atores, comandos, eventos, políticas, modelos de leitura e fluxos alternativos, além do **diagrama de agregados** na forma final do Event Storming. Este repositório passa a incluir:
+O enunciário prevê **diagramas visuais** com atores, comandos, eventos, políticas, modelos de leitura e fluxos alternativos, além do **diagrama de agregados** no Event Storming. Este repositório inclui:
 
 - [Domain Storytelling](domain-storytelling.md) (narrativa em cenas)
 - [Dicionário de Linguagem Ubíqua](dicionario-linguagem-ubiqua.md) (tabela)

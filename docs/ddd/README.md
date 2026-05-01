@@ -1,6 +1,6 @@
 # Documentação DDD (Fases 1 e 2)
 
-Índice dos artefatos exigidos pelo **Tech Challenge** e **reforçados no feedback** da avaliação da Fase 1.
+Índice dos artefatos exigidos pelo **Tech Challenge** (Fases 1 e 2).
 
 | Artefato | Conteúdo | Arquivo |
 |----------|----------|----------|

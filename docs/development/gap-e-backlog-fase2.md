@@ -3,7 +3,7 @@
 ## Fontes
 
 - Enunciado oficial da Fase 2 (requisitos de APIs, infraestrutura, entregáveis e critérios de avaliação)
-- Feedback acadêmico da Fase 1 (reforço de DDD visual, testes e clareza de artefatos)
+- Requisitos do Tech Challenge (Fases 1 e 2) para DDD, testes e documentação
 - Estado atual do repositório `oficina-springboot-mvp` (Java 21, Spring Boot, PostgreSQL, Liquibase, Keycloak, Docker)
 
 ## Situação atual resumida
@@ -12,7 +12,7 @@
 - **Segurança**: JWT com Keycloak para admin; rotas públicas para consulta e aprovação com validações
 - **Persistência**: JPA + Liquibase; repositórios por contexto
 - **Testes**: testes de domínio e integração presentes; cobertura ainda abaixo do desejado para Fase 2 em endpoints e erros
-- **Documentação DDD**: [índice `docs/ddd/README.md`](../ddd/README.md) com **Domain Storytelling**, **Dicionário de linguagem ubíqua** (tabela), Event Storming (incl. fluxos alternativos) e diagramas **SVG** em `docs/ddd/diagrams/` (incl. lousa com elementos C/A/E/P/R) — alinhado ao feedback da Fase 1
+- **Documentação DDD**: [índice `docs/ddd/README.md`](../ddd/README.md) com **Domain Storytelling**, **Dicionário de linguagem ubíqua** (tabela), Event Storming (incl. fluxos alternativos) e diagramas **SVG** em `docs/ddd/diagrams/` (incl. lousa com elementos C/A/E/P/R)
 - **Infra**: Dockerfile e docker-compose; `/k8s`; Terraform **AWS** (rede + RDS opcional) e **Kind local** em `infra/kind`; CI Maven + Terraform validate (AWS + Kind) + GHCR; **workflows manuais** Deploy Kubernetes e Terraform AWS; **EKS** na AWS não está no Terraform (cluster gerido seria evolução)
 - **README**: alinhado aos entregáveis da Fase 2 (objetivos, arquitetura, fluxo de deploy, links Swagger/OpenAPI; URL do vídeo na tabela **Links rápidos** quando publicado)
 
