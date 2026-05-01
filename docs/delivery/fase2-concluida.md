@@ -7,6 +7,7 @@ Este documento consolida **o que o repositório implementa** em relação ao PDF
 | Requisito | Evidência no repo |
 |-----------|-------------------|
 | Clean Code / **Clean Architecture** ou **Hexagonal** | Pacotes `domain`, `application` (portas), `adapters.in.web`, `adapters.out.*`; README [secção arquitetura](../../README.md#2-arquitetura-e-ddd-bounded-contexts) |
+| **Domínio desacoplado de JPA** (regras sem `jakarta.persistence` no núcleo) | POJOs em `*.domain`; entidades JPA em `*.infra.persistence.entity` / `adapters.out.persistence.entity`; mappers; `ArchitectureRulesTest` (sem `jakarta.persistence` em `..domain..`) |
 | Testes automatizados (fluxos críticos) | `mvn -Pci verify`; JaCoCo **≥80%** em `**/domain/**` ([`pom.xml`](../../pom.xml)); testes HTTP em `src/test/java/.../adapters/in/web` e segurança em `AdminJwtSecurityWebMvcTest` |
 | APIs Fase 2 (abertura OS, status, aprovação externa, listagem priorizada) | Rotas documentadas no Swagger; regras em [README](../../README.md#3-status-da-os-e-regras-principais) |
 
@@ -26,6 +27,7 @@ Este documento consolida **o que o repositório implementa** em relação ao PDF
 | README com solução, arquitetura, deploy, execução local | [`README.md`](../../README.md) |
 | Diagramas / DDD | [`docs/ddd/README.md`](../ddd/README.md) |
 | Collection / **Swagger** | Tabela **Links rápidos** no README |
+| **Git Flow** (features → `develop` → release → `main`) | [`docs/development/gitflow.md`](../development/gitflow.md) |
 
 ## Vídeo e portal (manual)
 

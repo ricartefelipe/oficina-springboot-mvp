@@ -71,8 +71,9 @@ Roteiro e tópicos obrigatórios: [`docs/video-script.md`](../video-script.md). 
 
 ### Fase 2 (resiliência e escalabilidade)
 
-- Arquitetura em evolução (hexagonal onde aplicável), testes nos fluxos críticos
-- **Kubernetes:** manifestos em `/k8s` (Deployment, Service, HPA, probes, etc.)
+- Arquitetura em evolução (hexagonal onde aplicável), **modelos de domínio sem JPA** (persistência em entidades e mappers na infra), testes nos fluxos críticos
+- **Git Flow:** integração em `develop`, releases via PR para `main` — ver [`docs/development/gitflow.md`](../development/gitflow.md)
+- **Kubernetes:** manifestos em `/k8s` (Deployment, Service, HPA, probes, etc.; `secret.example.yaml` e `secret.placeholder.yaml`) 
 - **IaC:** Terraform em `/infra` (rede AWS; **RDS PostgreSQL opcional** via `enable_rds`)
 - **CI/CD:** GitHub Actions (Maven, Terraform validate, imagem **GHCR**; workflows manuais para deploy em cluster e Terraform na AWS)
 - Diagramas DDD versionados (SVG em `docs/ddd/diagrams/`)
