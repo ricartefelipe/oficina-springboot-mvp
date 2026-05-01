@@ -73,7 +73,10 @@ class AdminRespostaOrcamentoExternaHttpTest {
         boolean chamouServico;
 
         RespostaExternaStub(OrdemServico resposta) {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
+            super(
+                    null, null, null, null, null, null, null, null,
+                    NotificacaoOrdemServicoPortNoop.INSTANCE,
+                    mock(OrdemServicoObservability.class));
             this.resposta = resposta;
         }
 

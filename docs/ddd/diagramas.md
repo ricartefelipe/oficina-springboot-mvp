@@ -214,6 +214,24 @@ sequenceDiagram
   API-->>Cliente: 200 OK
 ```
 
+## 5.1) Sequência - Recusar orçamento (Cliente)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor Cliente
+  participant API as Public API
+  participant App as Aplicação
+  participant OS as OrdemServico
+
+  Cliente->>API: POST /public/ordens-servico/{trackingCode}/recusar (cpfCnpj)
+  API->>App: recusarOrcamentoPublico(trackingCode, cpfCnpj)
+  App->>OS: validar cpfCnpj e transição AGUARDANDO_APROVACAO -> CANCELADA
+  OS-->>App: Status(CANCELADA)
+  App-->>API: detalhe
+  API-->>Cliente: 200 OK
+```
+
 ## 6) Sequência - Finalizar e entregar (Admin)
 
 ```mermaid

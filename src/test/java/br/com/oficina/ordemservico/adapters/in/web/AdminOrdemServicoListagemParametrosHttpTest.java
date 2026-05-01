@@ -48,7 +48,10 @@ class AdminOrdemServicoListagemParametrosHttpTest {
         boolean ultimoIncluirEncerradas;
 
         ListarStub() {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
+            super(
+                    null, null, null, null, null, null, null, null,
+                    NotificacaoOrdemServicoPortNoop.INSTANCE,
+                    mock(OrdemServicoObservability.class));
         }
 
         @Override

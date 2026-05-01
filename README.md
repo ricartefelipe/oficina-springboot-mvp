@@ -18,25 +18,57 @@ Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para
 
 Conforme o enunciado: **repositório** atualizado (código, `/k8s`, `/infra`, CI/CD) e **PDF no portal** com link do repo (partilhado com **`soat-architecture`**), **desenho da arquitetura** e **link do vídeo** (≤ 15 min: deploy, CI/CD, APIs, escalabilidade).
 
+| O quê | Conteúdo |
+|--------|-----------|
+| **Portal do aluno (PDF / upload)** | Documento derivado de [`docs/delivery/entrega-portal-fase2.md`](docs/delivery/entrega-portal-fase2.md): objetivos, link do GitHub, figuras DDD, referência ao vídeo e à collection OpenAPI. Normalmente **não** inclui ZIP com código; o avaliador obtém o código pelo **repositório**. |
+| **Repositório Git (fonte da verdade técnica)** | Código Java, testes, [`k8s/`](k8s/README.md), [`infra/`](infra/README.md), workflows CI/CD, documentação em `docs/`. É aqui que estão manifests Kubernetes, Terraform e pipelines referenciados no PDF. |
+
 | Documento | Uso |
 |-----------|-----|
 | [**Entrega PDF - portal (Fase 2)**](docs/delivery/entrega-portal-fase2.md) | Conteúdo Markdown; **PDF pronto:** [`docs/delivery/entrega-portal-fase2.pdf`](docs/delivery/entrega-portal-fase2.pdf) (submeter no portal). |
 | [Submissão / checklist](docs/delivery/submission.md) | Documento longo; **PDF pronto:** [`docs/delivery/submission.pdf`](docs/delivery/submission.pdf). |
 | [Roteiro do vídeo](docs/video-script.md) | Inclui blocos **Fase 2** obrigatórios no início do ficheiro. |
-| [Checklist crítica do professor](docs/delivery/critica-professor-checklist.md) | Matriz objetiva: crítica, evidência no repositório, status e pendências manuais de entrega. |
 
-Para **voltar a gerar** os PDFs após editar o Markdown: `.\scripts\delivery\md-to-pdf-edge.ps1 -InputMd "docs\delivery\entrega-portal-fase2.md"` (e o mesmo com `submission.md`). Requer **Pandoc** e **Microsoft Edge** no Windows.
+Para **voltar a gerar** os PDFs após editar o Markdown: no Windows, `.\scripts\delivery\md-to-pdf-edge.ps1 -InputMd "docs\delivery\entrega-portal-fase2.md"` (e o mesmo com `submission.md`), com **Pandoc** e **Microsoft Edge**. No Linux, um fluxo possível: `pandoc` (p.ex. imagem Docker `pandoc/latex`) gera HTML com `--standalone` a partir do `.md`, depois `google-chrome --headless --print-to-pdf=...` sobre o ficheiro `file://` do HTML.
 
 ---
 
-## Atendimento à crítica do professor (Fase 1)
+## Atendimento à crítica do professor
 
-Pontos reforçados na avaliação da Fase 1 e como estão cobertos:
+Pontos reforçados na avaliação e onde estão evidenciados no repositório.
+
+### Fase 1 — síntese
 
 - **DDD visual e rastreável:** Event Storming com comandos, agregados, eventos, políticas, read models e fluxos alternativos em `docs/ddd/event-storming.md`, com SVGs em `docs/ddd/diagrams/`.
-- **Clareza de artefatos:** índice único em `docs/ddd/README.md` ligando Domain Storytelling, dicionário de linguagem ubíqua, Event Storming e diagramas.
-- **Evidência de entrega acadêmica:** documentação de submissão em `docs/delivery/submission.md` e checklist focada no feedback em `docs/delivery/critica-professor-checklist.md`.
-- **Qualidade técnica:** suíte de testes e cobertura JaCoCo no pipeline (`mvn -B -Pci verify` em `.github/workflows/ci.yml`).
+- **Clareza de artefatos:** índice único em `docs/ddd/README.md` (Domain Storytelling, dicionário, Event Storming, diagramas).
+- **Evidência de entrega acadêmica:** `docs/delivery/submission.md` e documento de entrega do portal (esta secção e tabelas abaixo).
+- **Qualidade técnica:** `mvn -B -Pci verify` em `.github/workflows/ci.yml` e JaCoCo.
+
+#### Matriz Fase 1 (crítica → evidência)
+
+| Crítica / expectativa | Evidência | Status |
+|------------------------|-----------|--------|
+| Diagramas visuais DDD | `docs/ddd/diagrams/event-storming-contextos.svg`, `event-storming-lousa-elementos.svg`, `ordem-servico-agregado.svg` | Atendido |
+| Event Storming C/A/E/P/R + fluxos alternativos | `docs/ddd/event-storming.md` | Atendido |
+| Domain Storytelling | `docs/ddd/domain-storytelling.md` | Atendido |
+| Dicionário de linguagem ubíqua | `docs/ddd/dicionario-linguagem-ubiqua.md` | Atendido |
+| Índice de artefatos DDD | `docs/ddd/README.md` | Atendido |
+| Testes e cobertura | `.github/workflows/ci.yml`, JaCoCo | Atendido |
+| Submissão no portal | `docs/delivery/entrega-portal-fase2.md` (gera o PDF) | Parcial (vídeo / upload) |
+
+#### Matriz Fase 2 (pontos técnicos do feedback)
+
+| Crítica / expectativa | Evidência | Status |
+|------------------------|-----------|--------|
+| Domínio sem JPA no núcleo | POJOs em `*.domain`; entidades em `*.infra.persistence.entity` / `adapters.out.persistence.entity`; mappers; `ArchitectureRulesTest` sem `jakarta.persistence` em `..domain..` | Atendido |
+| Clareza entrega (PDF vs repositório) | Tabela *Entrega oficial* (acima) e `docs/delivery/entrega-portal-fase2.md` | Atendido |
+| Kubernetes Secret | `k8s/secret.example.yaml`, `k8s/secret.placeholder.yaml`, `k8s/secret.yaml` ignorado no Git, `k8s/README.md` | Atendido |
+
+#### Pendências manuais
+
+- Publicar o **vídeo (≤ 15 min)** e alinhar o URL no `README` e em `docs/delivery/entrega-portal-fase2.md`.
+- Convite ao avaliador **`soat-architecture`** no repositório.
+- Atualizar o **PDF** no portal após alterações ao Markdown.
 
 ---
 
@@ -102,7 +134,7 @@ flowchart TB
 | Artefato | Conteúdo |
 |----------|----------|
 | **Docker** | `Dockerfile` multi-stage; `docker-compose.yml` (app, PostgreSQL, Keycloak, MailHog). |
-| **`/k8s`** | Namespace, Deployment, Service, ConfigMap, exemplo de Secret, HPA, probes - ver [`k8s/README.md`](k8s/README.md). |
+| **`/k8s`** | Namespace, Deployment, Service, ConfigMap, Secret (`secret.example.yaml`, `secret.placeholder.yaml`; cópia local `secret.yaml` gitignored), HPA, probes - ver [`k8s/README.md`](k8s/README.md). |
 | **`/infra` (Terraform)** | **AWS:** rede (VPC, subnets públicas, IGW) e **RDS PostgreSQL opcional** (`enable_rds`). **Kubernetes local:** [`infra/kind`](infra/kind) (Kind + Docker). Detalhe de escopos: [`infra/docs/terraform-vs-enunciado.md`](infra/docs/terraform-vs-enunciado.md). |
 | **CI** | GitHub Actions: build Maven, testes, validação Terraform, build/push da imagem para **GHCR**. |
 | **DDD (visual + texto)** | Índice em [`docs/ddd/README.md`](docs/ddd/README.md): Domain Storytelling, dicionário, Event Storming, SVG em [`docs/ddd/diagrams/`](docs/ddd/diagrams/). |
@@ -222,7 +254,8 @@ Mesmo sendo monólito, a organização de pacotes segue bounded contexts (DDD pr
   - finalizar execução → `FINALIZADA`
   - registrar entrega → `ENTREGUE`
 - Ação do cliente:
-  - aprovar orçamento via endpoint público (exige CPF/CNPJ) → `EM_EXECUCAO`
+  - aprovar orçamento via endpoint público (`POST /api/public/ordens-servico/{trackingCode}/aprovar`, exige CPF/CNPJ) → `EM_EXECUCAO`
+  - recusar orçamento via endpoint público equivalente (`POST /api/public/ordens-servico/{trackingCode}/recusar`, exige CPF/CNPJ) → `CANCELADA`
   - ao entrar em `EM_EXECUCAO` decrementa estoque das peças usadas (falha se insuficiente)
 - Métrica:
   - tempo médio execução = média(`FINALIZADA.at - EM_EXECUCAO.at`)
