@@ -1,6 +1,14 @@
 # Kubernetes - aplicação Oficina
 
-Manifestos para o namespace `oficina`: **Deployment**, **Service**, **ConfigMap**, **Secret** (exemplo), **HPA** e probes HTTP nos endpoints do Actuator (`/actuator/health/*`).
+Manifestos para o namespace `oficina`: **Deployment**, **Service**, **ConfigMap**, **Secret**, **HPA** e probes HTTP nos endpoints do Actuator (`/actuator/health/*`).
+
+### Segredos: três ficheiros
+
+| Ficheiro | Função |
+|----------|--------|
+| [`secret.example.yaml`](secret.example.yaml) | Valores **ilustrativos** (ambiente de demo / documentação). Pode ser versionado com segurança. |
+| [`secret.placeholder.yaml`](secret.placeholder.yaml) | Mesma forma que o exemplo, mas com placeholders `<POSTGRES_HOST>`, `<DATABASE_PASSWORD>`, etc.: modelo explícito para preenchimento manual. |
+| `secret.yaml` | **Não está no Git** (`.gitignore`): cópia local com credenciais reais, criada a partir do exemplo ou do placeholder. |
 
 ## Pré-requisitos
 
@@ -18,10 +26,11 @@ kubectl apply -f k8s/namespace.yaml
 kubectl apply -f k8s/configmap.yaml
 ```
 
-2. Secret com credenciais reais (não commite):
+2. Secret com credenciais reais (não commite `secret.yaml`):
 
 ```bash
-cp k8s/secret.example.yaml k8s/secret.yaml
+cp k8s/secret.placeholder.yaml k8s/secret.yaml
+# ou: cp k8s/secret.example.yaml k8s/secret.yaml
 # Edite k8s/secret.yaml (DB_URL, DB_USER, DB_PASS)
 kubectl apply -f k8s/secret.yaml
 ```

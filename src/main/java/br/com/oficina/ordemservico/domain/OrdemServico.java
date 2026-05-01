@@ -6,22 +6,6 @@ import br.com.oficina.catalogo.peca.domain.PecaInsumo;
 import br.com.oficina.catalogo.servico.domain.ServicoCatalogo;
 import br.com.oficina.shared.domain.BusinessRuleException;
 import br.com.oficina.shared.domain.ValidationException;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,60 +16,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity
-@Table(
-        name = "ordens_servico",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_os_tracking_code", columnNames = {"tracking_code"})
-        }
-)
 public class OrdemServico {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @Column(name = "tracking_code", nullable = false, length = 16)
     private String trackingCode;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "veiculo_id", nullable = false)
     private Veiculo veiculo;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 40)
     private StatusOrdemServico status;
-
-    @Column(name = "orcamento_total", nullable = false, precision = 12, scale = 2)
     private BigDecimal orcamentoTotal;
-
-    @Column(name = "orcamento_enviado_at")
     private OffsetDateTime orcamentoEnviadoAt;
-
-    @Column(name = "aprovado_at")
     private OffsetDateTime aprovadoAt;
-
-    @CreationTimestamp
     private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
     private OffsetDateTime updatedAt;
-
-    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdemServicoItemServico> itensServico = new ArrayList<>();
-
-    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdemServicoItemPeca> itensPeca = new ArrayList<>();
-
-    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrdemServicoTransicaoStatus> transicoesStatus = new ArrayList<>();
 
-    protected OrdemServico() {
-        // JPA
+    private OrdemServico() {
     }
 
     private OrdemServico(String trackingCode, Cliente cliente, Veiculo veiculo) {
@@ -94,7 +41,7 @@ public class OrdemServico {
         this.veiculo = veiculo;
         this.status = StatusOrdemServico.RECEBIDA;
         this.orcamentoTotal = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-        registrarTransicao(null, StatusOrdemServico.RECEBIDA, OffsetDateTime.now());
+        transicoesStatus.add(OrdemServicoTransicaoStatus.criar(null, StatusOrdemServico.RECEBIDA, OffsetDateTime.now()));
     }
 
     /**
@@ -111,6 +58,43 @@ public class OrdemServico {
             throw new ValidationException("trackingCode deve ter entre 8 e 16 caracteres");
         }
         return new OrdemServico(normalized, cliente, veiculo);
+    }
+
+    public static OrdemServico restaurar(
+            UUID id,
+            String trackingCode,
+            Cliente cliente,
+            Veiculo veiculo,
+            StatusOrdemServico status,
+            BigDecimal orcamentoTotal,
+            OffsetDateTime orcamentoEnviadoAt,
+            OffsetDateTime aprovadoAt,
+            OffsetDateTime createdAt,
+            OffsetDateTime updatedAt,
+            List<OrdemServicoItemServico> itensServico,
+            List<OrdemServicoItemPeca> itensPeca,
+            List<OrdemServicoTransicaoStatus> transicoesStatus
+    ) {
+        Objects.requireNonNull(id, "id");
+        OrdemServico os = new OrdemServico();
+        os.id = id;
+        os.trackingCode = trackingCode;
+        os.cliente = cliente;
+        os.veiculo = veiculo;
+        os.status = status;
+        os.orcamentoTotal = orcamentoTotal;
+        os.orcamentoEnviadoAt = orcamentoEnviadoAt;
+        os.aprovadoAt = aprovadoAt;
+        os.createdAt = createdAt;
+        os.updatedAt = updatedAt;
+        os.itensServico = new ArrayList<>(itensServico);
+        os.itensPeca = new ArrayList<>(itensPeca);
+        os.transicoesStatus = new ArrayList<>(transicoesStatus);
+        return os;
+    }
+
+    void definirId(UUID id) {
+        this.id = id;
     }
 
     public UUID getId() {
@@ -187,15 +171,11 @@ public class OrdemServico {
         recalcularOrcamento();
     }
 
-    /**
-     * Acoes do workflow (status) - serao chamadas por casos de uso (Parte 3).
-     */
     public void iniciarDiagnostico() {
         transicionarPara(StatusOrdemServico.EM_DIAGNOSTICO, OffsetDateTime.now());
     }
 
     public void enviarOrcamento() {
-        // regra: ao enviar orcamento, status deve ficar AGUARDANDO_APROVACAO
         this.orcamentoEnviadoAt = OffsetDateTime.now();
         transicionarPara(StatusOrdemServico.AGUARDANDO_APROVACAO, this.orcamentoEnviadoAt);
     }
@@ -228,7 +208,7 @@ public class OrdemServico {
     }
 
     private void registrarTransicao(StatusOrdemServico de, StatusOrdemServico para, OffsetDateTime quando) {
-        OrdemServicoTransicaoStatus t = OrdemServicoTransicaoStatus.registrar(this, de, para, quando);
+        OrdemServicoTransicaoStatus t = OrdemServicoTransicaoStatus.criar(de, para, quando);
         transicoesStatus.add(t);
     }
 
@@ -243,11 +223,6 @@ public class OrdemServico {
         this.orcamentoTotal = total.setScale(2, RoundingMode.HALF_UP);
     }
 
-    /**
-     * Quantidades totais de pecas necessárias (por OS) para controle de estoque.
-     *
-     * O decremento real do estoque deve acontecer ao entrar em EM_EXECUCAO (Parte 3/4).
-     */
     public List<OrdemServicoItemPeca> pecasNecessarias() {
         return getItensPeca();
     }

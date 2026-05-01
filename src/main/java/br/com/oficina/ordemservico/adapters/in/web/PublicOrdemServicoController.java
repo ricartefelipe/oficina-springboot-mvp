@@ -32,11 +32,16 @@ public class PublicOrdemServicoController {
     }
 
     @PostMapping("/{trackingCode}/aprovar")
-    public OrdemServicoPublicResponse aprovar(@PathVariable String trackingCode, @Valid @RequestBody AprovarOrcamentoRequest request) {
+    public OrdemServicoPublicResponse aprovar(@PathVariable String trackingCode, @Valid @RequestBody ClienteIdentificacaoRequest request) {
         return OrdemServicoPublicResponse.from(osService.aprovarOrcamentoPublico(trackingCode, request.cpfCnpj()));
     }
 
-    public record AprovarOrcamentoRequest(
+    @PostMapping("/{trackingCode}/recusar")
+    public OrdemServicoPublicResponse recusar(@PathVariable String trackingCode, @Valid @RequestBody ClienteIdentificacaoRequest request) {
+        return OrdemServicoPublicResponse.from(osService.recusarOrcamentoPublico(trackingCode, request.cpfCnpj()));
+    }
+
+    public record ClienteIdentificacaoRequest(
             @NotBlank @ValidCpfCnpj String cpfCnpj
     ) {
     }

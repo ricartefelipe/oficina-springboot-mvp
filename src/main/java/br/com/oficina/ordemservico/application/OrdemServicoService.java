@@ -5,11 +5,15 @@ import br.com.oficina.cadastros.cliente.domain.Cliente;
 import br.com.oficina.cadastros.cliente.domain.CpfCnpj;
 import br.com.oficina.cadastros.veiculo.application.VeiculoService;
 import br.com.oficina.cadastros.veiculo.domain.Veiculo;
+import br.com.oficina.catalogo.peca.application.PecaInsumoService;
 import br.com.oficina.catalogo.peca.domain.PecaInsumo;
+import br.com.oficina.catalogo.peca.infra.persistence.PecaInsumoEntityMapper;
 import br.com.oficina.catalogo.peca.infra.persistence.PecaInsumoJpaRepository;
+import br.com.oficina.catalogo.peca.infra.persistence.entity.PecaInsumoEntity;
 import br.com.oficina.catalogo.servico.application.ServicoCatalogoService;
 import br.com.oficina.catalogo.servico.domain.ServicoCatalogo;
 import br.com.oficina.ordemservico.adapters.out.persistence.OsOrcamentoRespostaIdempotenciaRepository;
+import br.com.oficina.ordemservico.adapters.out.persistence.entity.OsOrcamentoRespostaIdempotenciaEntity;
 import br.com.oficina.ordemservico.application.port.NotificacaoOrdemServicoPort;
 import br.com.oficina.ordemservico.application.port.OrdemServicoPersistencePort;
 import br.com.oficina.ordemservico.domain.DecisaoRespostaOrcamentoExterna;
@@ -24,7 +28,6 @@ import br.com.oficina.shared.domain.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +49,9 @@ public class OrdemServicoService {
     private final ClienteService clienteService;
     private final VeiculoService veiculoService;
     private final ServicoCatalogoService servicoCatalogoService;
+    private final PecaInsumoService pecaInsumoService;
     private final PecaInsumoJpaRepository pecaRepository;
+    private final PecaInsumoEntityMapper pecaEntityMapper;
     private final OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository;
     private final NotificacaoOrdemServicoPort notificacaoOrdemServicoPort;
     private final OrdemServicoObservability observability;
@@ -56,7 +61,9 @@ public class OrdemServicoService {
             ClienteService clienteService,
             VeiculoService veiculoService,
             ServicoCatalogoService servicoCatalogoService,
+            PecaInsumoService pecaInsumoService,
             PecaInsumoJpaRepository pecaRepository,
+            PecaInsumoEntityMapper pecaEntityMapper,
             OsOrcamentoRespostaIdempotenciaRepository orcamentoRespostaIdempotenciaRepository,
             NotificacaoOrdemServicoPort notificacaoOrdemServicoPort,
             OrdemServicoObservability observability
@@ -65,7 +72,9 @@ public class OrdemServicoService {
         this.clienteService = clienteService;
         this.veiculoService = veiculoService;
         this.servicoCatalogoService = servicoCatalogoService;
+        this.pecaInsumoService = pecaInsumoService;
         this.pecaRepository = pecaRepository;
+        this.pecaEntityMapper = pecaEntityMapper;
         this.orcamentoRespostaIdempotenciaRepository = orcamentoRespostaIdempotenciaRepository;
         this.notificacaoOrdemServicoPort = notificacaoOrdemServicoPort;
         this.observability = observability;
@@ -101,8 +110,7 @@ public class OrdemServicoService {
         if (pecas != null) {
             for (ItemPeca i : pecas) {
                 Objects.requireNonNull(i, "itemPeca nao pode ser null");
-                PecaInsumo p = pecaRepository.findById(i.pecaId())
-                        .orElseThrow(() -> new NotFoundException("Peca/Insumo nao encontrado"));
+                PecaInsumo p = pecaInsumoService.obter(i.pecaId());
                 os.adicionarPeca(p, i.quantidade());
             }
         }
@@ -122,7 +130,7 @@ public class OrdemServicoService {
     @Transactional(readOnly = true)
     public OrdemServico obterPorTrackingCode(String trackingCode) {
         String tc = Strings.requireNonBlank(trackingCode, "trackingCode").trim().toUpperCase();
-        return ordemServicoPersistence.findByTrackingCode(tc)
+        return ordemServicoPersistence.findDetailedByTrackingCode(tc)
                 .orElseThrow(() -> new NotFoundException("Ordem de Servico nao encontrada"));
     }
 
@@ -148,9 +156,9 @@ public class OrdemServicoService {
             ordem = OrdemServicoListagemOrdem.CRIADA_MAIS_RECENTE;
         }
 
-        Specification<OrdemServico> spec = OrdemServicoSpecifications.filtrar(
+        OrdemServicoListagemFiltro filtro = new OrdemServicoListagemFiltro(
                 status, placaNormalized, cpfDigits, from, to, excluirEncerradas, ordem);
-        return ordemServicoPersistence.findAll(spec);
+        return ordemServicoPersistence.findAllFiltered(filtro);
     }
 
     @Transactional
@@ -204,6 +212,23 @@ public class OrdemServicoService {
         return executarAprovacaoComBaixaEstoque(os);
     }
 
+    @Transactional
+    public OrdemServico recusarOrcamentoPublico(String trackingCode, String cpfCnpjRaw) {
+        OrdemServico os = obterPorTrackingCode(trackingCode);
+
+        CpfCnpj informado = CpfCnpj.of(cpfCnpjRaw);
+        String esperado = os.getCliente().getCpfCnpj().value();
+        if (!esperado.equals(informado.value())) {
+            throw new BusinessRuleException("CPF/CNPJ nao confere para esta Ordem de Servico");
+        }
+
+        os.recusarOrcamento();
+        OrdemServico saved = ordemServicoPersistence.save(os);
+        log.info("orcamento_recusado_publico osId={} trackingCode={} status={}", saved.getId(), saved.getTrackingCode(), saved.getStatus());
+        notificarSeguro(n -> n.aoOrcamentoRecusado(saved));
+        return saved;
+    }
+
     /**
      * Integração externa (ex.: notificação de canal parceiro): aprova ou recusa o orçamento com idempotência por chave.
      */
@@ -214,7 +239,8 @@ public class OrdemServicoService {
             throw new ValidationException("Idempotency-Key deve ter no maximo 128 caracteres");
         }
 
-        Optional<OsOrcamentoRespostaIdempotencia> jaRegistrado = orcamentoRespostaIdempotenciaRepository.findByIdempotencyKey(key);
+        Optional<OsOrcamentoRespostaIdempotencia> jaRegistrado = orcamentoRespostaIdempotenciaRepository.findByIdempotencyKey(key)
+                .map(OrdemServicoService::mapearIdempotencia);
         if (jaRegistrado.isPresent()) {
             validarMesmaOperacaoIdempotente(osId, decisao, jaRegistrado.get());
             return obterDetalhe(osId);
@@ -229,9 +255,10 @@ public class OrdemServicoService {
 
         try {
             orcamentoRespostaIdempotenciaRepository.saveAndFlush(
-                    new OsOrcamentoRespostaIdempotencia(UUID.randomUUID(), key, osId, decisao));
+                    new OsOrcamentoRespostaIdempotenciaEntity(UUID.randomUUID(), key, osId, decisao));
         } catch (DataIntegrityViolationException e) {
             OsOrcamentoRespostaIdempotencia row = orcamentoRespostaIdempotenciaRepository.findByIdempotencyKey(key)
+                    .map(OrdemServicoService::mapearIdempotencia)
                     .orElseThrow(() -> e);
             validarMesmaOperacaoIdempotente(osId, decisao, row);
             return obterDetalhe(osId);
@@ -271,9 +298,12 @@ public class OrdemServicoService {
         for (Map.Entry<UUID, Integer> e : qtyByPeca.entrySet()) {
             UUID pecaId = e.getKey();
             int qtd = e.getValue();
-            PecaInsumo peca = pecaRepository.findByIdForUpdate(pecaId)
+            PecaInsumoEntity entity = pecaRepository.findByIdForUpdate(pecaId)
                     .orElseThrow(() -> new NotFoundException("Peca/Insumo nao encontrado"));
+            PecaInsumo peca = pecaEntityMapper.toDomain(entity);
             peca.decrementarEstoque(qtd);
+            pecaEntityMapper.aplicar(peca, entity);
+            pecaRepository.save(entity);
         }
 
         os.aprovarOrcamento();
@@ -290,8 +320,12 @@ public class OrdemServicoService {
     private OrdemServico carregarDetalheParaMutacao(UUID osId) {
         // findDetailedById usa @EntityGraph; em alguns cenários o Hibernate pode marcar o resultado como
         // somente leitura, falhando no flush (InvalidDataAccessApiUsageException). Para mutação usamos findById simples.
-        return ordemServicoPersistence.findById(osId)
+        return ordemServicoPersistence.findDetailedById(osId)
                 .orElseThrow(() -> new NotFoundException("Ordem de Servico nao encontrada"));
+    }
+
+    private static OsOrcamentoRespostaIdempotencia mapearIdempotencia(OsOrcamentoRespostaIdempotenciaEntity e) {
+        return new OsOrcamentoRespostaIdempotencia(e.getId(), e.getIdempotencyKey(), e.getOrdemServicoId(), e.getDecisao());
     }
 
     private void notificarSeguro(Consumer<NotificacaoOrdemServicoPort> acao) {

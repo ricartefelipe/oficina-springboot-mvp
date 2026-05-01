@@ -3,14 +3,6 @@ package br.com.oficina.catalogo.peca.domain;
 import br.com.oficina.shared.domain.BusinessRuleException;
 import br.com.oficina.shared.domain.Strings;
 import br.com.oficina.shared.domain.ValidationException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -18,37 +10,18 @@ import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity
-@Table(name = "pecas_insumos")
 public class PecaInsumo {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @Column(nullable = false, length = 140)
     private String nome;
-
-    @Column(length = 500)
     private String descricao;
-
-    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal preco;
-
-    @Column(nullable = false)
     private Integer estoqueAtual;
-
-    @Column(nullable = false)
     private Integer estoqueMinimo;
-
-    @CreationTimestamp
     private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
     private OffsetDateTime updatedAt;
 
-    protected PecaInsumo() {
-        // JPA
+    private PecaInsumo() {
     }
 
     private PecaInsumo(String nome, String descricao, BigDecimal preco, Integer estoqueAtual, Integer estoqueMinimo) {
@@ -76,6 +49,29 @@ public class PecaInsumo {
         }
 
         return new PecaInsumo(normalizedNome, normalizedDescricao, normalizedPreco, estoqueAtual, estoqueMinimo);
+    }
+
+    public static PecaInsumo restaurar(
+            UUID id,
+            String nome,
+            String descricao,
+            BigDecimal preco,
+            Integer estoqueAtual,
+            Integer estoqueMinimo,
+            OffsetDateTime createdAt,
+            OffsetDateTime updatedAt
+    ) {
+        Objects.requireNonNull(id, "id");
+        PecaInsumo p = new PecaInsumo();
+        p.id = id;
+        p.nome = Strings.requireNonBlank(nome, "nome");
+        p.descricao = descricao;
+        p.preco = Objects.requireNonNull(preco, "preco");
+        p.estoqueAtual = Objects.requireNonNull(estoqueAtual, "estoqueAtual");
+        p.estoqueMinimo = Objects.requireNonNull(estoqueMinimo, "estoqueMinimo");
+        p.createdAt = createdAt;
+        p.updatedAt = updatedAt;
+        return p;
     }
 
     public UUID getId() {

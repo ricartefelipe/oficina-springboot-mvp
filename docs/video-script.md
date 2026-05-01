@@ -152,6 +152,16 @@ Demonstre baixa de estoque:
 - Antes: consultar a peca via admin `GET /admin/pecas/{id}`
 - Depois da aprovacao: consultar novamente e mostrar `estoqueAtual` decrementado.
 
+### 5.5.1 Recusar orcamento (Cliente) - encerra em `CANCELADA`
+```bash
+curl -sS -X POST "http://localhost:8080/api/public/ordens-servico/${TRACKING_CODE}/recusar" \
+  -H "Content-Type: application/json" \
+  -d '{"cpfCnpj":"39053344705"}'
+```
+Mostre:
+- status agora `CANCELADA`
+- historico de transicoes refletindo a recusa
+
 ### 5.6 Finalizar execucao e registrar entrega (Admin)
 ```bash
 curl -sS -X POST "http://localhost:8080/api/admin/ordens-servico/${OS_ID}/execucao/finalizar" \

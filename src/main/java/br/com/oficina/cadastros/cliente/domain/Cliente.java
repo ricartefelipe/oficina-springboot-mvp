@@ -1,54 +1,21 @@
 package br.com.oficina.cadastros.cliente.domain;
 
 import br.com.oficina.shared.domain.Strings;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity
-@Table(
-        name = "clientes",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_clientes_cpf_cnpj", columnNames = {"cpf_cnpj"})
-        }
-)
 public class Cliente {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @Column(nullable = false, length = 120)
     private String nome;
-
-    @Embedded
     private CpfCnpj cpfCnpj;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private ClienteStatus status = ClienteStatus.ATIVO;
-
-    @CreationTimestamp
+    private ClienteStatus status;
     private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
     private OffsetDateTime updatedAt;
 
-    protected Cliente() {
-        // JPA
+    private Cliente() {
     }
 
     private Cliente(String nome, CpfCnpj cpfCnpj, ClienteStatus status) {
@@ -61,6 +28,25 @@ public class Cliente {
         String normalizedNome = Strings.requireNonBlank(nome, "nome");
         Objects.requireNonNull(cpfCnpj, "cpfCnpj nao pode ser null");
         return new Cliente(normalizedNome, cpfCnpj, ClienteStatus.ATIVO);
+    }
+
+    public static Cliente restaurar(
+            UUID id,
+            String nome,
+            CpfCnpj cpfCnpj,
+            ClienteStatus status,
+            OffsetDateTime createdAt,
+            OffsetDateTime updatedAt
+    ) {
+        Objects.requireNonNull(id, "id");
+        Cliente c = new Cliente();
+        c.id = id;
+        c.nome = Strings.requireNonBlank(nome, "nome");
+        c.cpfCnpj = Objects.requireNonNull(cpfCnpj, "cpfCnpj");
+        c.status = status != null ? status : ClienteStatus.ATIVO;
+        c.createdAt = createdAt;
+        c.updatedAt = updatedAt;
+        return c;
     }
 
     public UUID getId() {

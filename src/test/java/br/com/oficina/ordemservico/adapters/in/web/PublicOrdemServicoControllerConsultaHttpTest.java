@@ -42,7 +42,10 @@ class PublicOrdemServicoControllerConsultaHttpTest {
         private final OrdemServico ordem;
 
         ObterPorTrackingCodeStub(OrdemServico ordem) {
-            super(null, null, null, null, null, null, NotificacaoOrdemServicoPortNoop.INSTANCE, mock(OrdemServicoObservability.class));
+            super(
+                    null, null, null, null, null, null, null, null,
+                    NotificacaoOrdemServicoPortNoop.INSTANCE,
+                    mock(OrdemServicoObservability.class));
             this.ordem = ordem;
         }
 

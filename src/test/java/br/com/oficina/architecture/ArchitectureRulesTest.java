@@ -27,4 +27,16 @@ class ArchitectureRulesTest {
                             "br.com.oficina..infra.."
                     )
                     .because("domínio não deve depender de adaptadores de entrada/saída, controllers ou infraestrutura");
+
+    @ArchTest
+    static final ArchRule domain_has_no_jakarta_persistence =
+            noClasses()
+                    .that().resideInAnyPackage(
+                            "..cadastros..domain..",
+                            "..catalogo..domain..",
+                            "..ordemservico.domain..",
+                            "..shared.domain.."
+                    )
+                    .should().dependOnClassesThat().resideInAnyPackage("jakarta.persistence")
+                    .because("entidades JPA ficam em infra/adapters; o núcleo de domínio permanece sem anotações de persistência");
 }
