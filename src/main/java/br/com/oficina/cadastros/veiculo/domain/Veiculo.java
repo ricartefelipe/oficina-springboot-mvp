@@ -3,62 +3,24 @@ package br.com.oficina.cadastros.veiculo.domain;
 import br.com.oficina.cadastros.cliente.domain.Cliente;
 import br.com.oficina.shared.domain.Strings;
 import br.com.oficina.shared.domain.ValidationException;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 import java.time.Year;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity
-@Table(
-        name = "veiculos",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uq_veiculos_placa", columnNames = {"placa"})
-        }
-)
 public class Veiculo {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @Embedded
     private Placa placa;
-
-    @Column(nullable = false, length = 80)
     private String marca;
-
-    @Column(nullable = false, length = 120)
     private String modelo;
-
-    @Column(nullable = false)
     private Integer ano;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
-
-    @CreationTimestamp
     private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
     private OffsetDateTime updatedAt;
 
-    protected Veiculo() {
-        // JPA
+    private Veiculo() {
     }
 
     private Veiculo(Placa placa, String marca, String modelo, Integer ano, Cliente cliente) {
@@ -85,6 +47,29 @@ public class Veiculo {
         }
 
         return new Veiculo(placa, normalizedMarca, normalizedModelo, ano, cliente);
+    }
+
+    public static Veiculo restaurar(
+            UUID id,
+            Placa placa,
+            String marca,
+            String modelo,
+            Integer ano,
+            Cliente cliente,
+            OffsetDateTime createdAt,
+            OffsetDateTime updatedAt
+    ) {
+        Objects.requireNonNull(id, "id");
+        Veiculo v = new Veiculo();
+        v.id = id;
+        v.placa = Objects.requireNonNull(placa, "placa");
+        v.marca = Strings.requireNonBlank(marca, "marca");
+        v.modelo = Strings.requireNonBlank(modelo, "modelo");
+        v.ano = Objects.requireNonNull(ano, "ano");
+        v.cliente = Objects.requireNonNull(cliente, "cliente");
+        v.createdAt = createdAt;
+        v.updatedAt = updatedAt;
+        return v;
     }
 
     public UUID getId() {

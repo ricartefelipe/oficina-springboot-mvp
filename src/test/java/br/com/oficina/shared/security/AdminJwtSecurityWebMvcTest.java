@@ -66,7 +66,7 @@ class AdminJwtSecurityWebMvcTest {
         @Bean
         @Primary
         ClienteService clienteServiceStub() {
-            return new ClienteService(null) {
+            return new ClienteService(null, null) {
                 @Override
                 public List<Cliente> listar() {
                     return List.of();

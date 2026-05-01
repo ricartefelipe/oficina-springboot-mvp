@@ -2,55 +2,25 @@ package br.com.oficina.ordemservico.domain;
 
 import br.com.oficina.catalogo.servico.domain.ServicoCatalogo;
 import br.com.oficina.shared.domain.ValidationException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity
-@Table(name = "os_itens_servico")
 public class OrdemServicoItemServico {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ordem_servico_id", nullable = false)
-    private OrdemServico ordemServico;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "servico_id", nullable = false)
     private ServicoCatalogo servico;
-
-    @Column(nullable = false)
     private Integer quantidade;
-
-    @Column(name = "preco_unitario", nullable = false, precision = 12, scale = 2)
     private BigDecimal precoUnitario;
-
-    @Column(name = "tempo_estimado_min", nullable = false)
     private Integer tempoEstimadoMin;
-
-    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal;
 
-    protected OrdemServicoItemServico() {
-        // JPA
+    private OrdemServicoItemServico() {
     }
 
-    private OrdemServicoItemServico(OrdemServico ordemServico, ServicoCatalogo servico, Integer quantidade, BigDecimal precoUnitario, Integer tempoEstimadoMin) {
-        this.ordemServico = ordemServico;
+    private OrdemServicoItemServico(ServicoCatalogo servico, Integer quantidade, BigDecimal precoUnitario, Integer tempoEstimadoMin) {
         this.servico = servico;
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;
@@ -72,7 +42,30 @@ public class OrdemServicoItemServico {
         if (tempoEstimadoMin == null || tempoEstimadoMin <= 0) {
             throw new ValidationException("Servico sem tempo estimado valido");
         }
-        return new OrdemServicoItemServico(ordemServico, servico, quantidade, precoUnitario, tempoEstimadoMin);
+        return new OrdemServicoItemServico(servico, quantidade, precoUnitario, tempoEstimadoMin);
+    }
+
+    public static OrdemServicoItemServico restaurar(
+            UUID id,
+            ServicoCatalogo servico,
+            Integer quantidade,
+            BigDecimal precoUnitario,
+            Integer tempoEstimadoMin,
+            BigDecimal subtotal
+    ) {
+        Objects.requireNonNull(id, "id");
+        OrdemServicoItemServico i = new OrdemServicoItemServico();
+        i.id = id;
+        i.servico = Objects.requireNonNull(servico, "servico");
+        i.quantidade = quantidade;
+        i.precoUnitario = precoUnitario;
+        i.tempoEstimadoMin = tempoEstimadoMin;
+        i.subtotal = subtotal;
+        return i;
+    }
+
+    void definirId(UUID id) {
+        this.id = id;
     }
 
     public UUID getId() {
