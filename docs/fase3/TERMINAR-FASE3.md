@@ -26,7 +26,7 @@ A **Fase 3** pede **mais quatro coisas** em cima disso: **4 repositórios**, **c
 4. **App no K8s**: imagem no GHCR + manifestos `k8s/` + cluster (Kind local ou EKS na AWS).  
 5. **Observabilidade**: métricas/logs documentados; opcional **capturas** para o PDF (ver `entrega-portal-fase3.md`).  
 6. **PDF único** (sem vídeo, se preferir): preencha **[`entrega-portal-fase3.md`](entrega-portal-fase3.md)** — links dos 4 repos, runs do Actions, `soat-architecture`, evidências da seção 6.  
-7. **Vídeo** (opcional): só se o professor exigir; caso contrário, as evidências na seção 6 substituem a demonstração gravada.
+7. **Vídeo** (opcional): só se o enunciário da Fase 3 exigir; caso contrário, as evidências na seção 6 substituem a demonstração gravada.
 
 ---
 

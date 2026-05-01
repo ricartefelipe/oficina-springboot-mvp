@@ -33,7 +33,7 @@ https://github.com/ricartefelipe/oficina-springboot-mvp — branches **`main`** 
 
 ## 3. Confirmação — usuário `soat-architecture`
 
-- O usuário **`soat-architecture`** foi convidado (ou equipe equivalente) em **todos** os repositórios listados na tabela acima, com permissão de **leitura** (ou conforme instrução do professor).
+- O usuário **`soat-architecture`** foi convidado (ou equipe equivalente) em **todos** os repositórios listados na tabela acima, com permissão de **leitura** (ou conforme o enunciário da Fase 3).
 - **Como verificar:** em cada repositório → **Settings** → **Collaborators** / **Manage access** → confirmar presença de `soat-architecture`.
 
 ---
@@ -43,7 +43,7 @@ https://github.com/ricartefelipe/oficina-springboot-mvp — branches **`main`** 
 O enunciado da Fase 3 prevê vídeo de **até 15 minutos**. **Nesta entrega opta-se por não incluir vídeo**, conforme orientação do aluno.  
 **Evidências substitutas** para demonstração de funcionamento e infraestrutura estão na **seção 6** (links de CI, Terraform e observabilidade).
 
-*(Se o professor exigir vídeo obrigatório, grave um único arquivo e cole o link aqui.)*
+*(Se o enunciário exigir vídeo obrigatório, grave um único arquivo e cole o link aqui.)*
 
 ---
 

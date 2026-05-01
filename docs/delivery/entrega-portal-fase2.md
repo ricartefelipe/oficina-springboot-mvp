@@ -15,7 +15,7 @@ Documento para **entrega no portal** (PDF): repositório, `soat-architecture`, a
 
 **Acesso ao avaliador SOAT:** o repositório deve estar compartilhado com o usuário **`soat-architecture`** (convite em *Settings → Collaborators*).  
 
-**Documentação principal:** [`README.md`](../../README.md) (objetivos Fase 2, arquitetura, fluxo de deploy, execução local, Kubernetes, Terraform, links Swagger/OpenAPI e vídeo). **Critérios vs. enunciado:** [`fase2-concluida.md`](fase2-concluida.md). **Matriz de evidências (crítica do professor):** secção *Atendimento à crítica do professor* no [`README.md`](../../README.md).
+**Documentação principal:** [`README.md`](../../README.md) (objetivos Fase 2, arquitetura, fluxo de deploy, execução local, Kubernetes, Terraform, links Swagger/OpenAPI e vídeo). **Critérios vs. enunciado:** [`fase2-concluida.md`](fase2-concluida.md).
 
 **Portal vs. repositório:** o PDF submetido no portal resume objetivos, link do GitHub e figuras; o código, `/k8s`, `/infra` e pipelines existem no **clone do repositório** (fonte técnica), conforme tabela no [`README.md`](../../README.md) *Entrega oficial*.
 
@@ -97,8 +97,6 @@ Com a app em `http://localhost:8080`:
 - [ ] [`README.md`](../../README.md) no GitHub com o link do vídeo na tabela **Links rápidos**  
 
 Documento complementar: [`submission.md`](submission.md) (e [`submission.pdf`](submission.pdf)).
-
-Para a matriz de evidências (Fase 1 e 2) em relação ao feedback do professor, ver o [`README.md`](../../README.md) (*Atendimento à crítica do professor*).
 
 ---
 

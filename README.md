@@ -33,45 +33,6 @@ Para **voltar a gerar** os PDFs após editar o Markdown: no Windows, `.\scripts\
 
 ---
 
-## Atendimento à crítica do professor
-
-Pontos reforçados na avaliação e onde estão evidenciados no repositório.
-
-### Fase 1 — síntese
-
-- **DDD visual e rastreável:** Event Storming com comandos, agregados, eventos, políticas, read models e fluxos alternativos em `docs/ddd/event-storming.md`, com SVGs em `docs/ddd/diagrams/`.
-- **Clareza de artefatos:** índice único em `docs/ddd/README.md` (Domain Storytelling, dicionário, Event Storming, diagramas).
-- **Evidência de entrega acadêmica:** `docs/delivery/submission.md` e documento de entrega do portal (esta secção e tabelas abaixo).
-- **Qualidade técnica:** `mvn -B -Pci verify` em `.github/workflows/ci.yml` e JaCoCo.
-
-#### Matriz Fase 1 (crítica → evidência)
-
-| Crítica / expectativa | Evidência | Status |
-|------------------------|-----------|--------|
-| Diagramas visuais DDD | `docs/ddd/diagrams/event-storming-contextos.svg`, `event-storming-lousa-elementos.svg`, `ordem-servico-agregado.svg` | Atendido |
-| Event Storming C/A/E/P/R + fluxos alternativos | `docs/ddd/event-storming.md` | Atendido |
-| Domain Storytelling | `docs/ddd/domain-storytelling.md` | Atendido |
-| Dicionário de linguagem ubíqua | `docs/ddd/dicionario-linguagem-ubiqua.md` | Atendido |
-| Índice de artefatos DDD | `docs/ddd/README.md` | Atendido |
-| Testes e cobertura | `.github/workflows/ci.yml`, JaCoCo | Atendido |
-| Submissão no portal | `docs/delivery/entrega-portal-fase2.md` (gera o PDF) | Parcial (vídeo / upload) |
-
-#### Matriz Fase 2 (pontos técnicos do feedback)
-
-| Crítica / expectativa | Evidência | Status |
-|------------------------|-----------|--------|
-| Domínio sem JPA no núcleo | POJOs em `*.domain`; entidades em `*.infra.persistence.entity` / `adapters.out.persistence.entity`; mappers; `ArchitectureRulesTest` sem `jakarta.persistence` em `..domain..` | Atendido |
-| Clareza entrega (PDF vs repositório) | Tabela *Entrega oficial* (acima) e `docs/delivery/entrega-portal-fase2.md` | Atendido |
-| Kubernetes Secret | `k8s/secret.example.yaml`, `k8s/secret.placeholder.yaml`, `k8s/secret.yaml` ignorado no Git, `k8s/README.md` | Atendido |
-
-#### Pendências manuais
-
-- Publicar o **vídeo (≤ 15 min)** e alinhar o URL no `README` e em `docs/delivery/entrega-portal-fase2.md`.
-- Convite ao avaliador **`soat-architecture`** no repositório.
-- Atualizar o **PDF** no portal após alterações ao Markdown.
-
----
-
 ## Sumário
 
 - [Fase 3 - documentação de arquitetura (transição)](#fase-3---documentação-de-arquitetura-transição)
