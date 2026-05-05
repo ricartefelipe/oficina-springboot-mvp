@@ -1,4 +1,4 @@
-# Tech Challenge - Fases 1 e 2 - Documento de entrega (back-end Oficina)
+# Tech Challenge - Fases 1, 2 e 3 - Documento de entrega (back-end Oficina)
 
 ## Identificação do grupo
 
@@ -15,6 +15,7 @@
   - **Branches (nomes no Git):** `main` (estável), `develop` (integração).
   - **Acesso ao avaliador SOAT:** usuário ou equipe **`soat-architecture`** com permissão de leitura (ou conforme o enunciado). Passos: [Convidar o `soat-architecture` no GitHub](#1-convidar-soat-architecture-no-repositório).
 - **Documento para o PDF do portal (Fase 2):** [`entrega-portal-fase2.md`](entrega-portal-fase2.md) - *estrutura alinhada ao enunciário (repo, arquitetura, vídeo, Swagger).*
+- **Documento para o PDF do portal (Fase 3):** [`entrega-portal-fase3.md`](entrega-portal-fase3.md) - *links dos 4 repositórios, CI/CD, documentação e confirmação de acesso.*
 - **Swagger (local):** http://localhost:8080/api/swagger-ui/index.html
 - **Vídeo demonstrativo (≤ 15 min):** o URL público (YouTube ou Vimeo) será o mesmo indicado na tabela **Links rápidos (APIs e vídeo)** do [README](../../README.md) quando estiver publicado.
 - **PDF deste documento (gerado):** `submission.pdf` (na mesma pasta; ver [Conversão para PDF](#conversão-para-pdf-offline)).
@@ -55,6 +56,20 @@ Roteiro e tópicos obrigatórios: [`docs/video-script.md`](../video-script.md). 
 
 ---
 
+## Checklist entrega Fase 3
+
+1. Confirmar os quatro repositórios separados:
+   - `oficina-auth-lambda`
+   - `oficina-infra-kubernetes-`
+   - `oficina-infra-database`
+   - `oficina-app`
+2. Confirmar `main` protegida e merge por PR em todos os repositórios.
+3. Confirmar usuário `soat-architecture` com acesso de leitura em todos.
+4. Atualizar e gerar PDF de [`entrega-portal-fase3.md`](entrega-portal-fase3.md).
+5. Preencher/atualizar link do vídeo (quando disponível) antes do envio no portal.
+
+---
+
 ## Resumo do entregável
 
 ### Fase 1 (MVP)
@@ -77,6 +92,15 @@ Roteiro e tópicos obrigatórios: [`docs/video-script.md`](../video-script.md). 
 - **IaC:** Terraform em `/infra` (rede AWS; **RDS PostgreSQL opcional** via `enable_rds`)
 - **CI/CD:** GitHub Actions (Maven, Terraform validate, imagem **GHCR**; workflows manuais para deploy em cluster e Terraform na AWS)
 - Diagramas DDD versionados (SVG em `docs/ddd/diagrams/`)
+
+### Fase 3 (operação corporativa)
+
+- **4 repositórios** com CI/CD separados (Lambda, infra K8s, infra BD, app).
+- **API Gateway + Serverless** para autenticação CPF/JWT (repo `oficina-auth-lambda`).
+- **Banco gerenciado e Terraform** (repo `oficina-infra-database`).
+- **Cluster Kubernetes + Terraform** (repo `oficina-infra-kubernetes-`).
+- **Aplicação principal em Kubernetes** com pipelines de CI e deploy por branch (`develop`/`main`) no repo `oficina-app`.
+- **Arquitetura e documentação**: ADRs, RFC, diagramas, guia Fase 3 em `docs/fase3/`.
 
 ## Relatório de vulnerabilidades (scan)
 
