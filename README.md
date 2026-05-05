@@ -1,4 +1,4 @@
-# Oficina Service - Tech Challenge (Fases 1 e 2) - Back-end Spring Boot
+# Oficina Service - Tech Challenge (Fases 1, 2 e 3) - Back-end Spring Boot
 
 Monólito do **Sistema Integrado de Atendimento e Execução de Serviços** para oficina mecânica: gestão de clientes, veículos, catálogo, peças/estoque e **ordens de serviço (OS)** com fluxo completo, consulta pública por `trackingCode`, JWT (Keycloak) e notificações por e-mail.
 
@@ -26,6 +26,7 @@ Conforme o enunciado: **repositório** atualizado (código, `/k8s`, `/infra`, CI
 | Documento | Uso |
 |-----------|-----|
 | [**Entrega PDF - portal (Fase 2)**](docs/delivery/entrega-portal-fase2.md) | Conteúdo Markdown; **PDF pronto:** [`docs/delivery/entrega-portal-fase2.pdf`](docs/delivery/entrega-portal-fase2.pdf) (submeter no portal). |
+| [**Entrega PDF - portal (Fase 3)**](docs/delivery/entrega-portal-fase3.md) | Conteúdo Markdown da Fase 3; **PDF pronto:** [`docs/delivery/entrega-portal-fase3.pdf`](docs/delivery/entrega-portal-fase3.pdf). |
 | [Submissão / checklist](docs/delivery/submission.md) | Documento longo; **PDF pronto:** [`docs/delivery/submission.pdf`](docs/delivery/submission.pdf). |
 | [Roteiro do vídeo](docs/video-script.md) | Inclui blocos **Fase 2** obrigatórios no início do ficheiro. |
 
