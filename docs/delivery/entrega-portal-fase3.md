@@ -27,6 +27,17 @@ Documento de entrega da Fase 3 com links para os quatro repositórios, confirma�
 - Branch `main` protegida e merge via Pull Request nos quatro repositórios.
 - Deploy automatizado por branch (`develop` homologação, `main` produção) no repositório `oficina-app`.
 
+### Links de execução (runs verdes)
+
+| Repositório | Workflow | Run (success) |
+|---|---|---|
+| `oficina-auth-lambda` | CI (Python) | https://github.com/ricartefelipe/oficina-auth-lambda/actions/runs/25292726441 |
+| `oficina-infra-database` | Terraform validate | https://github.com/ricartefelipe/oficina-infra-database/actions/runs/25292729152 |
+| `oficina-infra-database` | Terraform AWS | https://github.com/ricartefelipe/oficina-infra-database/actions/runs/23729350036 |
+| `oficina-infra-kubernetes-` | Terraform (Kind) | https://github.com/ricartefelipe/oficina-infra-kubernetes-/actions/runs/25292731602 |
+| `oficina-app` | CI | https://github.com/ricartefelipe/oficina-app/actions/runs/25375581044 |
+| `oficina-app` | Deploy Kubernetes (develop / main) | https://github.com/ricartefelipe/oficina-app/actions/runs/25375670115 |
+
 ## Vídeo
 
 - Link do vídeo (YouTube/Vimeo, até 15 minutos): **preencher antes do envio no portal**.
