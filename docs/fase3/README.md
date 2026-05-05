@@ -20,6 +20,7 @@ Requisitos oficiais: documento **Tech Challenge - Fase 3** (disciplina SOAT).
 | [entrega-portal-fase3.docx](entrega-portal-fase3.docx) | **Versão Word** (opcional) |
 | [terraform-snippet-api-gateway.tf](terraform-snippet-api-gateway.tf) | Snippet Terraform: API Gateway HTTP + Lambda (apos deploy da funcao) |
 | [executar-fase3.md](executar-fase3.md) | Script local para quatro pastas-gêmeas, checklist GitHub/AWS e entrega |
+| [checklist-secrets-fase3.md](checklist-secrets-fase3.md) | Secrets minimos por repo e ordem de pre-deploy |
 | [readmes-primeiro-commit/](readmes-primeiro-commit/) | README.md prontos para copiar para cada um dos 4 repositórios |
 | [guia-enunciado-fase3.md](guia-enunciado-fase3.md) | Guia do enunciário Fase 3 (requisitos e implementação) |
 | [aws-oidc-github.md](aws-oidc-github.md) | OIDC: secret `AWS_ROLE_ARN` e workflow Terraform |
