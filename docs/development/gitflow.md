@@ -26,6 +26,6 @@ Fluxo típico de entrega:
 - Após merge bem-sucedido, **eliminar** o ramo remoto da feature ou release (GitHub: botão na própria página do PR ou `git push origin --delete nome`).
 - Manter apenas **`main`** e **`develop`** como ramos de longa duração.
 
-## Dependabot / atualizações de dependências
+## Atualização de dependências
 
-Os PRs automáticos devem incidir em **`develop`**. Atualizações **major** (ex.: Spring Boot 4) exigem ramo dedicado e validação com `mvn -Pci verify` antes de integrar.
+As alterações versionadas fazem parte de PRs criados pela equipa (por exemplo contra `develop` ou contra o ramo de integração atual). Actualizações **major** (ex.: Spring Boot 4) exigem ramo dedicado e validação com `mvn -Pci verify` antes de integrar.
